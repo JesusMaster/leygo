@@ -1,0 +1,25 @@
+mcp_servers:
+  - name: "github"
+    command: "npx"
+    transport: "stdio"
+    args: [
+      "-y",
+      "mcp-remote@latest",
+      "https://mcp-github-323381129796.us-central1.run.app/sse",
+      "--header",
+      "GITHUB_TOKEN:${GITHUB_TOKEN}"
+    ]
+    env:
+      GITHUB_TOKEN: "aca token"
+  - name: "faqs"
+    command: "npx"
+    transport: "stdio"
+    args: [
+      "-y",
+      "mcp-remote@latest",
+      "https://faqs.apprecio.ai/sse",
+      "--header",
+      "Authorization: Bearer ${BEARER_TOKEN}"
+    ]
+    env:
+      BEARER_TOKEN: "aca token"
