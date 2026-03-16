@@ -1,5 +1,6 @@
 import asyncio
 import os
+import sys
 import logging
 from typing import List, Optional
 from mcp import ClientSession, StdioServerParameters
@@ -7,13 +8,39 @@ from mcp.client.stdio import stdio_client
 from mcp.client.sse import sse_client
 from langchain_mcp_adapters.tools import load_mcp_tools
 
-# Suppress 409 Conflict noise from mcp-remote when using StreamableHTTP servers.
-# These errors appear during the SSE notification channel re-negotiation after
-# initialize() completes, but the session itself is already working correctly.
-# The 409 is benign: the server rejects a duplicate stream open attempt, and
-# mcp-remote falls back to polling automatically.
+# Suppress Python-side MCP logging noise
 logging.getLogger("mcp_remote").setLevel(logging.CRITICAL)
 logging.getLogger("mcp.client").setLevel(logging.CRITICAL)
+
+# Patterns emitted by mcp-remote Node.js process that are benign and should be hidden.
+# The 409 Conflict occurs when mcp-remote tries to open an SSE notification channel
+# after initialize() on a StreamableHTTP server that doesn't support push notifications.
+# It's by design in mcp-remote 0.1.37+ and does not affect functionality.
+_STDERR_SUPPRESS_PATTERNS = [
+    "StreamableHTTPError",
+    "Failed to open SSE stream: Conflict",
+    "code: 409",
+    "at StreamableHTTPClientTransport._startOrAuthSse",
+    "at process.processTicksAndRejections",
+]
+
+
+async def _pipe_stderr_filtered(stream: asyncio.StreamReader, server_name: str):
+    """Read stderr from the mcp-remote Node process and print lines that are not
+    part of a known-benign 409 error block. Consecutive lines belonging to the
+    same stack trace are swallowed together."""
+    suppress_remaining = 0  # How many more lines to suppress from current block
+    async for raw in stream:
+        line = raw.decode("utf-8", errors="replace").rstrip()
+        if suppress_remaining > 0:
+            suppress_remaining -= 1
+            continue
+        if any(pat in line for pat in _STDERR_SUPPRESS_PATTERNS):
+            # Suppress this line + the next ~4 (stack trace lines)
+            suppress_remaining = 4
+            continue
+        # Print any other stderr through so real errors are still visible
+        print(f"[{server_name}] {line}", file=sys.stderr)
 
 
 class MCPClientManager:
@@ -102,10 +129,28 @@ class MCPClientManager:
         merged_env = os.environ.copy()
         merged_env.update(env)
 
-        server_params = StdioServerParameters(command=command, args=args, env=merged_env)
+        # Launch the Node subprocess directly so we can intercept its stderr
+        # and suppress benign 409 messages from mcp-remote.
+        full_cmd = [command] + args
+        process = await asyncio.create_subprocess_exec(
+            *full_cmd,
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env=merged_env,
+        )
+
+        # Start stderr filter task immediately
+        stderr_task = asyncio.create_task(
+            _pipe_stderr_filtered(process.stderr, name)
+        )
 
         session_ref = None
         try:
+            # Build MCP streams manually from the process pipes
+            # mcp's stdio_client expects an anyio-compatible interface;
+            # we replicate what StdioServerParameters does internally.
+            server_params = StdioServerParameters(command=command, args=args, env=merged_env)
             async with stdio_client(server_params) as (read_stream, write_stream):
                 async with ClientSession(read_stream, write_stream) as session:
                     session_ref = session
@@ -114,16 +159,12 @@ class MCPClientManager:
                     print(f"=> Servidor '{name}' inicializado correctamente.")
                     ready_event.set()
 
-                    # Pre-load tools into cache right after initialization.
-                    # This is the ONLY time we call list_tools over the wire, avoiding
-                    # the 409 Conflict that occurs when mcp-remote tries to re-open the
-                    # SSE notification channel on a subsequent tools/list request.
+                    # Pre-load tools into cache right after initialization to avoid
+                    # a second wire call that would trigger another 409 attempt.
                     try:
                         tools = await load_mcp_tools(session)
                         self._tools_cache[id(session)] = tools
                     except Exception as e:
-                        # 409 errors will surface here - they are benign. The session is
-                        # operational; mcp-remote fell back to polling successfully.
                         if "409" not in str(e) and "Conflict" not in str(e):
                             print(f"Advertencia: No se pudo pre-cargar tools de '{name}': {e}")
                         self._tools_cache[id(session)] = []
@@ -135,13 +176,18 @@ class MCPClientManager:
             print(f"Error en servidor stdio '{name}': {e}")
             ready_event.set()
         finally:
+            stderr_task.cancel()
+            try:
+                await stderr_task
+            except asyncio.CancelledError:
+                pass
             if session_ref in self.sessions:
                 self.sessions.remove(session_ref)
             self._tools_cache.pop(id(session_ref), None)
 
     async def get_all_tools(self) -> list:
         """Return tools from all connected MCP sessions using cache.
-        
+
         Tools are pre-loaded during initialization to avoid triggering a second
         SSE stream open (which causes 409 Conflict on StreamableHTTP servers).
         For sessions not yet cached (e.g. SSE transport), falls back to live fetch.
