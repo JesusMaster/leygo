@@ -4,7 +4,7 @@ mcp_servers:
     transport: "stdio"
     args: [
       "-y",
-      "mcp-remote@latest",
+      "mcp-remote@0.1.14",
       "https://mcp-github-323381129796.us-central1.run.app/sse",
       "--header",
       "GITHUB_TOKEN:${GITHUB_TOKEN}"
@@ -16,7 +16,7 @@ mcp_servers:
     transport: "stdio"
     args: [
       "-y",
-      "mcp-remote@latest",
+      "mcp-remote@0.1.14",
       "https://faqs.apprecio.ai/sse",
       "--header",
       "Authorization: Bearer ${BEARER_TOKEN}"
