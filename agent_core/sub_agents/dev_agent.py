@@ -48,6 +48,8 @@ def registrar_comida(fecha: str, comida: str, calorias: int) -> str:
 
 class FitnessAgent(BaseSubAgent):
     @property
+    def model(self): return "gemini-3.1-flash-lite-preview"
+    @property
     def name(self): return "fitness"
     @property
     def description(self): return "Para registrar comidas y calorias."
@@ -63,10 +65,12 @@ REGLAS para crear un sub-agente:
 4. El agente tiene memorias en carpetas `episodica/` y `procedimental/` dentro de su directorio.
 5. La clase debe heredar de BaseSubAgent (importado de ..base).
 6. El name debe ser minusculas, sin espacios y solo letras a-z (ASCII).
-7. PRIORIDAD DE MEMORIA: Si el usuario te pide que un agente "recuerde" algo, cambie su "personalidad", o siga una "regla de negocio" (ej. "todo en pesos chilenos"), NO modifiques el archivo .py del agente. Usa `administrar_memoria_episodica` (para identidad/rol) o `administrar_memoria_procedimental` (para reglas tecnicas) apuntando a la carpeta del agente. El codigo (.py) solo se toca para cambios de estructura o herramientas.
-8. SEGURIDAD DE CARACTERES: Evita usar acentos (á, é, í, ó, ú, ñ) en el codigo Python generado.
-9. ACCESO A HERRAMIENTAS: Si el agente necesita filtrar una herramienta global de `all_available_tools` (ej. "web_search"), NUNCA uses `t.__name__`. Usa siempre `getattr(t, "name", None)`.
-10. Finalmente, avisa al usuario que el agente ya esta disponible gracias al hot-reload.
+7. MODELO POR DEFECTO: Todo nuevo agente DEBE incluir la propiedad `@property def model(self): return "gemini-3.1-flash-lite-preview"`.
+8. PRIORIDAD DE MEMORIA: Si el usuario te pide que un agente "recuerde" algo, cambie su "personalidad", o siga una "regla de negocio" (ej. "todo en pesos chilenos"), NO modifiques el archivo .py del agente. Usa `administrar_memoria_episodica` (para identidad/rol) o `administrar_memoria_procedimental` (para reglas tecnicas) apuntando a la carpeta del agente. El codigo (.py) solo se toca para cambios de estructura o herramientas.
+9. SEGURIDAD DE CARACTERES: Evita usar acentos (á, é, í, ó, ú, ñ) en el codigo Python generado.
+9. CERO ESCAPES (CRITICO): Al usar `escribir_archivo_en_proyecto` o `replace_file_content`, NUNCA uses la barra invertida para escapar comillas (ej. NO uses \" ni \'). Escribe el codigo en su formato final limpio. Si necesitas usar triples comillas, escribelas tal cual: """. El sistema de herramientas procesa el texto correctamente sin necesidad de escapes manuales que ensucian el codigo.
+10. ACCESO A HERRAMIENTAS: Si el agente necesita filtrar una herramienta global de `all_available_tools` (ej. "web_search"), NUNCA uses `t.__name__`. Usa siempre `getattr(t, "name", None)`.
+11. Finalmente, avisa al usuario que el agente ya esta disponible gracias al hot-reload.
 
 **¿COMO ELIMINAR SUB-AGENTES?**
 Si el usuario te pide eliminar uno:

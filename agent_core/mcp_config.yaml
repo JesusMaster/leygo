@@ -1,25 +1,13 @@
 mcp_servers:
-  - name: "github"
-    command: "npx"
-    transport: "stdio"
-    args: [
-      "-y",
-      "mcp-remote@0.1.14",
-      "https://mcp-github-323381129796.us-central1.run.app/sse",
-      "--header",
-      "GITHUB_TOKEN:${GITHUB_TOKEN}"
-    ]
-    env:
-      GITHUB_TOKEN: "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"
-  - name: "faqs"
-    command: "npx"
-    transport: "stdio"
-    args: [
-      "-y",
-      "mcp-remote@0.1.14",
-      "https://faqs.apprecio.ai/sse",
-      "--header",
-      "Authorization: Bearer ${BEARER_TOKEN}"
-    ]
-    env:
-      BEARER_TOKEN: "44ebfbec-913f-4515-9122-b0ec9db34fd6"
+  # - name: "github"
+  #   command: "npx"
+  #   transport: "stdio"
+  #   args: [
+  #     "-y",
+  #     "mcp-remote@latest",
+  #     "https://api.github.com/sse",
+  #     "--header",
+  #     "GITHUB_TOKEN:${GITHUB_TOKEN}"
+  #   ]
+  #   env:
+  #     GITHUB_TOKEN: "ghp_nlM8GbrBY7aero1YF3TifEoLY4ERlCLPeWT6tgn"
