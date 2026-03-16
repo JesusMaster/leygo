@@ -6,6 +6,8 @@ mcp_servers:
       "-y",
       "mcp-remote@latest",
       "https://mcp-github-323381129796.us-central1.run.app/sse",
+      "--transport",
+      "sse",
       "--header",
       "GITHUB_TOKEN:${GITHUB_TOKEN}"
     ]
@@ -18,6 +20,8 @@ mcp_servers:
       "-y",
       "mcp-remote@latest",
       "https://faqs.apprecio.ai/sse",
+      "--transport",
+      "sse",
       "--header",
       "Authorization: Bearer ${BEARER_TOKEN}"
     ]
