@@ -14,8 +14,9 @@ logging.getLogger("mcp.client").setLevel(logging.CRITICAL)
 
 # Lines emitted by mcp-remote (Node.js) that belong to the benign 409 Conflict block.
 # This happens when mcp-remote tries to open an SSE notification push channel after
-# initialize() on a StreamableHTTP server that doesn't support it. The session works
-# correctly regardless — mcp-remote falls back to polling automatically.
+# initialize() on a StreamableHTTP server. The server rejects it with 409 because the
+# session already has an active connection. This is by design in mcp-remote and the
+# session works correctly — mcp-remote falls back to polling automatically.
 _STDERR_SUPPRESS_PATTERNS = [
     "StreamableHTTPError",
     "Failed to open SSE stream: Conflict",
@@ -23,19 +24,39 @@ _STDERR_SUPPRESS_PATTERNS = [
     "at StreamableHTTPClientTransport._startOrAuthSse",
     "at process.processTicksAndRejections",
     "chunk-65X3S4HB",
+    "chunk-FBGYN3F2",
 ]
 
 
 class _FilteredStderrWriter:
-    """File-like wrapper that swallows lines matching suppress patterns.
-    Used to monkey-patch sys.stderr temporarily so that Node.js output
-    forwarded by anyio through the stdio_client doesn't reach the terminal."""
+    """File-like writer passed as errlog= to stdio_client so we can intercept
+    the Node.js process stderr before it reaches the terminal.
+
+    stdio_client accepts an `errlog` parameter and uses it to forward the child
+    process stderr. By passing this filtered writer we suppress the benign 409
+    blocks while letting real errors through.
+    """
 
     def __init__(self, original):
         self._original = original
         self._suppress_remaining = 0
+        self._pending = ""  # buffer for partial writes
 
     def write(self, text: str):
+        # Buffer incomplete lines across write() calls (anyio may split on chunks)
+        text = self._pending + text
+        self._pending = ""
+
+        # If text doesn't end with newline, hold the last partial line
+        if not text.endswith("\n"):
+            idx = text.rfind("\n")
+            if idx >= 0:
+                self._pending = text[idx + 1:]
+                text = text[:idx + 1]
+            else:
+                self._pending = text
+                return
+
         lines = text.split("\n")
         out_lines = []
         for line in lines:
@@ -43,14 +64,21 @@ class _FilteredStderrWriter:
                 self._suppress_remaining -= 1
                 continue
             if any(pat in line for pat in _STDERR_SUPPRESS_PATTERNS):
-                self._suppress_remaining = 4  # swallow the following stack trace lines
+                # Suppress this trigger line + the next N lines (stack trace)
+                self._suppress_remaining = 5
                 continue
             out_lines.append(line)
+
         filtered = "\n".join(out_lines)
         if filtered.strip():
-            self._original.write(filtered)
+            self._original.write(filtered + "\n")
 
     def flush(self):
+        # Flush any remaining buffered content
+        if self._pending.strip():
+            if not any(pat in self._pending for pat in _STDERR_SUPPRESS_PATTERNS):
+                self._original.write(self._pending + "\n")
+            self._pending = ""
         self._original.flush()
 
     def __getattr__(self, name):
@@ -145,14 +173,15 @@ class MCPClientManager:
 
         server_params = StdioServerParameters(command=command, args=args, env=merged_env)
 
-        # Temporarily wrap stderr to filter out benign 409 messages from mcp-remote.
-        # stdio_client forwards the child process stderr through Python's sys.stderr.
-        original_stderr = sys.stderr
-        sys.stderr = _FilteredStderrWriter(original_stderr)
+        # Pass a filtered writer as errlog= so stdio_client routes the child process
+        # stderr through our filter instead of directly to the terminal.
+        # This suppresses the benign 409 Conflict noise from mcp-remote while
+        # preserving any real errors.
+        filtered_stderr = _FilteredStderrWriter(sys.stderr)
 
         session_ref = None
         try:
-            async with stdio_client(server_params) as (read_stream, write_stream):
+            async with stdio_client(server_params, errlog=filtered_stderr) as (read_stream, write_stream):
                 async with ClientSession(read_stream, write_stream) as session:
                     session_ref = session
                     await session.initialize()
@@ -177,8 +206,7 @@ class MCPClientManager:
             print(f"Error en servidor stdio '{name}': {e}")
             ready_event.set()
         finally:
-            # Restore stderr regardless of what happened
-            sys.stderr = original_stderr
+            filtered_stderr.flush()
             if session_ref in self.sessions:
                 self.sessions.remove(session_ref)
             self._tools_cache.pop(id(session_ref), None)
