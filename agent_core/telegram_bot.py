@@ -13,6 +13,7 @@ load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from main import SelfExtendingAgent
 from scheduler_manager import start_scheduler, stop_scheduler
+from utils.audio_utils import transcribir_audio
 
 agent = SelfExtendingAgent()
 
@@ -120,17 +121,65 @@ async def process_update(request: Request):
         data = await request.json()
         update = Update.de_json(data, bot)
         
-        # Solo reaccionar a mensajes de texto convencionales
-        if update.message and update.message.text:
+        chat_id = None
+        text_to_process = None
+        
+        if update.message:
             chat_id = update.message.chat_id
-            text = update.message.text
-            print(f"\\n[Telegram] {update.message.from_user.first_name} (ID: {chat_id}): {text}")
             
-            # Lanzar tarea concurrente para responder antes de los 10 segundos de Timeout de Telegram
-            asyncio.create_task(handle_message_background(chat_id, text))
+            # 1. Manejar mensajes de texto
+            if update.message.text:
+                text_to_process = update.message.text
+                print(f"\n[Telegram] {update.message.from_user.first_name} (ID: {chat_id}): {text_to_process}")
             
+            # 2. Manejar mensajes de voz o audio
+            elif update.message.voice or update.message.audio:
+                audio_obj = update.message.voice if update.message.voice else update.message.audio
+                user_name = update.message.from_user.first_name
+                print(f"\n[Telegram] Recibido audio de {user_name} (ID: {chat_id})")
+                
+                # Feedback inicial
+                await bot.send_chat_action(chat_id=chat_id, action="record_voice")
+                
+                # Crear carpeta de descargas temporal
+                download_dir = "/tmp/leygo_downloads"
+                os.makedirs(download_dir, exist_ok=True)
+                
+                # Obtener el archivo de Telegram
+                file_id = audio_obj.file_id
+                telegram_file = await bot.get_file(file_id)
+                
+                # Generar ruta local
+                ext = ".ogg" if update.message.voice else os.path.splitext(telegram_file.file_path)[1]
+                file_name = f"{file_id}{ext}"
+                local_path = os.path.join(download_dir, file_name)
+                
+                # Descargar
+                await telegram_file.download_to_drive(local_path)
+                
+                # Transcribir usando Gemini
+                transcription = await transcribir_audio(local_path)
+                
+                if transcription:
+                    print(f"[Telegram] Audio transcrito: {transcription}")
+                    # Enviar un mensajito de feedback de lo que entendió (opcional, pero ayuda a la experiencia)
+                    # await bot.send_message(chat_id=chat_id, text=f"🎤 _Entendí: {transcription}_", parse_mode="Markdown")
+                    text_to_process = transcription
+                else:
+                    await bot.send_message(chat_id=chat_id, text="Lo siento, no pude procesar el audio correctamente.")
+                
+                # Limpiar archivo temporal
+                try: os.remove(local_path)
+                except: pass
+                
+            if chat_id and text_to_process:
+                # Lanzar tarea concurrente para responder antes de los 10 segundos de Timeout de Telegram
+                asyncio.create_task(handle_message_background(chat_id, text_to_process))
+                
     except Exception as e:
         print(f"Error procesando el payload del webhook: {e}")
+        import traceback
+        traceback.print_exc()
         
     # Devolver HTTP 200 OK rápido
     return {"ok": True}

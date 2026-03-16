@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  leygo-bot:
+    build: .
+    container_name: leygo-bot
+    restart: unless-stopped
+    env_file:
+      - agent_core/.env
+    volumes:
+      - ./agent_core/memoria:/app/agent_core/memoria
+      - ./agent_core/sub_agents:/app/agent_core/sub_agents
+      - ./agent_core/keys:/app/agent_core/keys
+    ports:
+      - "8000:8000"
+    command: python agent_core/telegram_bot.py
+
+  leygo-cli:
+    build: .
+    container_name: leygo-cli
+    env_file:
+      - agent_core/.env
+    volumes:
+      - ./agent_core/memoria:/app/agent_core/memoria
+      - ./agent_core/sub_agents:/app/agent_core/sub_agents
+      - ./agent_core/keys:/app/agent_core/keys
+    stdin_open: true
+    tty: true
+    command: python agent_core/main.py
