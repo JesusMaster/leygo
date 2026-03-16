@@ -12,35 +12,49 @@ from langchain_mcp_adapters.tools import load_mcp_tools
 logging.getLogger("mcp_remote").setLevel(logging.CRITICAL)
 logging.getLogger("mcp.client").setLevel(logging.CRITICAL)
 
-# Patterns emitted by mcp-remote Node.js process that are benign and should be hidden.
-# The 409 Conflict occurs when mcp-remote tries to open an SSE notification channel
-# after initialize() on a StreamableHTTP server that doesn't support push notifications.
-# It's by design in mcp-remote 0.1.37+ and does not affect functionality.
+# Lines emitted by mcp-remote (Node.js) that belong to the benign 409 Conflict block.
+# This happens when mcp-remote tries to open an SSE notification push channel after
+# initialize() on a StreamableHTTP server that doesn't support it. The session works
+# correctly regardless — mcp-remote falls back to polling automatically.
 _STDERR_SUPPRESS_PATTERNS = [
     "StreamableHTTPError",
     "Failed to open SSE stream: Conflict",
     "code: 409",
     "at StreamableHTTPClientTransport._startOrAuthSse",
     "at process.processTicksAndRejections",
+    "chunk-65X3S4HB",
 ]
 
 
-async def _pipe_stderr_filtered(stream: asyncio.StreamReader, server_name: str):
-    """Read stderr from the mcp-remote Node process and print lines that are not
-    part of a known-benign 409 error block. Consecutive lines belonging to the
-    same stack trace are swallowed together."""
-    suppress_remaining = 0  # How many more lines to suppress from current block
-    async for raw in stream:
-        line = raw.decode("utf-8", errors="replace").rstrip()
-        if suppress_remaining > 0:
-            suppress_remaining -= 1
-            continue
-        if any(pat in line for pat in _STDERR_SUPPRESS_PATTERNS):
-            # Suppress this line + the next ~4 (stack trace lines)
-            suppress_remaining = 4
-            continue
-        # Print any other stderr through so real errors are still visible
-        print(f"[{server_name}] {line}", file=sys.stderr)
+class _FilteredStderrWriter:
+    """File-like wrapper that swallows lines matching suppress patterns.
+    Used to monkey-patch sys.stderr temporarily so that Node.js output
+    forwarded by anyio through the stdio_client doesn't reach the terminal."""
+
+    def __init__(self, original):
+        self._original = original
+        self._suppress_remaining = 0
+
+    def write(self, text: str):
+        lines = text.split("\n")
+        out_lines = []
+        for line in lines:
+            if self._suppress_remaining > 0:
+                self._suppress_remaining -= 1
+                continue
+            if any(pat in line for pat in _STDERR_SUPPRESS_PATTERNS):
+                self._suppress_remaining = 4  # swallow the following stack trace lines
+                continue
+            out_lines.append(line)
+        filtered = "\n".join(out_lines)
+        if filtered.strip():
+            self._original.write(filtered)
+
+    def flush(self):
+        self._original.flush()
+
+    def __getattr__(self, name):
+        return getattr(self._original, name)
 
 
 class MCPClientManager:
@@ -129,28 +143,15 @@ class MCPClientManager:
         merged_env = os.environ.copy()
         merged_env.update(env)
 
-        # Launch the Node subprocess directly so we can intercept its stderr
-        # and suppress benign 409 messages from mcp-remote.
-        full_cmd = [command] + args
-        process = await asyncio.create_subprocess_exec(
-            *full_cmd,
-            stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            env=merged_env,
-        )
+        server_params = StdioServerParameters(command=command, args=args, env=merged_env)
 
-        # Start stderr filter task immediately
-        stderr_task = asyncio.create_task(
-            _pipe_stderr_filtered(process.stderr, name)
-        )
+        # Temporarily wrap stderr to filter out benign 409 messages from mcp-remote.
+        # stdio_client forwards the child process stderr through Python's sys.stderr.
+        original_stderr = sys.stderr
+        sys.stderr = _FilteredStderrWriter(original_stderr)
 
         session_ref = None
         try:
-            # Build MCP streams manually from the process pipes
-            # mcp's stdio_client expects an anyio-compatible interface;
-            # we replicate what StdioServerParameters does internally.
-            server_params = StdioServerParameters(command=command, args=args, env=merged_env)
             async with stdio_client(server_params) as (read_stream, write_stream):
                 async with ClientSession(read_stream, write_stream) as session:
                     session_ref = session
@@ -176,11 +177,8 @@ class MCPClientManager:
             print(f"Error en servidor stdio '{name}': {e}")
             ready_event.set()
         finally:
-            stderr_task.cancel()
-            try:
-                await stderr_task
-            except asyncio.CancelledError:
-                pass
+            # Restore stderr regardless of what happened
+            sys.stderr = original_stderr
             if session_ref in self.sessions:
                 self.sessions.remove(session_ref)
             self._tools_cache.pop(id(session_ref), None)
