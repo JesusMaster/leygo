@@ -10,7 +10,7 @@ mcp_servers:
       "GITHUB_TOKEN:${GITHUB_TOKEN}"
     ]
     env:
-      GITHUB_TOKEN: "aca token"
+      GITHUB_TOKEN: "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"
   - name: "faqs"
     command: "npx"
     transport: "stdio"
@@ -22,4 +22,4 @@ mcp_servers:
       "Authorization: Bearer ${BEARER_TOKEN}"
     ]
     env:
-      BEARER_TOKEN: "aca token"
+      BEARER_TOKEN: "44ebfbec-913f-4515-9122-b0ec9db34fd6"
