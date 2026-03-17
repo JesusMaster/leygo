@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   leygo-bot:
     build: .
@@ -27,3 +25,13 @@ services:
     stdin_open: true
     tty: true
     command: python agent_core/main.py
+
+  leygo-gui:
+    build: 
+      context: ./leygo-gui
+    container_name: leygo-gui
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - leygo-bot

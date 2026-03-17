@@ -1,0 +1,51 @@
+<div class="config-page">
+  <div class="header">
+    <h2>Configuración de Leygo</h2>
+    <p>Ajusta las variables de entorno y gestiona tu identidad.</p>
+  </div>
+
+  <div class="config-grid">
+    <!-- Google Auth Card -->
+    <div class="config-card glass highlight">
+      <div class="card-icon">🔐</div>
+      <h3>Google SSO</h3>
+      <p>Conecta tu cuenta para sincronizar llaves y preferencias.</p>
+      
+      <div class="auth-status">
+        @if (authStatus().authenticated) {
+          <span class="status-badge success">Conectado</span>
+        } @else {
+          <span class="status-badge warning">No autenticado</span>
+          <button class="btn-primary" (click)="loginWithGoogle()">
+            Iniciar Sesión con Google
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Env Vars Card -->
+    <div class="config-card glass wide">
+      <h3>Variables de Entorno (.env)</h3>
+      <div class="env-list">
+        @for (key of getEnvKeys(); track key) {
+          <div class="env-item">
+            <span class="key">{{ key }}</span>
+            <div class="value-input">
+              <input type="password" [value]="config()[key]" #valInput>
+              <button class="save-btn" (click)="updateVar(key, valInput.value)">💾</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="add-var">
+        <h4>Añadir nueva variable</h4>
+        <div class="add-row">
+          <input type="text" placeholder="KEY_NAME" [(ngModel)]="newKey">
+          <input type="text" placeholder="Valor" [(ngModel)]="newValue">
+          <button class="btn-primary" (click)='addNewVar()'>Añadir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

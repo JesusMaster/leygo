@@ -1,0 +1,62 @@
+<div class="agents-page">
+  <div class="header">
+    <h2>Agentes Disponibles</h2>
+    <p>Gestiona y explora las capacidades de tus sub-agentes dinámicos.</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loader-container">
+      <div class="loader"></div>
+    </div>
+  } @else {
+    
+    @if (customAgents().length > 0) {
+      <div class="agent-section">
+        <h3 class="section-title">Agentes Creados</h3>
+        <div class="agents-grid">
+          @for (agent of customAgents(); track agent.name) {
+            <ng-container *ngTemplateOutlet="agentCard; context: { agent: agent }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="agent-section">
+      <h3 class="section-title">Agentes del Sistema</h3>
+      <div class="agents-grid">
+        @for (agent of systemAgents(); track agent.name) {
+          <ng-container *ngTemplateOutlet="agentCard; context: { agent: agent }"></ng-container>
+        }
+      </div>
+    </div>
+
+  }
+</div>
+
+<ng-template #agentCard let-agent="agent">
+  <div class="agent-card glass">
+    <div class="card-header">
+      <div class="agent-icon">{{ agent.name[0].toUpperCase() }}</div>
+      <div class="agent-meta">
+        <h3>{{ agent.name }}</h3>
+        <span class="model-badge">{{ agent.model || 'Default' }}</span>
+      </div>
+    </div>
+    
+    <p class="description">{{ agent.description }}</p>
+    
+    <div class="tools-section">
+      <h4>Herramientas</h4>
+      <div class="tools-chips">
+        @for (tool of agent.tools; track tool.name) {
+          <span class="tool-chip" [title]="tool.description">
+            {{ tool.name }}
+          </span>
+        } @empty {
+          <span class="no-tools">Sin herramientas específicas</span>
+        }
+      </div>
+    </div>
+  </div>
+</ng-template>
+

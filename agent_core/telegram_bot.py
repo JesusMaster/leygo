@@ -14,6 +14,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from main import SelfExtendingAgent
 from scheduler_manager import start_scheduler, stop_scheduler
 from utils.audio_utils import transcribir_audio
+from api_endpoints import router as api_router
+from fastapi.middleware.cors import CORSMiddleware
 
 agent = SelfExtendingAgent()
 
@@ -64,6 +66,25 @@ async def lifespan(app: FastAPI):
         pass
 
 app = FastAPI(lifespan=lifespan)
+app.state.agent = agent
+
+# Habilitar CORS para desarrollo local (Angular)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+        "http://localhost:4200",
+        "http://127.0.0.1:4200",
+        "http://0.0.0.0:8080",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Montar API para la GUI
+app.include_router(api_router)
 
 import re
 

@@ -1,0 +1,71 @@
+<div class="layout-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo-section">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+      </div>
+      <h1>LeyGo AI</h1>
+    </div>
+    
+    <nav class="nav-menu">
+      <a routerLink="/chat" routerLinkActive="active" class="nav-item">
+        <span class="icon">💬</span>
+        <span class="label">Chat Assistant</span>
+      </a>
+      <a routerLink="/agents" routerLinkActive="active" class="nav-item">
+        <span class="icon">🤖</span>
+        <span class="label">Agents Library</span>
+      </a>
+      <a routerLink="/config" routerLinkActive="active" class="nav-item">
+        <span class="icon">⚙️</span>
+        <span class="label">Configuration</span>
+      </a>
+    </nav>
+
+    <div class="favorites-section">
+      <p class="section-title">FAVORITES</p>
+      <div class="favorite-item">
+        <span class="dot green"></span>
+        <span class="label">Data Analysis Pro</span>
+      </div>
+      <div class="favorite-item">
+        <span class="dot orange"></span>
+        <span class="label">Creative Writing</span>
+      </div>
+    </div>
+    
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="avatar-container">
+          <img src="https://ui-avatars.com/api/?name=Alex+Rivera&background=0D8ABC&color=fff" alt="User">
+        </div>
+        <div class="user-details">
+          <span class="user-name">Jesús Leiva</span>
+          <span class="user-plan">MIT License</span>
+        </div>
+        <div class="settings-gear">⚙️</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content-area">
+    <header class="main-header">
+      <div class="project-info">
+        <h2 class="project-name">Project</h2>
+        <div class="status">
+          <span class="dot green"></span>
+          Agent Online
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn">share</button>
+        <button class="btn-primary">Deploy Agent</button>
+      </div>
+    </header>
+    <div class="view-container">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

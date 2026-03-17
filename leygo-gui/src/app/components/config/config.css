@@ -1,0 +1,89 @@
+.config-page {
+  flex: 1;
+  padding: 48px;
+  overflow-y: auto;
+  background-color: var(--bg-main);
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+}
+
+.config-card {
+  background-color: white;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-icon {
+  font-size: 32px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.status-badge.warning { background-color: #fef3c7; color: #92400e; }
+.status-badge.success { background-color: #d1fae5; color: #065f46; }
+
+.env-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.env-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+}
+
+.env-item .key {
+  font-family: 'Monaco', monospace;
+  font-size: 13px;
+  color: #374151;
+  font-weight: 600;
+}
+
+.value-input input {
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 6px 12px;
+  width: 250px;
+}
+
+.add-var {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
+}
+
+.add-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.add-row input {
+  flex: 1;
+  background-color: white;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
