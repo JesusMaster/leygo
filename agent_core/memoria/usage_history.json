@@ -898,5 +898,41 @@
         "output_tokens": 765,
         "cost_usd": 0.00023519999999999997,
         "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T17:26:36.187741+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 1251,
+        "cost_usd": 0.00038099999999999994,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T17:28:17.473977+00:00",
+        "user_input": "necesito que revises el proyecto JesusMaster/leygo en github y crees una PR desde dev-jesus a main, ",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 151613,
+        "output_tokens": 1345,
+        "cost_usd": 0.011774475,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T17:41:32.214268+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 532,
+        "cost_usd": 0.0001653,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T17:56:34.306244+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 935,
+        "cost_usd": 0.00028619999999999996,
+        "thread_id": "1635021523"
     }
 ]
