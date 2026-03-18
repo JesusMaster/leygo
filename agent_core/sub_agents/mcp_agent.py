@@ -1,3 +1,4 @@
+import os
 from typing import List, Callable
 from .base import BaseSubAgent
 
@@ -17,9 +18,11 @@ class McpAgent(BaseSubAgent):
         # Herramientas locales a excluir (nombres en español o prefijos conocidos)
         local_tool_names = {
             "crear_y_ejecutar_herramienta_local", "usar_herramienta_local", "administrar_memoria_episodica",
-            "escribir_archivo_en_proyecto", "eliminar_archivo_en_proyecto", "buscar_en_internet", "programar_recordatorio", "listar_recordatorios",
-            "programar_intervalo_dinamico", "eliminar_recordatorio", "leer_correos_recientes", 
-            "modificar_etiquetas_correo", "enviar_correo", "listar_eventos_calendario", "responder_evento_calendario",
+            "escribir_archivo_en_proyecto", "eliminar_archivo_en_proyecto", "buscar_en_internet", 
+            "crear_recordatorio_solo_texto_para_usuario", "listar_tareas_programadas",
+            "crear_rutina_texto_periodica_para_usuario", "eliminar_tarea_programada",
+            "agendar_accion_autonoma_agente", "agendar_rutina_autonoma_agente",
+            "leer_correos_recientes", "modificar_etiquetas_correo", "enviar_correo", "listar_eventos_calendario", "responder_evento_calendario",
             "crear_evento_calendario", "leer_hoja_calculo", "escribir_hoja_calculo", "listar_espacios_chat",
             "leer_mensajes_chat", "enviar_mensaje_chat", "buscar_chat_directo",
         }
@@ -43,6 +46,10 @@ class McpAgent(BaseSubAgent):
             
         self._tools_names = names
         self._tools_text = "\\n".join(lines)
+
+    @property
+    def model(self) -> str:
+        return os.environ.get("MODEL_MCP")
 
     @property
     def name(self) -> str:

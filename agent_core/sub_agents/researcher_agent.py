@@ -1,7 +1,12 @@
+import os
 from typing import List, Callable
 from .base import BaseSubAgent
 
 class ResearcherAgent(BaseSubAgent):
+    @property
+    def model(self) -> str:
+        return os.environ.get("MODEL_RESEARCHER")
+
     @property
     def name(self) -> str:
         return "researcher"

@@ -1,7 +1,12 @@
+import os
 from typing import List, Callable
 from .base import BaseSubAgent
 
 class DevAgent(BaseSubAgent):
+    @property
+    def model(self) -> str:
+        return os.environ.get("MODEL_DEV")
+
     @property
     def name(self) -> str:
         return "dev"

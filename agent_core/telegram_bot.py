@@ -51,8 +51,8 @@ async def lifespan(app: FastAPI):
         print("=> Abre tu archivo agent_core/.env y añade la clave WEBHOOK_URL=https://tu-url")
         print("=======================================================\\n")
         
-    # Start the async job scheduler and pass the bot instance for messaging
-    start_scheduler(bot_instance=bot)
+    # Start the async job scheduler and pass the bot instance and agent instance for messaging and tasks
+    start_scheduler(bot_instance=bot, agent_instance=agent)
         
     yield
     

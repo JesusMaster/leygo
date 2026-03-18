@@ -23,6 +23,16 @@ async def transcribir_audio(ruta_archivo: str) -> str:
         # Pedir solo la transcripción literal
         prompt = "Transcribe este audio de forma literal, sin añadir comentarios, resúmenes ni introducciones. Solo el texto hablado."
         response = model.generate_content([prompt, audio_file])
+        
+        try:
+            from utils.token_tracker import log_token_usage
+            if hasattr(response, "usage_metadata") and response.usage_metadata:
+                in_tokens = response.usage_metadata.prompt_token_count
+                out_tokens = response.usage_metadata.candidates_token_count
+                _ = log_token_usage("Transcript Audio", model_name, in_tokens, out_tokens, thread_id="audio_system")
+        except Exception as t_err:
+            print(f"Error trackeando tokens de audio: {t_err}")
+            
         return response.text.strip()
     except Exception as e:
         print(f"Error en transcribir_audio: {e}")

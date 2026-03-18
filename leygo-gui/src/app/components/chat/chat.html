@@ -11,7 +11,13 @@
         <div class="message-bubble shadow-sm">
           <div class="message-content" [innerHTML]="msg.text | markdown"></div>
           <div class="message-meta">
-            {{ msg.timestamp | date:'HH:mm a' }}
+            <span>{{ msg.timestamp | date:'HH:mm a' }}</span>
+            @if (msg.tokens && msg.cost !== undefined) {
+              <span class="usage-badge" [title]="'Model: ' + msg.model">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 3px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                {{ msg.tokens }} tokens / ✨ ${{ msg.cost | number:'1.5-5' }}
+              </span>
+            }
           </div>
         </div>
 
@@ -42,7 +48,7 @@
         type="text" 
         [(ngModel)]="userInput" 
         (keyup.enter)="sendMessage()"
-        placeholder="Ask Nexus AI anything..."
+        placeholder="Ask leygo AI anything..."
       >
       <div class="input-actions">
         <button class="settings-btn">⌥</button>
@@ -56,6 +62,6 @@
       <span>● GPT-4 TURBO</span>
       <span class="count">{{ userInput().length }} / 2000</span>
     </div>
-    <p class="disclaimer">NEXUS AI MAY DISPLAY INACCURATE INFO, SO DOUBLE-CHECK ITS RESPONSES.</p>
+    <p class="disclaimer">LEYGO AI MAY DISPLAY INACCURATE INFO, SO DOUBLE-CHECK ITS RESPONSES.</p>
   </div>
 </div>

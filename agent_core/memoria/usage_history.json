@@ -1,0 +1,902 @@
+[
+    {
+        "timestamp": "2026-03-17T16:55:20.241880+00:00",
+        "user_input": "hola",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1393,
+        "output_tokens": 86,
+        "cost_usd": 0.00013027499999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T16:57:03.556389+00:00",
+        "user_input": "leygo me puedes ayudar a revisar mis ultimos correos?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7908,
+        "output_tokens": 390,
+        "cost_usd": 0.0007101,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T17:04:27.731784+00:00",
+        "user_input": "elimina el subagente fafi e imagenes",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 25733,
+        "output_tokens": 330,
+        "cost_usd": 0.0020289749999999997,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T17:04:57.513512+00:00",
+        "user_input": "hola, que puedo hacer aqui?=",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 2905,
+        "output_tokens": 807,
+        "cost_usd": 0.00045997499999999995,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T17:06:19.644990+00:00",
+        "user_input": "elimina fitness, finance y nami",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 26905,
+        "output_tokens": 207,
+        "cost_usd": 0.0020799749999999995,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T17:10:48.664322+00:00",
+        "user_input": "Gracias, nada más por el momento",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1158,
+        "output_tokens": 136,
+        "cost_usd": 0.00012764999999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-17T17:11:19.218070+00:00",
+        "user_input": "Transcript Audio",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 152,
+        "output_tokens": 16,
+        "cost_usd": 1.62e-05,
+        "thread_id": "audio_system"
+    },
+    {
+        "timestamp": "2026-03-17T17:11:36.943800+00:00",
+        "user_input": "¿Me puedes decir cuál es la distancia entre Colina y Santiago de Chile?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 5891,
+        "output_tokens": 591,
+        "cost_usd": 0.000619125,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-17T17:20:04.474918+00:00",
+        "user_input": "ayudame a crear un agente que sea mi entrenador de vuelos, este debe ayudarme a planificar y guiar. ",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12116,
+        "output_tokens": 745,
+        "cost_usd": 0.0011321999999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T17:21:40.496324+00:00",
+        "user_input": "perfecto, ademas quiero que pueda ver el checklist del Cessna172.. donde le pueda preguntar cuales s",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 90682,
+        "output_tokens": 4086,
+        "cost_usd": 0.00802695,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T17:53:22.693241+00:00",
+        "user_input": "Elimina el recordatorio de beber agua",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6652,
+        "output_tokens": 74,
+        "cost_usd": 0.0005210999999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-17T17:53:49.640715+00:00",
+        "user_input": "De hidratación?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6890,
+        "output_tokens": 71,
+        "cost_usd": 0.00053805,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-17T17:55:46.330211+00:00",
+        "user_input": "Puedes revisar en tu memoria si hay algo que envía un recordatorio?",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 13574,
+        "output_tokens": 143,
+        "cost_usd": 0.00106095,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-17T17:58:15.259093+00:00",
+        "user_input": "Coded: Buscar en todos los archivos del proyecto la palabra clave proporcionada para encontrar el or",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 315,
+        "output_tokens": 1393,
+        "cost_usd": 0.00735875,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-17T18:09:06.352477+00:00",
+        "user_input": "Coded: Buscar en todos los archivos .py y .md del proyecto las palabras clave proporcionadas separad",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 329,
+        "output_tokens": 1988,
+        "cost_usd": 0.010351250000000001,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-17T18:25:25.495437+00:00",
+        "user_input": "Agéndame una reunión con cvaldivia@apprecio.com y gjeria@apprecio.com a las 5:00 de la tarde vamos a",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 8185,
+        "output_tokens": 231,
+        "cost_usd": 0.000683175,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-17T19:48:37.539130+00:00",
+        "user_input": "Me puedes decir que reuniones tengo disponibles?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 8972,
+        "output_tokens": 130,
+        "cost_usd": 0.0007119,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-17T22:03:07.993451+00:00",
+        "user_input": "Hola",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1207,
+        "output_tokens": 86,
+        "cost_usd": 0.000116325,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-17T22:30:13.799206+00:00",
+        "user_input": "ayudame a crear un agente de salud, se llama Mario y quiero que registre mi peso y pueda calcular mi",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 23745,
+        "output_tokens": 1546,
+        "cost_usd": 0.03741125,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T22:30:56.200271+00:00",
+        "user_input": "mario registra mi peso de hoy: mido 1.88 y peso 90",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 2195,
+        "output_tokens": 147,
+        "cost_usd": 0.00020872499999999996,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T22:31:51.997879+00:00",
+        "user_input": "mario mi edad es 38",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1443,
+        "output_tokens": 76,
+        "cost_usd": 0.000131025,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T22:32:31.647549+00:00",
+        "user_input": "hay alguna manera en que te pueda compartir los datos de mi apple watch?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4382,
+        "output_tokens": 444,
+        "cost_usd": 0.0004618499999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T22:42:55.600985+00:00",
+        "user_input": "puedes leer el archivo https://docs.google.com/document/d/1hIcHCvQvoSsvNC8-TpLO7rwKO1UDTBZh6JolRpqYG",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12330,
+        "output_tokens": 167,
+        "cost_usd": 0.00097485,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-17T23:29:09.646363+00:00",
+        "user_input": "hola leygo",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1242,
+        "output_tokens": 107,
+        "cost_usd": 0.00012525,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T00:50:19.409824+00:00",
+        "user_input": "podemos revisar mi correo?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6693,
+        "output_tokens": 71,
+        "cost_usd": 0.000523275,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:22:16.166123+00:00",
+        "user_input": "puedes revisar mi correo?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7706,
+        "output_tokens": 253,
+        "cost_usd": 0.0006538500000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:34:48.862239+00:00",
+        "user_input": "puedes leer mis ultimos chat con ivaldovinos@apprecio.com?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 10711,
+        "output_tokens": 274,
+        "cost_usd": 0.0008855250000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:38:06.974677+00:00",
+        "user_input": "hola",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 2177,
+        "output_tokens": 106,
+        "cost_usd": 0.000195075,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:39:55.211925+00:00",
+        "user_input": "hola",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 2223,
+        "output_tokens": 87,
+        "cost_usd": 0.000192825,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:42:00.298448+00:00",
+        "user_input": "que hora tienes?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1243,
+        "output_tokens": 214,
+        "cost_usd": 0.000157425,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:42:43.507749+00:00",
+        "user_input": "quiero que recuerdes que los horarios son en GMT-3",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 16755,
+        "output_tokens": 666,
+        "cost_usd": 0.001456425,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:43:03.947959+00:00",
+        "user_input": "que hora es?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1471,
+        "output_tokens": 371,
+        "cost_usd": 0.00022162499999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:43:20.403124+00:00",
+        "user_input": "cuales son las reuniones que tengo hoy?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7543,
+        "output_tokens": 59,
+        "cost_usd": 0.000583425,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:43:30.543288+00:00",
+        "user_input": "y mañana?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1894,
+        "output_tokens": 306,
+        "cost_usd": 0.00023385000000000002,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:44:56.546663+00:00",
+        "user_input": "hola leygo, cuales son las herramientas que tengo disponible?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1251,
+        "output_tokens": 509,
+        "cost_usd": 0.000246525,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T01:46:12.399533+00:00",
+        "user_input": "quiero que envies un email a las 8:00am a jesus@lattelier.cl diciendo que ya voy a la oficina",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 8740,
+        "output_tokens": 138,
+        "cost_usd": 0.0006969,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:52:16.637303+00:00",
+        "user_input": "quiero que envies un email a las 8:00am a jesus@lattelier.cl diciendo que ya voy a la oficina",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6970,
+        "output_tokens": 129,
+        "cost_usd": 0.00056145,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T01:56:52.060232+00:00",
+        "user_input": "quiero que envies un email a las 8:00am a jesus@lattelier.cl diciendo que ya estoy llegando a la ofi",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7193,
+        "output_tokens": 130,
+        "cost_usd": 0.000578475,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T02:01:02.655176+00:00",
+        "user_input": "puedes mandarle un chat a cvaldivia@apprecio.com a las 9:00am diciendole que viene tarde",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 22217,
+        "output_tokens": 1745,
+        "cost_usd": 0.002189775,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T02:03:11.272281+00:00",
+        "user_input": "puedes enviarme un mail a jesus@lattelier.cl todos los lunes a las 9:00 diciendo que tenga un lindo ",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 20393,
+        "output_tokens": 117,
+        "cost_usd": 0.001564575,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T02:04:27.631306+00:00",
+        "user_input": "quiero que todos los dias Nami a las 9:00am me envie un pregunta al telegram de velocidad nudos a km",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 20181,
+        "output_tokens": 127,
+        "cost_usd": 0.001551675,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T02:06:25.334599+00:00",
+        "user_input": "recuerdame tomar agua todos los dias a las 11:30 am",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 22042,
+        "output_tokens": 1137,
+        "cost_usd": 0.00199425,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T12:41:37.182077+00:00",
+        "user_input": "Me puedes decir que reuniones tengo agendada hoy?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5556,
+        "output_tokens": 53,
+        "cost_usd": 0.0004326,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T12:56:35.380109+00:00",
+        "user_input": "puedes ayudarme a crear un recordatorio para tomar agua cada 15 min",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 21556,
+        "output_tokens": 1001,
+        "cost_usd": 0.0019169999999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:02:51.889857+00:00",
+        "user_input": "ayudame a crear un subagente que me ayude con las finanzas, quiero ir registrando mis gastos diarios",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 32715,
+        "output_tokens": 4222,
+        "cost_usd": 0.062003749999999996,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:03:36.939816+00:00",
+        "user_input": "nachi, registra que recibi 10000",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4815,
+        "output_tokens": 88,
+        "cost_usd": 0.00038752499999999995,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:03:55.893630+00:00",
+        "user_input": "gasté 200 con tarjeta de credito",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5020,
+        "output_tokens": 105,
+        "cost_usd": 0.000408,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:04:06.590769+00:00",
+        "user_input": "gaste 100 con efectivo",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5343,
+        "output_tokens": 109,
+        "cost_usd": 0.0004334249999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:04:18.786397+00:00",
+        "user_input": "puedes darme un balance?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5804,
+        "output_tokens": 138,
+        "cost_usd": 0.0004767,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:05:17.537507+00:00",
+        "user_input": "quiero que mes el top of descent desde 35000 a 1300 pies con una velocidad de 800 GS",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11588,
+        "output_tokens": 268,
+        "cost_usd": 0.0009494999999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:07:19.178067+00:00",
+        "user_input": "Transcript Audio",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 129,
+        "output_tokens": 16,
+        "cost_usd": 1.4475e-05,
+        "thread_id": "audio_system"
+    },
+    {
+        "timestamp": "2026-03-18T13:07:26.328254+00:00",
+        "user_input": "Nami, ¿me puedes decir cuál fue la última pregunta que te hice?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1585,
+        "output_tokens": 80,
+        "cost_usd": 0.000142875,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T13:11:36.958721+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 700,
+        "cost_usd": 0.00021569999999999998,
+        "thread_id": "Jesus"
+    },
+    {
+        "timestamp": "2026-03-18T13:18:24.707159+00:00",
+        "user_input": "enviale un saludo por chat a rvenegas",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 17459,
+        "output_tokens": 128,
+        "cost_usd": 0.001347825,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:18:44.876403+00:00",
+        "user_input": "rvenegas@apprecio.com",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 18923,
+        "output_tokens": 116,
+        "cost_usd": 0.0014540249999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:26:39.703413+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 1202,
+        "cost_usd": 0.00036629999999999996,
+        "thread_id": "Jesus"
+    },
+    {
+        "timestamp": "2026-03-18T13:43:40.791549+00:00",
+        "user_input": "Leygo me puedes decir que tareas tengo programadas?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 20489,
+        "output_tokens": 696,
+        "cost_usd": 0.001745475,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T13:45:24.589689+00:00",
+        "user_input": "envia un correo a rvenegas@apprecio.com, necesito que revises el README del proyecto de github /Jesu",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 42665,
+        "output_tokens": 2570,
+        "cost_usd": 0.003970875,
+        "thread_id": "default_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:49:55.801028+00:00",
+        "user_input": "Si",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1526,
+        "output_tokens": 179,
+        "cost_usd": 0.00016815,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T13:55:20.728266+00:00",
+        "user_input": "Leygo, ¿qué tareas tengo programadas ahora?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 20141,
+        "output_tokens": 46,
+        "cost_usd": 0.001524375,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T13:55:39.160829+00:00",
+        "user_input": "Leygo, ¿qué tareas tengo programadas ahora?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 20582,
+        "output_tokens": 782,
+        "cost_usd": 0.0017782499999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T13:57:29.506470+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 728,
+        "cost_usd": 0.0002241,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T14:10:45.419239+00:00",
+        "user_input": "Leygo, ¿qué tareas tengo programadas ahora?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 9292,
+        "output_tokens": 132,
+        "cost_usd": 0.0007365,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T14:11:37.156793+00:00",
+        "user_input": "necesito que en 2 minutos le envies un correo a jesus@lattelier.cl, preguntandole si va a llegar a l",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 10200,
+        "output_tokens": 124,
+        "cost_usd": 0.0008022000000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T14:25:03.509031+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 936,
+        "cost_usd": 0.00028649999999999997,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T14:29:20.057036+00:00",
+        "user_input": "necesito que en 2 minutos le envies un correo a jesus@lattelier.cl, preguntandole si va a llegar a l",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 9506,
+        "output_tokens": 107,
+        "cost_usd": 0.00074505,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T14:31:24.314174+00:00",
+        "user_input": "Enviar un correo a jesus@lattelier.cl con el asunto '¿Llegarás a la reunión?' y el cuerpo 'Hola Jesú",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 9698,
+        "output_tokens": 74,
+        "cost_usd": 0.00074955,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T14:34:30.364040+00:00",
+        "user_input": "necesito que en 5 min revises el archivo README.md del proyecto JesusMaster/leygo y le envies un res",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11200,
+        "output_tokens": 193,
+        "cost_usd": 0.0008978999999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T14:38:14.446764+00:00",
+        "user_input": "cuanto es 0.17465 USD a CLP",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7830,
+        "output_tokens": 227,
+        "cost_usd": 0.00065535,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T14:39:52.879246+00:00",
+        "user_input": "1. Leer el archivo README.md del repositorio 'JesusMaster/leygo' usando la herramienta 'get_file_con",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 57738,
+        "output_tokens": 2004,
+        "cost_usd": 0.004931549999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T14:41:55.265461+00:00",
+        "user_input": "Ok",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1283,
+        "output_tokens": 84,
+        "cost_usd": 0.00012142500000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T14:42:38.474272+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 672,
+        "cost_usd": 0.0002073,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T14:52:09.581505+00:00",
+        "user_input": "necesito que en 1 min revises el archivo README.md del proyecto JesusMaster/leygo y le envies un res",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 30806,
+        "output_tokens": 2822,
+        "cost_usd": 0.00315705,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T14:52:59.307135+00:00",
+        "user_input": "necesito que en 5 min revises el archivo README.md del proyecto JesusMaster/leygo y le envies un res",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 52228,
+        "output_tokens": 593,
+        "cost_usd": 0.004095,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T14:55:37.950540+00:00",
+        "user_input": "Que tareas o rutinas tengo programadas",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12029,
+        "output_tokens": 159,
+        "cost_usd": 0.000949875,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T14:58:07.069767+00:00",
+        "user_input": "necesito que en 2 min revises el archivo README.md del proyecto JesusMaster/leygo y le envies un res",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 11919,
+        "output_tokens": 173,
+        "cost_usd": 0.0009458250000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:00:28.535822+00:00",
+        "user_input": "Revisa el archivo README.md del repositorio JesusMaster/leygo, genera un resumen y envíalo por corre",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 44842,
+        "output_tokens": 1389,
+        "cost_usd": 0.00377985,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:03:12.517319+00:00",
+        "user_input": "Revisa el último mensaje recibido al chat de ivaldovinos y proponme una respuesta",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 24714,
+        "output_tokens": 323,
+        "cost_usd": 0.0019504499999999998,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T15:03:54.441060+00:00",
+        "user_input": "Me refiero al chat de Google",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 19402,
+        "output_tokens": 142,
+        "cost_usd": 0.00149775,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T15:04:36.836035+00:00",
+        "user_input": "El usuario es ivaldovinos@apprecio.com",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 28138,
+        "output_tokens": 293,
+        "cost_usd": 0.00219825,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T15:06:39.040681+00:00",
+        "user_input": "Quiero ajustar la hora puede ser a las 14:30 hrs",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 15089,
+        "output_tokens": 221,
+        "cost_usd": 0.001197975,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T15:08:22.362016+00:00",
+        "user_input": "Recuerda que el horario es GMT-3",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 23527,
+        "output_tokens": 201,
+        "cost_usd": 0.001824825,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T15:09:16.694494+00:00",
+        "user_input": "Puedes agendar la reunión para esa hora?",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 24353,
+        "output_tokens": 282,
+        "cost_usd": 0.001911075,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T15:11:31.542055+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 853,
+        "cost_usd": 0.00026159999999999996,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T15:16:08.453949+00:00",
+        "user_input": "necesito que en 2 min revises el archivo README.md del proyecto JesusMaster/leygo y le envies un res",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 9560,
+        "output_tokens": 162,
+        "cost_usd": 0.0007656000000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:24:44.097028+00:00",
+        "user_input": "necesito que en 1 min revises el archivo README.md del proyecto JesusMaster/leygo y le envies un res",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 10196,
+        "output_tokens": 209,
+        "cost_usd": 0.0008274,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:26:30.070930+00:00",
+        "user_input": "1. Leer el archivo README.md del repositorio JesusMaster/leygo (usando el agente MCP). 2. Resumir el",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 70255,
+        "output_tokens": 1560,
+        "cost_usd": 0.005737124999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:42:34.339883+00:00",
+        "user_input": "necesito que en 1 min revises el archivo README.md del proyecto JesusMaster/leygo y le envies un res",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 10358,
+        "output_tokens": 157,
+        "cost_usd": 0.0008239499999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:44:12.235293+00:00",
+        "user_input": "Lee el archivo README.md del repositorio JesusMaster/leygo, genera un resumen y envíalo por correo a",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 87199,
+        "output_tokens": 1470,
+        "cost_usd": 0.006980924999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:56:34.110244+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 1088,
+        "cost_usd": 0.00033209999999999994,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:03:30.445995+00:00",
+        "user_input": "Podemos crear un agente que se conecte a los chat de linkedin? Si necesitas alguna variable la agreg",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 29178,
+        "output_tokens": 3441,
+        "cost_usd": 0.0536775,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:11:33.927114+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 936,
+        "cost_usd": 0.00028649999999999997,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:12:07.069951+00:00",
+        "user_input": "Puedes decirme cuáles son los recordatorios que tengo configurado?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 13249,
+        "output_tokens": 147,
+        "cost_usd": 0.0010377750000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:26:35.865976+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 1172,
+        "cost_usd": 0.0003573,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:30:39.926613+00:00",
+        "user_input": "Puedes agregar a fafigueroa@apprecio.com a la reunión de las 14:30",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 22247,
+        "output_tokens": 256,
+        "cost_usd": 0.0017453249999999998,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:41:34.371970+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 930,
+        "cost_usd": 0.0002847,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:56:33.829889+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 831,
+        "cost_usd": 0.00025499999999999996,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T17:02:47.484811+00:00",
+        "user_input": "De qué está echo el envoltorio de la bolsa de té",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 8272,
+        "output_tokens": 327,
+        "cost_usd": 0.0007185,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T17:03:54.789128+00:00",
+        "user_input": "Los te supremo de Chile que utilizan?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 9743,
+        "output_tokens": 366,
+        "cost_usd": 0.000840525,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T17:11:33.715988+00:00",
+        "user_input": "Routine: Recuérdame toma...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 765,
+        "cost_usd": 0.00023519999999999997,
+        "thread_id": "1635021523"
+    }
+]

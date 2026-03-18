@@ -1,83 +1,127 @@
-from typing import List, Callable
+import math
+import json
+import os
+from typing import List, Optional
 from ..base import BaseSubAgent
 
-def aeronautical_calculator(operation: str, value1: float, value2: float = 0.0) -> str:
-    """
-    Realiza calculos aeronauticos comunes.
-    Operaciones:
-    - 'tod': Top of Descent. value1=Altitud Crucero, value2=Altitud Objetivo. (Regla del 3).
-    - 'vs': Velocidad Vertical recomendada. value1=Ground Speed (GS). (GS * 5).
-    - 'knots_to_kmh': Convierte nudos a km/h.
-    - 'kmh_to_knots': Convierte km/h a nudos.
-    - 'feet_to_km': Convierte pies a kilometros.
-    - 'km_to_feet': Convierte kilometros a pies.
-    - 'nm_to_km': Millas nauticas a kilometros.
-    - 'km_to_nm': Kilometros a millas nauticas.
-    - 'fuel': Consumo basico. value1=Galones por hora (GPH), value2=Tiempo en horas.
-    """
-    if operation == 'tod':
-        res = ((value1 - value2) / 1000) * 3
-        return f"Para descender de {value1}ft a {value2}ft, debes iniciar el descenso a {res:.2f} NM del objetivo."
-    elif operation == 'vs':
-        res = value1 * 5
-        return f"Para un descenso de 3 grados con una GS de {value1} kts, la VS recomendada es de {res:.0f} fpm."
-    elif operation == 'knots_to_kmh':
-        return f"{value1} kts son {value1 * 1.852:.2f} km/h."
-    elif operation == 'kmh_to_knots':
-        return f"{value1} km/h son {value1 / 1.852:.2f} kts."
-    elif operation == 'feet_to_km':
-        return f"{value1} ft son {value1 * 0.0003048:.4f} km."
-    elif operation == 'km_to_feet':
-        return f"{value1} km son {value1 / 0.0003048:.0f} ft."
-    elif operation == 'nm_to_km':
-        return f"{value1} NM son {value1 * 1.852:.2f} km."
-    elif operation == 'km_to_nm':
-        return f"{value1} km son {value1 / 1.852:.2f} NM."
-    elif operation == 'fuel':
-        return f"Consumo estimado para {value2} horas a {value1} GPH: {value1 * value2:.2f} galones."
-    return "Operacion no reconocida."
+def calcular_tod(altitud_actual_pies: float, altitud_objetivo_pies: float) -> str:
+    """Calcula el Top of Descent (TOD) usando la regla de los 3 grados."""
+    altitud_a_perder = altitud_actual_pies - altitud_objetivo_pies
+    if altitud_a_perder <= 0:
+        return "Ya estas en la altitud objetivo o por debajo de ella, Cadete."
+    distancia_nm = (altitud_a_perder / 1000) * 3
+    return f"Deberias iniciar el descenso a {distancia_nm:.1f} millas nauticas del objetivo."
 
-def get_cessna_172_checklists() -> str:
-    """Retorna los checklists basicos del Cessna 172P/S."""
-    return """
-    CHECKLISTS CESSNA 172:
-    1. PREFLIGHT: Cabin, Left Wing, Nose, Right Wing, Tail.
-    2. ENGINE START: Fuel Selector BOTH, Mixture RICH, Throttle 1/4 open, Master ON, Beacon ON, Magnetos START.
-    3. TAXI: Brakes CHECK, Instruments CHECK.
-    4. BEFORE TAKEOFF: Parking Brake SET, Flight Controls FREE, Fuel BOTH, Mixture RICH, Throttle 1800 RPM, Magnetos CHECK, Instruments CHECK.
-    5. TAKEOFF: Flaps 0-10, Full Throttle, Rotate 55 KIAS.
-    6. CLIMB: 70-85 KIAS, Flaps UP.
-    7. CRUISE: 2100-2700 RPM, Trim SET, Mixture LEAN.
-    8. DESCENT: Power AS REQUIRED, Mixture ENRICH, Altimeter SET.
-    9. BEFORE LANDING: Fuel BOTH, Mixture RICH, Flaps AS REQUIRED, Speed 65 KIAS.
-    10. LANDING: Touchdown main wheels first, Braking AS NEEDED.
-    11. SHUTDOWN: Avionics OFF, Mixture IDLE CUT-OFF, Magnetos OFF, Master OFF.
-    """
+def calcular_regimen_descenso(ground_speed_nudos: float) -> str:
+    """Calcula el regimen de descenso (fpm) para mantener una senda de 3 grados."""
+    fpm = ground_speed_nudos * 5
+    return f"Para una senda de 3 grados, mantén un regimen de descenso de {fpm:.0f} pies por minuto."
+
+def convertir_velocidad(valor: float, unidad_origen: str) -> str:
+    """Convierte entre nudos y km/h. unidad_origen: 'nudos' o 'kmh'."""
+    if unidad_origen.lower() == "nudos":
+        resultado = valor * 1.852
+        return f"{valor} nudos son {resultado:.2f} km/h."
+    else:
+        resultado = valor / 1.852
+        return f"{valor} km/h son {resultado:.2f} nudos."
+
+def convertir_altitud(valor: float, unidad_origen: str) -> str:
+    """Convierte entre pies y km. unidad_origen: 'pies' o 'km'."""
+    if unidad_origen.lower() == "pies":
+        resultado = valor * 0.0003048
+        return f"{valor} pies son {resultado:.3f} km."
+    else:
+        resultado = valor / 0.0003048
+        return f"{valor} km son {resultado:.0f} pies."
+
+def calcular_combustible(tiempo_minutos: float, tasa_consumo_gph: float) -> str:
+    """Calcula el combustible necesario basado en el tiempo y consumo por hora."""
+    consumo = (tiempo_minutos / 60) * tasa_consumo_gph
+    return f"Para {tiempo_minutos} minutos de vuelo, necesitaremos aproximadamente {consumo:.1f} galones."
+
+def calcular_wca_gs(rumbo_deseado: float, airspeed_nudos: float, dir_viento: float, vel_viento: float) -> str:
+    """Calcula el Angulo de Correccion de Viento (WCA) y la Ground Speed (GS)."""
+    # Convertir a radianes
+    r_rumbo = math.radians(rumbo_deseado)
+    r_viento = math.radians(dir_viento)
+    
+    # Angulo del viento relativo al rumbo
+    angulo_viento = r_viento - r_rumbo
+    
+    # WCA = arcsin((Vviento * sin(angulo_viento)) / Vaire)
+    try:
+        wca_rad = math.asin((vel_viento * math.sin(angulo_viento)) / airspeed_nudos)
+        wca_deg = math.degrees(wca_rad)
+        
+        # GS = Vaire * cos(WCA) - Vviento * cos(angulo_viento)
+        gs = airspeed_nudos * math.cos(wca_rad) - vel_viento * math.cos(angulo_viento)
+        
+        rumbo_a_volar = (rumbo_deseado + wca_deg) % 360
+        return f"WCA: {wca_deg:.1f} grados. Rumbo a volar: {rumbo_a_volar:.0f}. Ground Speed estimada: {gs:.1f} nudos."
+    except Exception:
+        return "Error en el calculo. Asegurate de que la velocidad del aire sea mayor que la del viento."
+
+def calcular_altitud_densidad(altitud_presion_pies: float, temperatura_oat_c: float) -> str:
+    """Calcula la altitud de densidad aproximada."""
+    isa_temp = 15 - (2 * (altitud_presion_pies / 1000))
+    da = altitud_presion_pies + (120 * (temperatura_oat_c - isa_temp))
+    return f"La altitud de densidad es de aproximadamente {da:.0f} pies."
+
+def calcular_ete(distancia_nm: float, ground_speed_nudos: float) -> str:
+    """Calcula el tiempo estimado en ruta (ETE)."""
+    if ground_speed_nudos <= 0: return "La velocidad debe ser mayor a cero."
+    tiempo_horas = distancia_nm / ground_speed_nudos
+    minutos = tiempo_horas * 60
+    return f"El tiempo estimado en ruta es de {minutos:.1f} minutos."
+
+def ver_checklist_c172(fase: Optional[str] = None) -> str:
+    """Muestra el checklist del Cessna 172. Fases: PRE-FLIGHT, ENGINE START, BEFORE TAKE-OFF, LANDING."""
+    path = os.path.join(os.path.dirname(__file__), "files", "checklist_c172.json")
+    try:
+        with open(path, "r") as f:
+            data = json.load(f)
+        if fase and fase.upper() in data:
+            items = "\n".join([f"- {i}" for i in data[fase.upper()]])
+            return f"Checklist para {fase.upper()}:\n{items}"
+        else:
+            fases = ", ".join(data.keys())
+            return f"Por favor indica una fase valida: {fases}"
+    except Exception as e:
+        return f"No pude encontrar el manual del Cessna, Cadete. Error: {str(e)}"
 
 class NamiAgent(BaseSubAgent):
     @property
     def model(self): return "gemini-3.1-flash-lite-preview"
+    
     @property
     def name(self): return "nami"
+    
     @property
-    def description(self): return "Instructora de vuelo experta para entrenamiento y planificacion."
+    def description(self): 
+        return "Entrenadora de vuelo experta, sabia y paciente. Ayuda con calculos aeronauticos y checklists."
+    
     @property
     def system_prompt(self):
         return (
-            "Eres Nami, una piloto con muchisima experiencia, amable, cercana, sabia y muy paciente. "
-            "Tu mision es guiar y entrenar al usuario en planificacion, comprension y practica de vuelos. "
-            "REGLA CRITICA: Siempre debes dirigirte al usuario como 'Cadete Jesus'. "
-            "Actua como una instructora clara, pedagogica y motivadora. "
-            "Explica los procedimientos paso a paso y el razonamiento detras de cada calculo. "
-            "Puedes realizar briefings, interpretar METAR/TAF, evaluar vientos, explicar altitud de densidad, "
-            "practicar fraseologia ATC y simular emergencias. "
-            "Manten siempre un tono profesional, calmado y de apoyo."
+            "Eres Nami, una piloto con mucha trayectoria y ahora entrenadora de vuelo. "
+            "Tu personalidad es amable, cercana, sabia y extremadamente paciente. "
+            "Te diriges al usuario siempre como 'Cadete'. "
+            "Tu objetivo es guiar y ayudar en la planificacion de vuelos. "
+            "Cuando realices calculos, explica brevemente el porqué si es necesario, "
+            "siempre manteniendo ese tono de mentora experimentada."
         )
     
     def get_tools(self, all_available_tools):
-        # Nami necesita buscar en internet para METAR/TAF y procedimientos actualizados
-        search_tool = next((t for t in all_available_tools if getattr(t, "name", None) == "buscar_en_internet"), None)
-        tools = [aeronautical_calculator, get_cessna_172_checklists]
-        if search_tool:
-            tools.append(search_tool)
-        return tools
+        # Filtramos herramientas globales si fuera necesario, pero aqui usamos las locales definidas arriba.
+        return [
+            calcular_tod, 
+            calcular_regimen_descenso, 
+            convertir_velocidad, 
+            convertir_altitud,
+            calcular_combustible,
+            calcular_wca_gs,
+            calcular_altitud_densidad,
+            calcular_ete,
+            ver_checklist_c172
+        ]

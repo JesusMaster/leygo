@@ -1,0 +1,4 @@
+fecha,tipo,monto,descripcion,metodo_pago
+2026-03-18 13:03:35,ingreso,10000.0,Ingreso recibido,efectivo
+2026-03-18 13:03:54,gasto,200.0,Gasto realizado,tarjeta
+2026-03-18 13:04:05,gasto,100.0,Gasto realizado en efectivo,efectivo

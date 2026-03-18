@@ -1,0 +1,41 @@
+{
+  "PRE-FLIGHT": [
+    "Documentos del avion - A BORDO",
+    "Seguro de mandos - QUITAR",
+    "Interruptor de encendido - OFF",
+    "Interruptor Maestro (Master) - ON",
+    "Cantidad de combustible - COMPROBAR",
+    "Flaps - EXTENDER",
+    "Interruptor Maestro - OFF",
+    "Valvula selectora de combustible - BOTH"
+  ],
+  "ENGINE START": [
+    "Freno de estacionamiento - PUESTO",
+    "Interruptores electricos - OFF",
+    "Mezcla - RICA",
+    "Gas (Throttle) - ABIERTO 1/4 pulgada",
+    "Interruptor Maestro - ON",
+    "Bomba de combustible (si aplica) - ON",
+    "Area de la helice - LIBRE",
+    "Interruptor de encendido - START",
+    "Presion de aceite - COMPROBAR"
+  ],
+  "BEFORE TAKE-OFF": [
+    "Frenos - PUESTOS",
+    "Puertas y Ventanas - CERRADAS Y BLOQUEADAS",
+    "Mandos de vuelo - LIBRES Y CORRECTOS",
+    "Instrumentos de vuelo - AJUSTADOS",
+    "Mezcla - RICA",
+    "Prueba de motor (Run-up) - 1700 RPM",
+    "Magnetos - COMPROBAR (caida max 125 RPM)",
+    "Instrumentos de motor y Amperimetro - COMPROBAR",
+    "Ralenti - COMPROBAR"
+  ],
+  "LANDING": [
+    "Asientos y Cinturones - ASEGURADOS",
+    "Mezcla - RICA",
+    "Calefaccion del carburador - ON",
+    "Velocidad - 60-70 KIAS (Flaps abajo)",
+    "Flaps - SEGUN REQUERIDO"
+  ]
+}

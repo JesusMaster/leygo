@@ -7,6 +7,17 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from e2b_code_interpreter import Sandbox
 
 import memory_utils
+from utils.token_tracker import log_token_usage
+
+def _track_autocoder_llm(response, description: str):
+    try:
+        if hasattr(response, "usage_metadata") and response.usage_metadata:
+            i = response.usage_metadata.get("input_tokens", 0)
+            o = response.usage_metadata.get("output_tokens", 0)
+            model_name = os.environ.get("MODEL_AUTOCODER", "gemini-3.1-pro-preview")
+            log_token_usage(description, model_name, i, o, "autocoder_system")
+    except Exception as e:
+        print(f"[AutoCoder] Warning: Cannot track tokens: {e}")
 
 @tool
 def crear_y_ejecutar_herramienta_local(descripcion_tarea: str, argumentos_de_prueba: str = "") -> str:
@@ -21,7 +32,8 @@ def crear_y_ejecutar_herramienta_local(descripcion_tarea: str, argumentos_de_pru
     print(f"\\n[AutoCoder] Intentando crear herramienta para: {descripcion_tarea} con test-args: '{argumentos_de_prueba}'")
     
     try:
-        llm = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0.2)
+        model_name = os.environ.get("MODEL_AUTOCODER", "gemini-3.1-pro-preview")
+        llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.2)
     except Exception as e:
         return f"Error iniciando AutoCoder LLM: {e}"
 
@@ -61,6 +73,7 @@ def crear_y_ejecutar_herramienta_local(descripcion_tarea: str, argumentos_de_pru
         else:
             response = llm.invoke([HumanMessage(content=prompt)])
             
+        _track_autocoder_llm(response, f"Coded: {descripcion_tarea}")
         codigo_python = response.content.strip()
         
         # Super simple cleanup in case the LLM stubbornly adds markdown
@@ -133,6 +146,7 @@ Tu documentación debe seguir exactamente esta estructura de Manual de Uso:
 [Variables o constantes usadas dentro del script]
 """
                         doc_response = llm.invoke([HumanMessage(content=doc_prompt)])
+                        _track_autocoder_llm(doc_response, f"Doc for: {descripcion_tarea}")
                         memory_utils.save_procedural_memory(md_filename, doc_response.content)
                         
                         return f"Éxito ejecutando herramienta auto-generada remota. Salida:\\n{stdout_str.strip()}"
@@ -180,6 +194,7 @@ Tu documentación debe seguir exactamente esta estructura de Manual de Uso:
 [Variables o constantes usadas dentro del script]
 """
                     doc_response = llm.invoke([HumanMessage(content=doc_prompt)])
+                    _track_autocoder_llm(doc_response, f"Doc for: {descripcion_tarea}")
                     memory_utils.save_procedural_memory(md_filename, doc_response.content)
                     
                     return f"Éxito ejecutando herramienta auto-generada local. Salida:\\n{result.stdout.strip()}"

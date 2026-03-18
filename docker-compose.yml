@@ -6,9 +6,7 @@ services:
     env_file:
       - agent_core/.env
     volumes:
-      - ./agent_core/memoria:/app/agent_core/memoria
-      - ./agent_core/sub_agents:/app/agent_core/sub_agents
-      - ./agent_core/keys:/app/agent_core/keys
+      - ./agent_core:/app/agent_core
     ports:
       - "8000:8000"
     command: python agent_core/telegram_bot.py
@@ -19,9 +17,7 @@ services:
     env_file:
       - agent_core/.env
     volumes:
-      - ./agent_core/memoria:/app/agent_core/memoria
-      - ./agent_core/sub_agents:/app/agent_core/sub_agents
-      - ./agent_core/keys:/app/agent_core/keys
+      - ./agent_core:/app/agent_core
     stdin_open: true
     tty: true
     command: python agent_core/main.py

@@ -6,13 +6,15 @@
   background-color: var(--bg-main);
   height: 100%;
   width: 100%; /* Explicit width */
+  overflow: hidden;
 }
 
 .messages-container {
   flex: 1;
   width: 100%;
+  min-height: 0;
   overflow-y: auto;
-  padding: 40px 20px 180px 20px;
+  padding: 40px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -73,34 +75,34 @@
   line-height: 1.6;
 }
 
-.message-content p {
+::ng-deep .message-content p {
   margin: 0 0 12px 0;
 }
 
-.message-content p:last-child {
+::ng-deep .message-content p:last-child {
   margin-bottom: 0;
 }
 
-.message-content h1, .message-content h2, .message-content h3 {
+::ng-deep .message-content h1, ::ng-deep .message-content h2, ::ng-deep .message-content h3 {
   margin: 16px 0 8px 0;
   font-weight: 700;
   line-height: 1.25;
 }
 
-.message-content h1 { font-size: 1.5em; }
-.message-content h2 { font-size: 1.3em; }
-.message-content h3 { font-size: 1.1em; }
+::ng-deep .message-content h1 { font-size: 1.5em; }
+::ng-deep .message-content h2 { font-size: 1.3em; }
+::ng-deep .message-content h3 { font-size: 1.1em; }
 
-.message-content ul, .message-content ol {
+::ng-deep .message-content ul, ::ng-deep .message-content ol {
   margin: 8px 0;
   padding-left: 24px;
 }
 
-.message-content li {
+::ng-deep .message-content li {
   margin-bottom: 4px;
 }
 
-.message-content code {
+::ng-deep .message-content code {
   background-color: #f3f4f6;
   padding: 2px 4px;
   border-radius: 4px;
@@ -108,7 +110,7 @@
   font-size: 13px;
 }
 
-.message-content pre {
+::ng-deep .message-content pre {
   background-color: #f3f4f6;
   padding: 12px;
   border-radius: 8px;
@@ -116,13 +118,13 @@
   margin: 12px 0;
 }
 
-.message-content pre code {
+::ng-deep .message-content pre code {
   background-color: transparent;
   padding: 0;
   font-size: 13px;
 }
 
-.message-content blockquote {
+::ng-deep .message-content blockquote {
   border-left: 4px solid var(--border-light);
   padding-left: 12px;
   color: var(--text-dim);
@@ -135,10 +137,27 @@
   font-weight: 600;
   text-transform: uppercase;
   margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.usage-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(13, 138, 188, 0.1);
+  color: var(--accent-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  text-transform: none;
+  font-weight: 500;
+  border: 1px solid rgba(13, 138, 188, 0.2);
 }
 
 .user .message-meta {
   text-align: right;
+  justify-content: flex-end;
 }
 
 /* Typing indicator dots */
@@ -168,18 +187,16 @@
 }
 /* Input area */
 .input-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  padding: 0 40px;
+  padding: 15px 40px 10px 40px;
   box-sizing: border-box;
   background-color: #f9fafb;
+  border-top: 1px solid var(--border-light);
 }
 
 .floating-input {

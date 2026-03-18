@@ -20,7 +20,7 @@ import memory_utils
 from mcp_client import MCPClientManager
 from auto_coder import crear_y_ejecutar_herramienta_local, usar_herramienta_local, escribir_archivo_en_proyecto, eliminar_archivo_en_proyecto
 from web_tools import buscar_en_internet
-from scheduler_manager import programar_recordatorio, listar_recordatorios, start_scheduler, stop_scheduler, programar_intervalo_dinamico, eliminar_recordatorio
+from scheduler_manager import crear_recordatorio_solo_texto_para_usuario, listar_tareas_programadas, start_scheduler, stop_scheduler, crear_rutina_texto_periodica_para_usuario, eliminar_tarea_programada, agendar_accion_autonoma_agente, agendar_rutina_autonoma_agente
 from google_tools import leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo
 
 import logging
@@ -110,38 +110,37 @@ def get_dynamic_route_model(sub_agents: List[BaseSubAgent]):
     # Para simplicidad y compatibilidad con pydantic v2:
     return create_model(
         'Route',
-        next_node=(str, Field(description=desc)) # TODO: Aquí GEMINI se restringe por el str normal. Confiaremos en la docstring.
+        next_node=(str, Field(description=desc)),
+        respuesta_conversacional=(str, Field(default="", description="Si el next_node es FINISH, usa este campo para darle tu respuesta final en texto al usuario (ej. saludar, dar la hora, o confirmar)."))
     )
 
 def make_supervisor_node(llm, sub_agents: List[BaseSubAgent]):
     RouteModel = get_dynamic_route_model(sub_agents)
-    supervisor_llm = llm.bind_tools([RouteModel])
+    supervisor_llm = llm.bind_tools([RouteModel], tool_choice="any")
     
     async def supervisor_node(state: AgentState, config: RunnableConfig):
         messages = state["messages"]
-        if len(messages) > 0 and isinstance(messages[-1], (BaseMessage)) and messages[-1].type == "ai":
-            # Solo terminar si el worker YA respondió sin tool_calls pendientes
-            has_tool_calls = hasattr(messages[-1], "tool_calls") and messages[-1].tool_calls
-            if not has_tool_calls:
-                print(f"[Supervisor] Trabajo del sub-agente '{messages[-1].name if hasattr(messages[-1], 'name') else 'worker'}' concluido (END).")
-                # Passthrough the worker's final answer instead of re-evaluating
-                return {"next_node": "END"}
 
-        import datetime
-        current_time_iso = datetime.datetime.now().astimezone().isoformat()
+        from datetime import datetime
+        import os
+        from zoneinfo import ZoneInfo
+        
+        tz_str = os.getenv("TZ", "America/Santiago")
+        current_time_iso = datetime.now(ZoneInfo(tz_str)).isoformat()
         
         # Generar las reglas del prompt dinámicamente mapeadas
         agent_rules = "\\n".join([f"- '{a.name}': {a.description}" for a in sub_agents])
         
         system_prompt = SystemMessage(content=f"""Eres el Supervisor Orquestador del 'Self-Extending Agent'.
 La fecha y hora actual es {current_time_iso}.
-Tu trabajo es analizar la petición del usuario y DELEGAR usando la herramienta 'Route'.
+Tu trabajo es analizar la petición del usuario, leer SIEMPRE TODO EL HISTORIAL para revisar si alguno de tus sub-agentes acaba de completar una parte del trabajo, y DELEGAR el resto usando la herramienta 'Route'.
 {agent_rules}
 
 REGLAS:
-1. DEBES usar la herramienta `Route` devolviendo el 'next_node' si la tarea requiere acción.
-2. Si es un saludo genérico o plática, responde amigablemente y NO uses la herramienta `Route` (terminará en FINISH).
-3. PRIORIZACIÓN: El agente MCP ('mcp') contiene las integraciones clave de la empresa (GitHub, KPIs, Documentación interna, APIs). SIEMPRE dale prioridad al MCP para preguntas sobre proyectos, repositorios o negocio. Usa el 'researcher' SÓLO como ÚLTIMO RECURSO para búsquedas generales de la web pública (noticias, eventos).
+1. SI EL USUARIO PIDE AGENDAR, MOSTRAR O PROGRAMAR ALGO PARA EL FUTURO (ej. "en 1 min", "mañana", "recuérdame", "cada x horas"): **DEBES ENVIARLO INMEDIATAMENTE AL AGENTE 'assistant'**, ya que SOLO ÉL tiene las herramientas del Scheduler. No intentes enviar la tarea a otros agentes ni ejecutarla ahora.
+2. DEBES usar la herramienta `Route` devolviendo el 'next_node' si la tarea requiere acción o **si un sub-agente completó un paso pero falta otro** (ejemplo: 'mcp' leyó un archivo, pero falta enviarlo por correo, entonces asigna 'assistant').
+3. PRIORIZACIÓN (Para acciones en TIEMPO REAL): El agente MCP ('mcp') contiene integraciones (GitHub, KPIs). Dale prioridad al MCP para preguntas sobre proyectos o repositorios, SIEMPRE Y CUANDO no estén pidiendo que se programe para el futuro.
+4. SI TODAS LAS TAREAS FUERON COMPLETADAS por los agentes previos, O SI SÓLO ES CHARLA (preguntas generales, la hora, saludos): DEBES usar la herramienta `Route` con `next_node`='FINISH'. Y usar el campo `respuesta_conversacional` de la herramienta para escribirle el texto al usuario.
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
@@ -154,11 +153,20 @@ REGLAS:
             if "next_node" in tc["args"]:
                 next_step = tc["args"]["next_node"].lower()
                 
-            print(f"[Supervisor] Delegando tarea a: {next_step}")
+            resp_conv = tc["args"].get("respuesta_conversacional", "").strip()
+                
+            if next_step in ("finish", "end"):
+                print(f"[Supervisor] El flujo general está completo según el Supervisor. Terminando (END).")
+                if resp_conv:
+                    from langchain_core.messages import AIMessage
+                    return {"messages": [AIMessage(content=resp_conv)], "next_node": "END"}
+                return {"next_node": "END"}
+                
+            print(f"[Supervisor] Delegando tarea (o sub-tarea pendiente) a: {next_step}")
             tool_msg = ToolMessage(content=f"Delegado a {next_step}", tool_call_id=tc["id"])
             return {"messages": [response, tool_msg], "next_node": next_step}
             
-        print("[Supervisor] Respondiendo directamente (END).")
+        print("[Supervisor] Respondiendo directamente o asumiendo END sin herramienta.")
         return {"messages": [response], "next_node": "END"}
 
     return supervisor_node
@@ -183,8 +191,13 @@ def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, cust
         if config and "configurable" in config:
             thread_id = config["configurable"].get("thread_id", "default_session")
             
-        import datetime
-        current_time_iso = datetime.datetime.now().astimezone().isoformat()
+        from datetime import datetime
+        import os
+        from zoneinfo import ZoneInfo
+        
+        tz_str = os.getenv("TZ", "America/Santiago")
+        current_time_iso = datetime.now(ZoneInfo(tz_str)).isoformat()
+        
         episodic_context = memory_utils.load_all_episodic_context(agent_name=agent_name)
         procedural_context = memory_utils.load_procedural_documentation(agent_name=agent_name)
         
@@ -194,6 +207,7 @@ def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, cust
             episodic_context=episodic_context,
             procedural_context=procedural_context if procedural_context else "Aún no tienes herramientas."
         )
+        formatted_prompt += "\\n\\nATENCIÓN: Eres un Sub-Agente Trabajador. NUNCA intentes usar la herramienta 'Route' y NO intentes delegar por tu cuenta a otros agentes. Si una tarea excede tus herramientas, simplemente HAZ TU PARTE, responde con un texto explicando qué hiciste y escribe qué le toca hacer al SIGUIENTE agente (ej. 'Ya leí el archivo, ahora el assistant debe enviarlo'). El Supervisor te leerá y hará la derivación automáticamente."
         system_msg = SystemMessage(content=formatted_prompt)
         
         messages = state["messages"]
@@ -258,10 +272,12 @@ class SelfExtendingAgent:
             memory_utils.administrar_memoria_episodica, 
             memory_utils.administrar_memoria_procedimental,
             buscar_en_internet, 
-            programar_recordatorio,
-            listar_recordatorios,
-            programar_intervalo_dinamico,
-            eliminar_recordatorio,
+            crear_recordatorio_solo_texto_para_usuario,
+            agendar_accion_autonoma_agente,
+            listar_tareas_programadas,
+            crear_rutina_texto_periodica_para_usuario,
+            agendar_rutina_autonoma_agente,
+            eliminar_tarea_programada,
             leer_correos_recientes,
             modificar_etiquetas_correo,
             enviar_correo,
@@ -440,10 +456,10 @@ class SelfExtendingAgent:
                     elif node_name in tools_nodes:
                         print(f"\\n[Herramienta finalizó]: {latest_message.name}")
 
-    async def process_message(self, user_input: str, thread_id: str = "default_session") -> str:
-        """Process a message and return the final string response directly (useful for APIs)."""
+    async def process_message(self, user_input: str, thread_id: str = "default_session", return_usage: bool = False):
+        """Process a message and return the final string response (and usage if requested)."""
         if not self.graph:
-            return "Error: El agente no ha sido inicializado."
+            return ("Error: El agente no ha sido inicializado.", {}) if return_usage else "Error: El agente no ha sido inicializado."
 
         # Hot-Reload: detectar y cargar nuevos sub-agentes sin reiniciar
         self._check_and_reload_graph()
@@ -452,10 +468,23 @@ class SelfExtendingAgent:
         config = {"configurable": {"thread_id": thread_id}}
         final_answer = ""
         
+        total_input_tokens = 0
+        total_output_tokens = 0
+        main_model = "Desconocido"
+        
         async for output in self.graph.astream({"messages": [HumanMessage(content=user_input)]}, config=config, stream_mode="updates"):
             for node_name, node_state in output.items():
                 if "messages" in node_state:
                     latest_message = node_state["messages"][-1]
+                    
+                    if hasattr(latest_message, "usage_metadata") and latest_message.usage_metadata:
+                        total_input_tokens += latest_message.usage_metadata.get("input_tokens", 0)
+                        total_output_tokens += latest_message.usage_metadata.get("output_tokens", 0)
+                        
+                    if hasattr(latest_message, "response_metadata") and latest_message.response_metadata:
+                        if latest_message.response_metadata.get("model_name"):
+                            main_model = latest_message.response_metadata.get("model_name")
+                            
                     worker_nodes = getattr(self, "_agent_names", ["dev", "assistant", "researcher"])
                     if node_name in worker_nodes:
                         if hasattr(latest_message, "tool_calls") and latest_message.tool_calls:
@@ -482,6 +511,24 @@ class SelfExtendingAgent:
                             else:
                                 if content:
                                     final_answer = content
+        
+        usage_record = {}
+        if total_input_tokens > 0 or total_output_tokens > 0:
+            try:
+                from utils.token_tracker import log_token_usage
+                usage_record = log_token_usage(
+                    user_input=user_input,
+                    model=main_model,
+                    input_tokens=total_input_tokens,
+                    output_tokens=total_output_tokens,
+                    thread_id=thread_id
+                )
+            except Exception as e:
+                print(f"[API] Error trackeando tokens del Agente: {e}")
+
+        if return_usage:
+            return final_answer, usage_record
+            
         return final_answer
 
     async def cleanup(self):

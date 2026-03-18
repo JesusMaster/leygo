@@ -1,1 +1,27 @@
-[]
+[
+    {
+        "id": "2664f2cfa52741eeacfc6704158859dc",
+        "name": "RUTINA TEXTO: Recuérdame tomar agua de forma",
+        "func_name": "send_dynamic_telegram_reminder",
+        "args": [
+            "1635021523",
+            "Recuérdame tomar agua de forma breve y motivadora."
+        ],
+        "next_run_time_iso": "2026-03-18T12:56:27.938179-03:00",
+        "type": "interval",
+        "interval_minutes": 15.0
+    },
+    {
+        "id": "508bec85810440d594ea2cb84e6541ed",
+        "name": "Rutina Dia: envia un correo a rvenegas@app",
+        "func_name": "execute_agent_task",
+        "args": [
+            "default_session",
+            "envia un correo a rvenegas@apprecio.com, necesito que revises el README del proyecto de github /JesusMaster/leygo y le envies un resumen"
+        ],
+        "next_run_time_iso": "2026-03-19T10:45:00-03:00",
+        "type": "cron",
+        "cron_hour": "10",
+        "cron_minute": "45"
+    }
+]

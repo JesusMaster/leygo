@@ -1,4 +1,4 @@
-import { Component, inject, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, inject, signal, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
@@ -12,7 +12,7 @@ import { MarkdownPipe } from '../../pipes/markdown.pipe';
   templateUrl: './chat.html',
   styleUrl: './chat.css'
 })
-export class ChatComponent implements AfterViewChecked {
+export class ChatComponent implements AfterViewInit, OnDestroy {
   private api = inject(ApiService);
   private chatService = inject(ChatService);
   
@@ -23,9 +23,28 @@ export class ChatComponent implements AfterViewChecked {
   isTyping = signal(false);
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+  private observer?: MutationObserver;
 
-  ngAfterViewChecked() {
-    this.scrollToBottom();
+  ngAfterViewInit() {
+    this.observer = new MutationObserver(() => {
+      this.scrollToBottom();
+    });
+    
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      this.observer.observe(this.scrollContainer.nativeElement, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+      // Set initial scroll
+      setTimeout(() => this.scrollToBottom(), 100);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
   }
 
   async sendMessage() {
@@ -48,7 +67,10 @@ export class ChatComponent implements AfterViewChecked {
         this.chatService.addMessage({
           text: res.response,
           sender: 'bot',
-          timestamp: new Date()
+          timestamp: new Date(),
+          tokens: res.usage ? res.usage.input_tokens + res.usage.output_tokens : undefined,
+          cost: res.usage ? res.usage.cost_usd : undefined,
+          model: res.usage ? res.usage.model : undefined
         });
         this.isTyping.set(false);
       },

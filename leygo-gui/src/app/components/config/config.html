@@ -14,11 +14,28 @@
       <div class="auth-status">
         @if (authStatus().authenticated) {
           <span class="status-badge success">Conectado</span>
+          <div class="user-info" style="margin-top: 10px;">
+            <p><strong>Usuario:</strong> {{ authStatus().user?.name }} ({{ authStatus().user?.email }})</p>
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; align-items: center;">
+              @if (!authStatus().workspaceConnected) {
+                <button class="btn-primary" style="padding: 5px 10px; font-size: 0.9em; background-color: #0b5394;" (click)="authorizeWorkspace()">
+                  Conectar Workspace (Crear token.pickle)
+                </button>
+              } @else {
+                <span class="status-badge success" style="background-color: #0d8abc; color: white;">Workspace Conectado ✅</span>
+              }
+              <button class="btn-primary" style="padding: 5px 10px; font-size: 0.9em; background-color: #f44336;" (click)="logoutGoogle()">
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
         } @else {
           <span class="status-badge warning">No autenticado</span>
-          <button class="btn-primary" (click)="loginWithGoogle()">
-            Iniciar Sesión con Google
-          </button>
+          @if (authStatus().clientId) {
+            <div id="google-buttonDiv" style="margin-top: 15px;"></div>
+          } @else {
+            <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">Configura el Client ID en las variables de entorno para usar SSO.</p>
+          }
         }
       </div>
     </div>
@@ -31,7 +48,7 @@
           <div class="env-item">
             <span class="key">{{ key }}</span>
             <div class="value-input">
-              <input type="password" [value]="config()[key]" #valInput>
+              <input type="text" [value]="config()[key]" #valInput>
               <button class="save-btn" (click)="updateVar(key, valInput.value)">💾</button>
             </div>
           </div>

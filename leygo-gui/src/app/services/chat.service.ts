@@ -4,6 +4,9 @@ export interface Message {
   text: string;
   sender: 'user' | 'bot';
   timestamp: Date;
+  tokens?: number;
+  cost?: number;
+  model?: string;
 }
 
 @Injectable({
