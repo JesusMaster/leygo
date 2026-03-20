@@ -13,6 +13,10 @@ EPISODICA_DIR = os.path.join(MEMORY_DIR, "episodica")
 PROCEDIMENTAL_DIR = os.path.join(MEMORY_DIR, "procedimental")
 SANDBOX_DIR = os.path.join(BASE_DIR, "sandbox")
 
+# Limitar el tamaño de memoria cargada para evitar inflar tokens
+MAX_MEMORY_FILE_CHARS = 2000  # máximo por archivo
+MAX_MEMORY_TOTAL_CHARS = 4000  # máximo total combinado
+
 def init_memory_structure():
     """Initializes the memory folder structure if it doesn't exist."""
     directories = [
@@ -183,7 +187,10 @@ def load_all_episodic_context(agent_name: str = None) -> str:
                     with open(os.path.join(agent_episodica_dir, filename), 'r', encoding='utf-8') as f:
                         context_blocks.append(f"--- Archivo de Contexto Específico del Agente ({agent_name}): {filename} ---\n{f.read()}\n")
                         
-    return "\n".join(context_blocks)
+    result = "\n".join(context_blocks)
+    if len(result) > MAX_MEMORY_TOTAL_CHARS:
+        result = result[:MAX_MEMORY_TOTAL_CHARS] + "\n[... memoria truncada por límite de tokens]"  
+    return result
 
 def load_procedural_documentation(agent_name: str = None) -> str:
     """Reads all .md files in the procedural memory directory and returns a unified catalog of skills."""
@@ -206,7 +213,10 @@ def load_procedural_documentation(agent_name: str = None) -> str:
                     with open(os.path.join(agent_procedimental_dir, filename), 'r', encoding='utf-8') as f:
                         context_blocks.append(f"--- Documentación Herramienta Específica del Agente ({agent_name}): {filename} ---\n{f.read()}\n")
                         
-    return "\n".join(context_blocks)
+    result = "\n".join(context_blocks)
+    if len(result) > MAX_MEMORY_TOTAL_CHARS:
+        result = result[:MAX_MEMORY_TOTAL_CHARS] + "\n[... documentación truncada por límite de tokens]"
+    return result
 
 @tool
 def administrar_memoria_episodica(accion: str, archivo: str, contenido: str = "", agente: str = None) -> str:

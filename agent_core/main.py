@@ -22,6 +22,8 @@ from auto_coder import crear_y_ejecutar_herramienta_local, usar_herramienta_loca
 from web_tools import buscar_en_internet
 from scheduler_manager import crear_recordatorio_solo_texto_para_usuario, listar_tareas_programadas, start_scheduler, stop_scheduler, crear_rutina_texto_periodica_para_usuario, eliminar_tarea_programada, agendar_accion_autonoma_agente, agendar_rutina_autonoma_agente
 from google_tools import leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo
+# Máximo de mensajes recientes a enviar al LLM para evitar inflar tokens
+MAX_CONTEXT_MESSAGES = 10
 
 import logging
 import warnings
@@ -93,15 +95,23 @@ def discover_sub_agents() -> List[BaseSubAgent]:
         print(f"Error descubriendo agentes: {e}")
     return sub_agents
 
-def get_dynamic_route_model(sub_agents: List[BaseSubAgent]):
+def get_dynamic_route_model(sub_agents: List[BaseSubAgent], all_tools: list = None):
     """Crea dinámicamente la clase Pydantic de enrutamiento basada en agentes descubiertos."""
+    if all_tools is None:
+        all_tools = []
+        
     # Las opciones posibles son los nombres de los agentes descubiertos + "FINISH"
     options = [a.name for a in sub_agents] + ["FINISH"]
     
     # Construimos la descripción detallada uniendo las de cada sub-agente
     desc = "El agente encargado. "
     for a in sub_agents:
-        desc += f"'{a.name}' ({a.description}), "
+        try:
+            agent_tools = [getattr(t, "name", getattr(t, "__name__", str(t))) for t in a.get_tools(all_tools)]
+            tools_str = f" [herramientas: {', '.join(agent_tools)}]" if agent_tools else ""
+        except Exception:
+            tools_str = ""
+        desc += f"'{a.name}' ({a.description}{tools_str}), "
     desc += "'FINISH' si la tarea está lista."
 
     # Creamos un tipo literal dinámicamente. 
@@ -111,12 +121,52 @@ def get_dynamic_route_model(sub_agents: List[BaseSubAgent]):
     return create_model(
         'Route',
         next_node=(str, Field(description=desc)),
+        instruccion=(str, Field(default="", description="Si delegas a un agente, escribe aquí una instrucción clara y directa de lo que esperas que haga. Él leerá este mensaje.")),
         respuesta_conversacional=(str, Field(default="", description="Si el next_node es FINISH, usa este campo para darle tu respuesta final en texto al usuario (ej. saludar, dar la hora, o confirmar)."))
     )
 
-def make_supervisor_node(llm, sub_agents: List[BaseSubAgent]):
-    RouteModel = get_dynamic_route_model(sub_agents)
-    supervisor_llm = llm.bind_tools([RouteModel], tool_choice="any")
+def _sanitize_messages_for_gemini(messages):
+    """Sanitiza la lista de mensajes después de truncar para mantener secuencias válidas para Gemini.
+    
+    Gemini requiere:
+    - Un ToolMessage SIEMPRE debe ir precedido por un AIMessage con tool_calls
+    - Un AIMessage con tool_calls SIEMPRE debe ir seguido por su(s) ToolMessage(s) de respuesta
+    
+    Si la truncación cortó en medio de una secuencia, esta función limpia los huérfanos.
+    """
+    if not messages:
+        return messages
+    
+    sanitized = list(messages)
+    
+    # 1. Remover ToolMessages huérfanos al inicio (fueron separados de su AIMessage previo)
+    while sanitized and isinstance(sanitized[0], ToolMessage):
+        sanitized.pop(0)
+    
+    # 2. Si la lista quedó vacía, o si empieza con un AIMessage, 
+    # insertamos un HumanMessage de contexto. Gemini exige que las secuencias de funciones 
+    # SIEMPRE tengan un HumanMessage o ToolMessage predecesor. Si un AIMessage queda de primero, crashea.
+    from langchain_core.messages import HumanMessage, AIMessage
+    if not sanitized or isinstance(sanitized[0], AIMessage):
+        sanitized.insert(0, HumanMessage(content="Continúa con la tarea pendiente usando tu contexto y herramientas.", name="WorkerContext"))
+    
+    return sanitized
+
+def make_supervisor_node(llm, sub_agents: List[BaseSubAgent], all_tools: list):
+    RouteModel = get_dynamic_route_model(sub_agents, all_tools)
+    
+    # Usar modelo más liviano para routing (el supervisor solo decide a quién derivar)
+    import os
+    supervisor_model_name = os.environ.get("MODEL_SUPERVISOR", "gemini-2.5-flash-lite")
+    try:
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        supervisor_base_llm = ChatGoogleGenerativeAI(model=supervisor_model_name, temperature=0)
+        print(f"  [Supervisor] Usando modelo liviano para routing: {supervisor_model_name}")
+    except Exception as e:
+        print(f"  [Supervisor] Fallo al cargar {supervisor_model_name}, usando modelo por defecto: {e}")
+        supervisor_base_llm = llm
+    
+    supervisor_llm = supervisor_base_llm.bind_tools([RouteModel], tool_choice="any")
     
     async def supervisor_node(state: AgentState, config: RunnableConfig):
         messages = state["messages"]
@@ -128,14 +178,28 @@ def make_supervisor_node(llm, sub_agents: List[BaseSubAgent]):
         tz_str = os.getenv("TZ", "America/Santiago")
         current_time_iso = datetime.now(ZoneInfo(tz_str)).isoformat()
         
-        # Generar las reglas del prompt dinámicamente mapeadas
-        agent_rules = "\\n".join([f"- '{a.name}': {a.description}" for a in sub_agents])
+        episodic_context = memory_utils.load_all_episodic_context(agent_name="supervisor")
+        
+        # Generar las reglas del prompt dinámicamente mapeadas incluyendo sus herramientas
+        agent_desc_lines = []
+        for a in sub_agents:
+            try:
+                agent_tools = [getattr(t, "name", getattr(t, "__name__", str(t))) for t in a.get_tools(all_tools)]
+                tools_str = f" [Herramientas que domina: {', '.join(agent_tools)}]" if agent_tools else ""
+            except Exception:
+                tools_str = ""
+            agent_desc_lines.append(f"- '{a.name}': {a.description}{tools_str}")
+            
+        agent_rules = "\\n".join(agent_desc_lines)
         
         system_prompt = SystemMessage(content=f"""Eres el Supervisor Orquestador del 'Self-Extending Agent'.
 La fecha y hora actual es {current_time_iso}.
+
+MEMORIA EPISÓDICA RELACIONADA CON TU IDENTIDAD/PREFERENCIAS:
+{episodic_context}
+
 Tu trabajo es analizar la petición del usuario, leer SIEMPRE TODO EL HISTORIAL para revisar si alguno de tus sub-agentes acaba de completar una parte del trabajo, y DELEGAR el resto usando la herramienta 'Route'.
 {agent_rules}
-
 REGLAS:
 1. SI EL USUARIO PIDE AGENDAR, MOSTRAR O PROGRAMAR ALGO PARA EL FUTURO (ej. "en 1 min", "mañana", "recuérdame", "cada x horas"): **DEBES ENVIARLO INMEDIATAMENTE AL AGENTE 'assistant'**, ya que SOLO ÉL tiene las herramientas del Scheduler. No intentes enviar la tarea a otros agentes ni ejecutarla ahora.
 2. DEBES usar la herramienta `Route` devolviendo el 'next_node' si la tarea requiere acción o **si un sub-agente completó un paso pero falta otro** (ejemplo: 'mcp' leyó un archivo, pero falta enviarlo por correo, entonces asigna 'assistant').
@@ -144,8 +208,24 @@ REGLAS:
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
-        print(f">> Supervisor evaluando (historial: {len(clean_messages)} msjs)...")
-        response = await supervisor_llm.ainvoke([system_prompt] + clean_messages)
+        # Para el Supervisor: filtrar mensajes de herramientas (ToolMessage y AIMessage con solo tool_calls)
+        # El Supervisor solo necesita ver texto humano/AI para decidir el routing, no payloads JSON de tools
+        lightweight_messages = []
+        for m in clean_messages:
+            # Saltar ToolMessages (respuestas de herramientas con JSON pesado)
+            if isinstance(m, ToolMessage):
+                continue
+            # Saltar AIMessages que solo tienen tool_calls sin texto útil
+            if hasattr(m, 'tool_calls') and m.tool_calls and not (m.content and str(m.content).strip()):
+                continue
+            lightweight_messages.append(m)
+        
+        # Truncar a los últimos N mensajes para evitar explotar tokens
+        if len(lightweight_messages) > MAX_CONTEXT_MESSAGES:
+            lightweight_messages = lightweight_messages[-MAX_CONTEXT_MESSAGES:]
+        
+        print(f">> Supervisor evaluando (historial: {len(lightweight_messages)} msjs, filtrados de {len(clean_messages)})...")
+        response = await supervisor_llm.ainvoke([system_prompt] + lightweight_messages)
         
         next_step = "FINISH"
         if hasattr(response, "tool_calls") and response.tool_calls:
@@ -157,14 +237,28 @@ REGLAS:
                 
             if next_step in ("finish", "end"):
                 print(f"[Supervisor] El flujo general está completo según el Supervisor. Terminando (END).")
-                if resp_conv:
-                    from langchain_core.messages import AIMessage
-                    return {"messages": [AIMessage(content=resp_conv)], "next_node": "END"}
-                return {"next_node": "END"}
+                from langchain_core.messages import AIMessage
+                new_msg = AIMessage(
+                    content=resp_conv, 
+                    usage_metadata=getattr(response, "usage_metadata", {}), 
+                    response_metadata=getattr(response, "response_metadata", {})
+                )
+                return {"messages": [new_msg], "next_node": "END"}
                 
             print(f"[Supervisor] Delegando tarea (o sub-tarea pendiente) a: {next_step}")
-            tool_msg = ToolMessage(content=f"Delegado a {next_step}", tool_call_id=tc["id"])
-            return {"messages": [response, tool_msg], "next_node": next_step}
+            instruccion = tc["args"].get("instruccion", "").strip()
+            if instruccion:
+                content = f"[Instrucción del Supervisor para {next_step}]: {instruccion}"
+            else:
+                content = f"[Instrucción del Supervisor para {next_step}]: Por favor, atiende la solicitud del usuario de acuerdo a tu rol usando tu contexto."
+            
+            from langchain_core.messages import HumanMessage
+            instruction_msg = HumanMessage(content=content, name="Supervisor")
+            
+            # ATENCIÓN: Solo devolvemos la instrucción fingida como HumanMessage. NO devolvemos
+            # el 'response' original (AIMessage con tool_calls) para evitar corromper la alternancia 
+            # Human/AI de la API de Gemini (INVALID_ARGUMENT).
+            return {"messages": [instruction_msg], "next_node": next_step}
             
         print("[Supervisor] Respondiendo directamente o asumiendo END sin herramienta.")
         return {"messages": [response], "next_node": "END"}
@@ -207,13 +301,21 @@ def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, cust
             episodic_context=episodic_context,
             procedural_context=procedural_context if procedural_context else "Aún no tienes herramientas."
         )
-        formatted_prompt += "\\n\\nATENCIÓN: Eres un Sub-Agente Trabajador. NUNCA intentes usar la herramienta 'Route' y NO intentes delegar por tu cuenta a otros agentes. Si una tarea excede tus herramientas, simplemente HAZ TU PARTE, responde con un texto explicando qué hiciste y escribe qué le toca hacer al SIGUIENTE agente (ej. 'Ya leí el archivo, ahora el assistant debe enviarlo'). El Supervisor te leerá y hará la derivación automáticamente."
+        formatted_prompt += "\n\nATENCIÓN: Eres un Sub-Agente Trabajador. NUNCA intentes usar la herramienta 'Route' y NO intentes delegar por tu cuenta a otros agentes. Si una tarea excede tus herramientas, simplemente HAZ TU PARTE, responde con un texto explicando qué hiciste y escribe qué le toca hacer al SIGUIENTE agente (ej. 'Ya leí el archivo, ahora el assistant debe enviarlo'). El Supervisor te leerá y hará la derivación automáticamente. \nCRÍTICO: Si intentas usar una herramienta y falla reiteradamente o te devuelve error, NO te quedes pegado en un bucle infinito reintentando. Detente de inmediato, reporta el fallo y el motivo de forma amigable al usuario en texto plano, y termina tu turno."
         system_msg = SystemMessage(content=formatted_prompt)
         
         messages = state["messages"]
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
-        print(f">> LLM Razonando en contexto Worker...")
+        # Truncar a los últimos N mensajes para evitar explotar tokens
+        if len(clean_messages) > MAX_CONTEXT_MESSAGES:
+            clean_messages = clean_messages[-MAX_CONTEXT_MESSAGES:]
+        
+        # Sanitizar: asegurar que la secuencia de mensajes sea válida para Gemini
+        # (no dejar ToolMessages huérfanos ni AIMessages con tool_calls sin respuesta)
+        clean_messages = _sanitize_messages_for_gemini(clean_messages)
+        
+        print(f">> LLM Razonando en contexto Worker (historial: {len(clean_messages)} msjs)...")
         response = await llm_with_tools.ainvoke([system_msg] + clean_messages)
         return {"messages": [response]}
         
@@ -361,7 +463,7 @@ class SelfExtendingAgent:
         workflow = StateGraph(AgentState)
         
         # 3. Añadir el Supervisor (ahora instanciado y dotado con la lista de agentes)
-        workflow.add_node("supervisor", make_supervisor_node(self.llm, sub_agents))
+        workflow.add_node("supervisor", make_supervisor_node(self.llm, sub_agents, tools))
         
         # 4. Inyectar dinámicamente cada Sub-Agente como nodos y enlazar
         for agent in sub_agents:
@@ -467,24 +569,38 @@ class SelfExtendingAgent:
         print(f"\\n[API] Recibido: {user_input}")
         config = {"configurable": {"thread_id": thread_id}}
         final_answer = ""
-        
-        total_input_tokens = 0
-        total_output_tokens = 0
-        main_model = "Desconocido"
-        
+        usage_record = {}
         async for output in self.graph.astream({"messages": [HumanMessage(content=user_input)]}, config=config, stream_mode="updates"):
             for node_name, node_state in output.items():
                 if "messages" in node_state:
-                    latest_message = node_state["messages"][-1]
+                    # En algunos casos (ej: Supervisor) el estado tiene múltiples mensajes,
+                    # así que aseguramos revisar todos los mensajes para no perder el AIMessage
+                    msgs_to_check = node_state["messages"] if isinstance(node_state["messages"], list) else [node_state["messages"]]
                     
-                    if hasattr(latest_message, "usage_metadata") and latest_message.usage_metadata:
-                        total_input_tokens += latest_message.usage_metadata.get("input_tokens", 0)
-                        total_output_tokens += latest_message.usage_metadata.get("output_tokens", 0)
-                        
-                    if hasattr(latest_message, "response_metadata") and latest_message.response_metadata:
-                        if latest_message.response_metadata.get("model_name"):
-                            main_model = latest_message.response_metadata.get("model_name")
-                            
+                    latest_message = msgs_to_check[-1]
+                    
+                    # Trackear cada paso individual que tenga tokens
+                    for msg in msgs_to_check:
+                        if hasattr(msg, "usage_metadata") and msg.usage_metadata:
+                            i_toks = msg.usage_metadata.get("input_tokens", 0)
+                            o_toks = msg.usage_metadata.get("output_tokens", 0)
+                            if i_toks > 0 or o_toks > 0:
+                                mod_name = "Desconocido"
+                                if hasattr(msg, "response_metadata") and msg.response_metadata:
+                                    mod_name = msg.response_metadata.get("model_name", "Desconocido")
+                                    
+                                try:
+                                    from utils.token_tracker import log_token_usage
+                                    usage_record = log_token_usage(
+                                        user_input=f"[{node_name}] {user_input[:50]}...",
+                                        model=mod_name,
+                                        input_tokens=i_toks,
+                                        output_tokens=o_toks,
+                                        thread_id=thread_id
+                                    )
+                                except Exception as e:
+                                    print(f"[API] Error trackeando tokens de {node_name}: {e}")
+
                     worker_nodes = getattr(self, "_agent_names", ["dev", "assistant", "researcher"])
                     if node_name in worker_nodes:
                         if hasattr(latest_message, "tool_calls") and latest_message.tool_calls:
@@ -511,20 +627,6 @@ class SelfExtendingAgent:
                             else:
                                 if content:
                                     final_answer = content
-        
-        usage_record = {}
-        if total_input_tokens > 0 or total_output_tokens > 0:
-            try:
-                from utils.token_tracker import log_token_usage
-                usage_record = log_token_usage(
-                    user_input=user_input,
-                    model=main_model,
-                    input_tokens=total_input_tokens,
-                    output_tokens=total_output_tokens,
-                    thread_id=thread_id
-                )
-            except Exception as e:
-                print(f"[API] Error trackeando tokens del Agente: {e}")
 
         if return_usage:
             return final_answer, usage_record

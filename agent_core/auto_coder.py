@@ -19,6 +19,16 @@ def _track_autocoder_llm(response, description: str):
     except Exception as e:
         print(f"[AutoCoder] Warning: Cannot track tokens: {e}")
 
+def _extract_text_from_response(response) -> str:
+    raw_content = response.content
+    if isinstance(raw_content, list):
+        text_out = "".join([c.get("text", "") for c in raw_content if isinstance(c, dict) and "text" in c])
+        if not text_out:
+            text_out = "".join([str(c) for c in raw_content])
+        return text_out
+    return str(raw_content)
+
+
 @tool
 def crear_y_ejecutar_herramienta_local(descripcion_tarea: str, argumentos_de_prueba: str = "") -> str:
     """
@@ -60,6 +70,8 @@ def crear_y_ejecutar_herramienta_local(descripcion_tarea: str, argumentos_de_pru
     py_filename = f"{task_name}.py"
     md_filename = f"{task_name}.md"
     
+    chat_history = [HumanMessage(content=prompt)]
+    
     for intento in range(max_retries):
         if intento > 0:
             print(f"[AutoCoder] Reintentando (Intento {intento+1}/{max_retries}). Corrigiendo error...")
@@ -67,14 +79,17 @@ def crear_y_ejecutar_herramienta_local(descripcion_tarea: str, argumentos_de_pru
             El código que generaste falló con este error:
             {error_output}
             
-            Corrige el código. Retorna ÚNICAMENTE el código en crudo sin tags markdown.
+            Corrige el código basándote en la tarea original. Retorna ÚNICAMENTE el código en crudo sin tags markdown.
             """
-            response = llm.invoke([HumanMessage(content=retry_prompt)])
-        else:
-            response = llm.invoke([HumanMessage(content=prompt)])
+            chat_history.append(HumanMessage(content=retry_prompt))
+            
+        response = llm.invoke(chat_history)
+        chat_history.append(response)
+
             
         _track_autocoder_llm(response, f"Coded: {descripcion_tarea}")
-        codigo_python = response.content.strip()
+        
+        codigo_python = _extract_text_from_response(response).strip()
         
         # Super simple cleanup in case the LLM stubbornly adds markdown
         if codigo_python.startswith("```python"):
@@ -147,7 +162,8 @@ Tu documentación debe seguir exactamente esta estructura de Manual de Uso:
 """
                         doc_response = llm.invoke([HumanMessage(content=doc_prompt)])
                         _track_autocoder_llm(doc_response, f"Doc for: {descripcion_tarea}")
-                        memory_utils.save_procedural_memory(md_filename, doc_response.content)
+                        doc_text = _extract_text_from_response(doc_response)
+                        memory_utils.save_procedural_memory(md_filename, doc_text)
                         
                         return f"Éxito ejecutando herramienta auto-generada remota. Salida:\\n{stdout_str.strip()}"
                         
@@ -195,7 +211,8 @@ Tu documentación debe seguir exactamente esta estructura de Manual de Uso:
 """
                     doc_response = llm.invoke([HumanMessage(content=doc_prompt)])
                     _track_autocoder_llm(doc_response, f"Doc for: {descripcion_tarea}")
-                    memory_utils.save_procedural_memory(md_filename, doc_response.content)
+                    doc_text = _extract_text_from_response(doc_response)
+                    memory_utils.save_procedural_memory(md_filename, doc_text)
                     
                     return f"Éxito ejecutando herramienta auto-generada local. Salida:\\n{result.stdout.strip()}"
                 else:

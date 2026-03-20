@@ -5,20 +5,92 @@
   </div>
 
   <div class="summary-cards">
+    <!-- Presupuesto -->
+    <div class="card shadow-sm glass-panel budget-card">
+      <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>
+      <div class="card-content" style="width: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3>Cuota Mensual (Límite)</h3>
+          <button class="icon-btn edit-btn" (click)="toggleEditBudget()" title="Editar Cuota">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+          </button>
+        </div>
+        
+        @if (isEditingBudget()) {
+          <div class="edit-budget-form">
+            <input type="number" step="0.5" min="0" [(ngModel)]="editBudgetValue" class="budget-input">
+            <button class="btn btn-sm save-btn" (click)="saveBudget()" [disabled]="budgetLoading()">Guardar</button>
+          </div>
+        } @else {
+          <p class="amount">${{ monthlyBudget() | number:'1.2-2' }}</p>
+          <div class="progress-bar-container" style="margin-top: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; height: 6px; width: 100%; overflow: hidden;">
+            <div class="progress-bar-fill" [style.width.%]="(totalCost() / monthlyBudget() * 100) > 100 ? 100 : (totalCost() / monthlyBudget() * 100)" [style.background]="totalCost() >= monthlyBudget() ? '#ff4b4b' : '#4CAF50'" style="height: 100%;"></div>
+          </div>
+          <p style="font-size: 0.75rem; color: #aaa; margin-top: 4px;">Utilizado: {{ (totalCost() / monthlyBudget() * 100) | number:'1.0-1' }}%</p>
+        }
+      </div>
+    </div>
+
+    <!-- Gasto Actual -->
     <div class="card shadow-sm glass-panel">
       <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-coins"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></div>
       <div class="card-content">
-        <h3>Costo Total Estimado</h3>
-        <p class="amount">${{ totalCost() | number:'1.5-5' }}</p>
+        <h3>Gasto Usado Este Mes</h3>
+        <p class="amount" [class.danger]="totalCost() >= monthlyBudget()">${{ totalCost() | number:'1.5-5' }}</p>
       </div>
     </div>
     
+    <!-- Tokens -->
     <div class="card shadow-sm glass-panel">
       <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div>
       <div class="card-content">
-        <h3>Tokens Totales Procesados</h3>
+        <h3>Tokens Este Mes</h3>
         <p class="amount">{{ totalTokens() | number }}</p>
       </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-bar glass-panel shadow-sm">
+    <div class="filter-group">
+      <label>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Modelo
+      </label>
+      <select [ngModel]="filterModel()" (ngModelChange)="filterModel.set($event); onFilterChange()">
+        <option value="">Todos</option>
+        @for (m of availableModels(); track m) {
+          <option [value]="m">{{ m }}</option>
+        }
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        Desde
+      </label>
+      <input type="date" [ngModel]="filterDateFrom()" (ngModelChange)="filterDateFrom.set($event); onFilterChange()">
+    </div>
+    
+    <div class="filter-group">
+      <label>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        Hasta
+      </label>
+      <input type="date" [ngModel]="filterDateTo()" (ngModelChange)="filterDateTo.set($event); onFilterChange()">
+    </div>
+    
+    @if (filterModel() || filterDateFrom() || filterDateTo()) {
+      <button class="clear-filters-btn" (click)="clearFilters()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        Limpiar
+      </button>
+    }
+    
+    <div class="filter-summary">
+      <span class="filter-label">{{ activeFilterLabel() }}</span>
+      <span class="filter-stats">{{ filteredHistory().length }} registros · ${{ filteredCost() | number:'1.4-4' }} · {{ filteredTokens() | number }} tokens</span>
     </div>
   </div>
 
@@ -29,10 +101,14 @@
         <p>Cargando registros...</p>
       </div>
     } @else {
-      @if (usageHistory().length === 0) {
+      @if (filteredHistory().length === 0) {
         <div class="empty-state">
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-          <p>Aún no hay interacciones con Leygo AI.</p>
+          @if (filterModel() || filterDateFrom() || filterDateTo()) {
+            <p>No hay registros que coincidan con los filtros aplicados.</p>
+          } @else {
+            <p>Aún no hay interacciones con Leygo AI.</p>
+          }
         </div>
       } @else {
         <table class="usage-table">
@@ -47,7 +123,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (record of usageHistory(); track record.timestamp) {
+            @for (record of filteredHistory(); track $index) {
               <tr>
                 <td>{{ record.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</td>
                 <td class="prompt-text">{{ record.user_input || 'N/A' }}{{ (record.user_input && record.user_input.length > 40) ? '...' : '' }}</td>
@@ -59,6 +135,15 @@
             }
           </tbody>
         </table>
+        
+        @if (canLoadMore()) {
+          <div class="load-more-container">
+            <button class="load-more-btn" (click)="loadMore()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
+              Cargar más registros
+            </button>
+          </div>
+        }
       }
     }
   </div>

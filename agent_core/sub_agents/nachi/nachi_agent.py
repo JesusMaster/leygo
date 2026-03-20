@@ -1,72 +1,53 @@
-from typing import List, Callable
-from ..base import BaseSubAgent
-
-def registrar_transaccion(tipo: str, monto: float, descripcion: str, metodo_pago: str = "efectivo") -> str:
-    """
-    Registra un ingreso o gasto en el archivo de finanzas.
-    tipo: 'ingreso' o 'gasto'
-    monto: cantidad de dinero
-    descripcion: detalle de la transaccion
-    metodo_pago: 'efectivo' o 'tarjeta' (solo relevante para gastos)
-    """
-    import csv, os
-    from datetime import datetime
-    
-    os.makedirs("agent_core/sub_agents/nachi/files", exist_ok=True)
-    path = "agent_core/sub_agents/nachi/files/registro_finanzas.csv"
-    existe = os.path.exists(path)
-    
-    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    with open(path, "a", newline="") as f:
-        w = csv.writer(f)
-        if not existe:
-            w.writerow(["fecha", "tipo", "monto", "descripcion", "metodo_pago"])
-        w.writerow([fecha, tipo, monto, descripcion, metodo_pago])
-        
-    return f"Transaccion registrada: {tipo} de {monto} ({descripcion}) pagado con {metodo_pago}."
-
-def obtener_resumen_mensual(mes: str, anio: str) -> str:
-    """
-    Obtiene el resumen de ingresos, gastos y saldo del mes especificado.
-    mes: numero del mes (ej. '03')
-    anio: numero del año (ej. '2026')
-    """
-    import csv, os
-    
-    path = "agent_core/sub_agents/nachi/files/registro_finanzas.csv"
-    if not os.path.exists(path):
-        return "No hay registros financieros todavia."
-        
-    total_ingresos = 0.0
-    total_gastos = 0.0
-    
-    with open(path, "r") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            fecha = row["fecha"]
-            if fecha.startswith(f"{anio}-{mes}"):
-                monto = float(row["monto"])
-                if row["tipo"] == "ingreso":
-                    total_ingresos += monto
-                elif row["tipo"] == "gasto":
-                    total_gastos += monto
-                    
-    saldo = total_ingresos - total_gastos
-    return f"Resumen {mes}/{anio}: Ingresos: {total_ingresos}, Gastos: {total_gastos}, Saldo: {saldo}"
+from agent_core.sub_agents.base import BaseSubAgent
 
 class NachiAgent(BaseSubAgent):
     @property
-    def model(self): return "gemini-3.1-flash-lite-preview"
-    
+    def model(self) -> str:
+        return "gemini-3.1-flash-lite-preview"
+
     @property
-    def name(self): return "nachi"
-    
+    def name(self) -> str:
+        return "nachi"
+
     @property
-    def description(self): return "Experto en finanzas para registrar gastos diarios, ingresos y saldos mensuales."
-    
+    def description(self) -> str:
+        return "Asistente financiero personal. Registra ingresos y egresos, calcula balances y da consejos financieros."
+
     @property
-    def system_prompt(self): return "Eres Nachi, un experto en finanzas. Revisa tus memorias para conocer tu personalidad y reglas de negocio."
-    
-    def get_tools(self, all_available_tools: List[Callable]) -> List[Callable]:
-        return [registrar_transaccion, obtener_resumen_mensual]
+    def system_prompt(self) -> str:
+        return """Eres Nachi, el asistente financiero personal de Jesus.
+Tu objetivo es ayudarle a llevar un control estricto de sus finanzas mensuales.
+Debes registrar sus movimientos diarios (ingresos y egresos) en su Google Sheet.
+El ID del Google Sheet es: 1nu6vFN_oda6hferhnUV5Ez9yQNlFvg3o95N2zV4vb0U
+
+Las columnas de la hoja son:
+A: Fecha (DD/MM/YYYY)
+B: Tipo (Ingreso / Egreso)
+C: Monto (Numerico)
+D: Metodo (Efectivo / Tarjeta de Credito / Transferencia)
+E: Categoria (Ej. Comida, Transporte, Sueldo, etc.)
+F: Concepto (Descripcion breve)
+
+Cuando Jesus te pida registrar un gasto o ingreso:
+1. Extrae la informacion necesaria. Si falta algo (como el metodo de pago o el monto), preguntale amablemente.
+2. Usa la herramienta 'escribir_hoja_calculo' para agregar una nueva fila al final de la hoja. El rango debe ser 'A:F'. Los valores deben ser una lista de listas, ej: [['25/10/2023', 'Egreso', '1500', 'Efectivo', 'Comida', 'Almuerzo']].
+
+Cuando te pida el balance o resumen:
+1. Usa 'leer_hoja_calculo' con el rango 'A:F' para obtener todos los registros.
+2. Calcula el total de ingresos, el total de egresos, y el balance neto.
+3. Desglosa los gastos por metodo de pago (Efectivo vs Tarjeta) si es posible.
+4. Dale un breve consejo financiero basado en sus habitos de gasto recientes.
+
+Tono: Amable, profesional, motivador y conciso.
+"""
+
+    def get_tools(self, all_available_tools: list = None) -> list:
+        if all_available_tools is None:
+            return []
+        
+        tools = []
+        for t in all_available_tools:
+            tool_name = getattr(t, "name", None)
+            if tool_name in ["leer_hoja_calculo", "escribir_hoja_calculo"]:
+                tools.append(t)
+        return tools

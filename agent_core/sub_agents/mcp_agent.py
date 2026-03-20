@@ -61,11 +61,10 @@ class McpAgent(BaseSubAgent):
             return "Para tareas que involucren herramientas externas de MCP configuradas."
             
         return (
-            "ESTE AGENTE ES EL CEREBRO DE NEGOCIO Y REPOSITORIOS (MCP). Contiene todas las integraciones "
-            "externas: bases de datos internas, KPIs, documentación de Apprecio, FAQs, reglas de puntos, y repositorios de "
-            "código (GitHub). Si el usuario pregunta por 'apprecio', 'puntos', o cualquier regla de negocio, ESTE es el agente correcto. "
-            f"Posee estas herramientas ({len(self._tools_names)} en total): " + 
-            ", ".join(self._tools_names[:100])
+            "CEREBRO DE NEGOCIO Y REPOSITORIOS (MCP). Contiene integraciones "
+            "externas: GitHub, bases de datos, KPIs, documentación de Apprecio, FAQs y reglas de puntos. "
+            "Si el usuario pregunta por 'apprecio', 'puntos', repositorios, o reglas de negocio, ESTE es el agente correcto. "
+            f"Tiene {len(self._tools_names)} herramientas MCP disponibles."
         )
 
     @property

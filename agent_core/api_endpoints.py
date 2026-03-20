@@ -111,6 +111,16 @@ async def chat(req: MessageRequest, request: Request):
     agent = request.app.state.agent
     if not agent:
         raise HTTPException(status_code=503, detail="Agente no inicializado")
+        
+    # Check monthly quota
+    from utils.token_tracker import check_budget_exceeded
+    is_exceeded, alert_msg = check_budget_exceeded()
+    if is_exceeded:
+        # Usamos markdown/tags adecuados para el HTML si se prefiere, aunque el GUI parsea bien
+        return {
+            "response": alert_msg,
+            "usage": {}
+        }
     
     response, usage = await agent.process_message(req.message, thread_id=req.thread_id, return_usage=True)
     return {"response": response, "usage": usage}

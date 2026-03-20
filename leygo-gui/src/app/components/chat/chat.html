@@ -15,7 +15,7 @@
             @if (msg.tokens && msg.cost !== undefined) {
               <span class="usage-badge" [title]="'Model: ' + msg.model">
                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 3px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                {{ msg.tokens }} tokens / ✨ ${{ msg.cost | number:'1.5-5' }}
+                {{ msg.tokens | number:'1.0-0' }} tokens · ${{ msg.cost | number:'1.4-4' }}
               </span>
             }
           </div>

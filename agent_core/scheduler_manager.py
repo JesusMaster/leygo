@@ -4,6 +4,7 @@ import json
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.events import EVENT_JOB_EXECUTED
 from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
@@ -22,6 +23,15 @@ MEMORIA_RECORDATORIOS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file
 
 # Global scheduler instance — configurado con timezone de Chile
 scheduler = AsyncIOScheduler(timezone=TIMEZONE)
+
+def __re_sync_jobs_listener(event):
+    if getattr(event, 'exception', None) is None:
+        try:
+            guardar_estado_jobs()
+        except Exception:
+            pass
+
+scheduler.add_listener(__re_sync_jobs_listener, EVENT_JOB_EXECUTED)
 
 def guardar_estado_jobs():
     """Serializa las tareas actuales del scheduler a un archivo JSON."""
@@ -194,9 +204,22 @@ async def send_dynamic_telegram_reminder(chat_id: str, prompt_instruccion: str):
         if token:
             TELEGRAM_BOT_INSTANCE = Bot(token=token)
 
+    from utils.token_tracker import check_budget_exceeded
+    is_exceeded, alert_msg = check_budget_exceeded()
+    if is_exceeded:
+        print(f"[Scheduler] Bloqueado envío de rutina dinámica por cuota excedida: {prompt_instruccion[:20]}")
+        if TELEGRAM_BOT_INSTANCE:
+            resolved_id = _resolve_chat_id(chat_id)
+            if resolved_id:
+                try:
+                    await TELEGRAM_BOT_INSTANCE.send_message(chat_id=resolved_id, text=f"Rutina pausada: {alert_msg}")
+                except:
+                    pass
+        return
+
     # Autogenerate text with Gemini
     try:
-        model_name = "gemini-2.5-flash"
+        model_name = os.getenv("MODEL_SUPERVISOR", "gemini-2.5-flash-lite")
         mini_llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.7)
         response = await mini_llm.ainvoke(
             [HumanMessage(content=f"Genera un mensaje corto directo y amigable cumpliendo esta instrucción: '{prompt_instruccion}'. No repitas lo mismo de siempre, sé creativo. IMPORTANTE: Devuelve ÚNICAMENTE el mensaje, sin saludos iniciales, sin afirmaciones previas como 'Claro, aquí tienes', ni texto conversacional extra.")]
@@ -211,7 +234,14 @@ async def send_dynamic_telegram_reminder(chat_id: str, prompt_instruccion: str):
         except Exception as t_err:
             print(f"Error trackeando tokens del Scheduler: {t_err}")
             
-        mensaje_dinamico = response.content.strip()
+        content_raw = response.content
+        if isinstance(content_raw, list):
+            # En modelos recientes de Langchain, content puede ser un array de bloques.
+            content_str = "".join([part.get("text", "") if isinstance(part, dict) else str(part) for part in content_raw])
+        else:
+            content_str = str(content_raw)
+            
+        mensaje_dinamico = content_str.strip()
     except Exception as e:
         mensaje_dinamico = f"⏰ [Recordatorio Recurrente] (Error generando contenido: {e})"
 
@@ -236,6 +266,19 @@ async def execute_agent_task(chat_id: str, instruccion: str):
         token = os.getenv("TELEGRAM_TOKEN")
         if token:
             TELEGRAM_BOT_INSTANCE = Bot(token=token)
+            
+    from utils.token_tracker import check_budget_exceeded
+    is_exceeded, alert_msg = check_budget_exceeded()
+    if is_exceeded:
+        print(f"[Scheduler] Bloqueado ejecución de tarea programada por cuota excedida: {instruccion[:20]}")
+        if TELEGRAM_BOT_INSTANCE:
+            resolved_id = _resolve_chat_id(chat_id)
+            if resolved_id:
+                try:
+                    await TELEGRAM_BOT_INSTANCE.send_message(chat_id=resolved_id, text=f"Tarea programada pausada: {alert_msg}")
+                except:
+                    pass
+        return
             
     try:
         if GLOBAL_AGENT_INSTANCE:

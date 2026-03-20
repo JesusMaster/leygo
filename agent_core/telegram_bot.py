@@ -114,6 +114,20 @@ def format_telegram_html(text: str) -> str:
 async def handle_message_background(chat_id: int, text: str):
     """Procesar el mensaje con el Agente en segundo plano para no bloquear el ACK del webhook."""
     try:
+        # Check monthly quota first
+        from utils.token_tracker import check_budget_exceeded
+        is_exceeded, alert_msg = check_budget_exceeded()
+        if is_exceeded:
+            try:
+                from telegram.constants import ParseMode
+                # telegram markdown doesn't like some characters unescaped, but since we only use basic bold, we format basic
+                alert_html = alert_msg.replace('*', '<b>').replace(' \n', '\n').replace('\n\n', '<br><br>')
+                # Let's just use text to avoid parsing errors
+                await bot.send_message(chat_id=chat_id, text=alert_msg)
+            except Exception:
+                await bot.send_message(chat_id=chat_id, text=alert_msg)
+            return
+
         # Enviar estado "Escribiendo..." para dar feedback visual
         await bot.send_chat_action(chat_id=chat_id, action="typing")
         

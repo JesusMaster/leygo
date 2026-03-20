@@ -5,7 +5,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1393,
         "output_tokens": 86,
-        "cost_usd": 0.00013027499999999998,
+        "cost_usd": 0.0009544999999999999,
         "thread_id": "gui_session"
     },
     {
@@ -14,7 +14,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 7908,
         "output_tokens": 390,
-        "cost_usd": 0.0007101,
+        "cost_usd": 0.005124,
         "thread_id": "gui_session"
     },
     {
@@ -23,7 +23,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 25733,
         "output_tokens": 330,
-        "cost_usd": 0.0020289749999999997,
+        "cost_usd": 0.013856499999999999,
         "thread_id": "gui_session"
     },
     {
@@ -32,7 +32,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 2905,
         "output_tokens": 807,
-        "cost_usd": 0.00045997499999999995,
+        "cost_usd": 0.0038735,
         "thread_id": "gui_session"
     },
     {
@@ -41,7 +41,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 26905,
         "output_tokens": 207,
-        "cost_usd": 0.0020799749999999995,
+        "cost_usd": 0.0140735,
         "thread_id": "gui_session"
     },
     {
@@ -50,7 +50,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1158,
         "output_tokens": 136,
-        "cost_usd": 0.00012764999999999999,
+        "cost_usd": 0.000987,
         "thread_id": "1635021523"
     },
     {
@@ -59,7 +59,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 152,
         "output_tokens": 16,
-        "cost_usd": 1.62e-05,
+        "cost_usd": 4.6e-05,
         "thread_id": "audio_system"
     },
     {
@@ -68,7 +68,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 5891,
         "output_tokens": 591,
-        "cost_usd": 0.000619125,
+        "cost_usd": 0.0047185000000000005,
         "thread_id": "1635021523"
     },
     {
@@ -77,7 +77,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 12116,
         "output_tokens": 745,
-        "cost_usd": 0.0011321999999999999,
+        "cost_usd": 0.008293,
         "thread_id": "gui_session"
     },
     {
@@ -86,7 +86,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 90682,
         "output_tokens": 4086,
-        "cost_usd": 0.00802695,
+        "cost_usd": 0.057599,
         "thread_id": "gui_session"
     },
     {
@@ -95,7 +95,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 6652,
         "output_tokens": 74,
-        "cost_usd": 0.0005210999999999999,
+        "cost_usd": 0.0017,
         "thread_id": "1635021523"
     },
     {
@@ -104,7 +104,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 6890,
         "output_tokens": 71,
-        "cost_usd": 0.00053805,
+        "cost_usd": 0.001758,
         "thread_id": "1635021523"
     },
     {
@@ -113,7 +113,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 13574,
         "output_tokens": 143,
-        "cost_usd": 0.00106095,
+        "cost_usd": 0.0044297,
         "thread_id": "1635021523"
     },
     {
@@ -122,7 +122,7 @@
         "model": "gemini-3.1-pro-preview",
         "input_tokens": 315,
         "output_tokens": 1393,
-        "cost_usd": 0.00735875,
+        "cost_usd": 0.017345999999999997,
         "thread_id": "autocoder_system"
     },
     {
@@ -131,7 +131,7 @@
         "model": "gemini-3.1-pro-preview",
         "input_tokens": 329,
         "output_tokens": 1988,
-        "cost_usd": 0.010351250000000001,
+        "cost_usd": 0.024514,
         "thread_id": "autocoder_system"
     },
     {
@@ -140,7 +140,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 8185,
         "output_tokens": 231,
-        "cost_usd": 0.000683175,
+        "cost_usd": 0.00216175,
         "thread_id": "1635021523"
     },
     {
@@ -149,7 +149,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 8972,
         "output_tokens": 130,
-        "cost_usd": 0.0007119,
+        "cost_usd": 0.002308,
         "thread_id": "1635021523"
     },
     {
@@ -158,7 +158,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1207,
         "output_tokens": 86,
-        "cost_usd": 0.000116325,
+        "cost_usd": 0.0008615,
         "thread_id": "1635021523"
     },
     {
@@ -167,7 +167,7 @@
         "model": "gemini-3.1-pro-preview",
         "input_tokens": 23745,
         "output_tokens": 1546,
-        "cost_usd": 0.03741125,
+        "cost_usd": 0.06604199999999999,
         "thread_id": "gui_session"
     },
     {
@@ -176,7 +176,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 2195,
         "output_tokens": 147,
-        "cost_usd": 0.00020872499999999996,
+        "cost_usd": 0.00062225,
         "thread_id": "gui_session"
     },
     {
@@ -185,7 +185,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 1443,
         "output_tokens": 76,
-        "cost_usd": 0.000131025,
+        "cost_usd": 0.00039875,
         "thread_id": "gui_session"
     },
     {
@@ -194,7 +194,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 4382,
         "output_tokens": 444,
-        "cost_usd": 0.0004618499999999999,
+        "cost_usd": 0.0013174999999999999,
         "thread_id": "gui_session"
     },
     {
@@ -203,7 +203,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 12330,
         "output_tokens": 167,
-        "cost_usd": 0.00097485,
+        "cost_usd": 0.003166,
         "thread_id": "gui_session"
     },
     {
@@ -212,7 +212,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1242,
         "output_tokens": 107,
-        "cost_usd": 0.00012525,
+        "cost_usd": 0.000942,
         "thread_id": "gui_session"
     },
     {
@@ -221,7 +221,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 6693,
         "output_tokens": 71,
-        "cost_usd": 0.000523275,
+        "cost_usd": 0.00170875,
         "thread_id": "gui_session"
     },
     {
@@ -230,7 +230,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 7706,
         "output_tokens": 253,
-        "cost_usd": 0.0006538500000000001,
+        "cost_usd": 0.002053,
         "thread_id": "gui_session"
     },
     {
@@ -239,7 +239,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 10711,
         "output_tokens": 274,
-        "cost_usd": 0.0008855250000000001,
+        "cost_usd": 0.00281475,
         "thread_id": "gui_session"
     },
     {
@@ -248,7 +248,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 2177,
         "output_tokens": 106,
-        "cost_usd": 0.000195075,
+        "cost_usd": 0.0014065000000000002,
         "thread_id": "gui_session"
     },
     {
@@ -257,7 +257,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 2223,
         "output_tokens": 87,
-        "cost_usd": 0.000192825,
+        "cost_usd": 0.0013725,
         "thread_id": "gui_session"
     },
     {
@@ -266,7 +266,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1243,
         "output_tokens": 214,
-        "cost_usd": 0.000157425,
+        "cost_usd": 0.0012634999999999999,
         "thread_id": "gui_session"
     },
     {
@@ -275,7 +275,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 16755,
         "output_tokens": 666,
-        "cost_usd": 0.001456425,
+        "cost_usd": 0.0103755,
         "thread_id": "gui_session"
     },
     {
@@ -284,7 +284,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1471,
         "output_tokens": 371,
-        "cost_usd": 0.00022162499999999998,
+        "cost_usd": 0.0018485,
         "thread_id": "gui_session"
     },
     {
@@ -293,7 +293,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 7543,
         "output_tokens": 59,
-        "cost_usd": 0.000583425,
+        "cost_usd": 0.00191525,
         "thread_id": "gui_session"
     },
     {
@@ -302,7 +302,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1894,
         "output_tokens": 306,
-        "cost_usd": 0.00023385000000000002,
+        "cost_usd": 0.001865,
         "thread_id": "gui_session"
     },
     {
@@ -311,7 +311,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1251,
         "output_tokens": 509,
-        "cost_usd": 0.000246525,
+        "cost_usd": 0.0021525,
         "thread_id": "1635021523"
     },
     {
@@ -320,7 +320,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 8740,
         "output_tokens": 138,
-        "cost_usd": 0.0006969,
+        "cost_usd": 0.002254,
         "thread_id": "gui_session"
     },
     {
@@ -329,7 +329,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 6970,
         "output_tokens": 129,
-        "cost_usd": 0.00056145,
+        "cost_usd": 0.001807,
         "thread_id": "gui_session"
     },
     {
@@ -338,7 +338,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 7193,
         "output_tokens": 130,
-        "cost_usd": 0.000578475,
+        "cost_usd": 0.0018632499999999999,
         "thread_id": "gui_session"
     },
     {
@@ -347,7 +347,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 22217,
         "output_tokens": 1745,
-        "cost_usd": 0.002189775,
+        "cost_usd": 0.0163435,
         "thread_id": "gui_session"
     },
     {
@@ -356,7 +356,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 20393,
         "output_tokens": 117,
-        "cost_usd": 0.001564575,
+        "cost_usd": 0.010547500000000001,
         "thread_id": "gui_session"
     },
     {
@@ -365,7 +365,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 20181,
         "output_tokens": 127,
-        "cost_usd": 0.001551675,
+        "cost_usd": 0.0104715,
         "thread_id": "gui_session"
     },
     {
@@ -374,7 +374,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 22042,
         "output_tokens": 1137,
-        "cost_usd": 0.00199425,
+        "cost_usd": 0.014432,
         "thread_id": "gui_session"
     },
     {
@@ -383,7 +383,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 5556,
         "output_tokens": 53,
-        "cost_usd": 0.0004326,
+        "cost_usd": 0.0014155,
         "thread_id": "1635021523"
     },
     {
@@ -392,7 +392,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 21556,
         "output_tokens": 1001,
-        "cost_usd": 0.0019169999999999999,
+        "cost_usd": 0.013780999999999998,
         "thread_id": "gui_session"
     },
     {
@@ -401,7 +401,7 @@
         "model": "gemini-3.1-pro-preview",
         "input_tokens": 32715,
         "output_tokens": 4222,
-        "cost_usd": 0.062003749999999996,
+        "cost_usd": 0.116094,
         "thread_id": "gui_session"
     },
     {
@@ -410,7 +410,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 4815,
         "output_tokens": 88,
-        "cost_usd": 0.00038752499999999995,
+        "cost_usd": 0.00124775,
         "thread_id": "gui_session"
     },
     {
@@ -419,7 +419,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 5020,
         "output_tokens": 105,
-        "cost_usd": 0.000408,
+        "cost_usd": 0.0013075,
         "thread_id": "gui_session"
     },
     {
@@ -428,7 +428,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 5343,
         "output_tokens": 109,
-        "cost_usd": 0.0004334249999999999,
+        "cost_usd": 0.00139025,
         "thread_id": "gui_session"
     },
     {
@@ -437,7 +437,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 5804,
         "output_tokens": 138,
-        "cost_usd": 0.0004767,
+        "cost_usd": 0.00152,
         "thread_id": "gui_session"
     },
     {
@@ -446,7 +446,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 11588,
         "output_tokens": 268,
-        "cost_usd": 0.0009494999999999999,
+        "cost_usd": 0.003031,
         "thread_id": "gui_session"
     },
     {
@@ -455,7 +455,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 129,
         "output_tokens": 16,
-        "cost_usd": 1.4475e-05,
+        "cost_usd": 4.0249999999999996e-05,
         "thread_id": "audio_system"
     },
     {
@@ -464,7 +464,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 1585,
         "output_tokens": 80,
-        "cost_usd": 0.000142875,
+        "cost_usd": 0.00043625,
         "thread_id": "1635021523"
     },
     {
@@ -473,7 +473,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 700,
-        "cost_usd": 0.00021569999999999998,
+        "cost_usd": 0.0017728,
         "thread_id": "Jesus"
     },
     {
@@ -482,7 +482,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 17459,
         "output_tokens": 128,
-        "cost_usd": 0.001347825,
+        "cost_usd": 0.0044287499999999995,
         "thread_id": "gui_session"
     },
     {
@@ -491,7 +491,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 18923,
         "output_tokens": 116,
-        "cost_usd": 0.0014540249999999998,
+        "cost_usd": 0.00478875,
         "thread_id": "gui_session"
     },
     {
@@ -500,7 +500,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 1202,
-        "cost_usd": 0.00036629999999999996,
+        "cost_usd": 0.0030277999999999998,
         "thread_id": "Jesus"
     },
     {
@@ -509,7 +509,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 20489,
         "output_tokens": 696,
-        "cost_usd": 0.001745475,
+        "cost_usd": 0.0123325,
         "thread_id": "1635021523"
     },
     {
@@ -518,7 +518,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 42665,
         "output_tokens": 2570,
-        "cost_usd": 0.003970875,
+        "cost_usd": 0.0290425,
         "thread_id": "default_session"
     },
     {
@@ -527,7 +527,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1526,
         "output_tokens": 179,
-        "cost_usd": 0.00016815,
+        "cost_usd": 0.0013,
         "thread_id": "1635021523"
     },
     {
@@ -536,7 +536,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 20141,
         "output_tokens": 46,
-        "cost_usd": 0.001524375,
+        "cost_usd": 0.010208499999999999,
         "thread_id": "1635021523"
     },
     {
@@ -545,7 +545,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 20582,
         "output_tokens": 782,
-        "cost_usd": 0.0017782499999999999,
+        "cost_usd": 0.012636999999999999,
         "thread_id": "gui_session"
     },
     {
@@ -554,7 +554,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 728,
-        "cost_usd": 0.0002241,
+        "cost_usd": 0.0018428,
         "thread_id": "1635021523"
     },
     {
@@ -563,7 +563,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 9292,
         "output_tokens": 132,
-        "cost_usd": 0.0007365,
+        "cost_usd": 0.002389,
         "thread_id": "gui_session"
     },
     {
@@ -572,7 +572,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 10200,
         "output_tokens": 124,
-        "cost_usd": 0.0008022000000000001,
+        "cost_usd": 0.002612,
         "thread_id": "gui_session"
     },
     {
@@ -581,7 +581,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 936,
-        "cost_usd": 0.00028649999999999997,
+        "cost_usd": 0.0023628,
         "thread_id": "1635021523"
     },
     {
@@ -590,7 +590,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 9506,
         "output_tokens": 107,
-        "cost_usd": 0.00074505,
+        "cost_usd": 0.0024300000000000003,
         "thread_id": "gui_session"
     },
     {
@@ -599,7 +599,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 9698,
         "output_tokens": 74,
-        "cost_usd": 0.00074955,
+        "cost_usd": 0.0024615,
         "thread_id": "gui_session"
     },
     {
@@ -608,7 +608,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 11200,
         "output_tokens": 193,
-        "cost_usd": 0.0008978999999999999,
+        "cost_usd": 0.0028964999999999998,
         "thread_id": "gui_session"
     },
     {
@@ -617,7 +617,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 7830,
         "output_tokens": 227,
-        "cost_usd": 0.00065535,
+        "cost_usd": 0.002071,
         "thread_id": "gui_session"
     },
     {
@@ -626,7 +626,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 57738,
         "output_tokens": 2004,
-        "cost_usd": 0.004931549999999999,
+        "cost_usd": 0.034880999999999995,
         "thread_id": "gui_session"
     },
     {
@@ -635,7 +635,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 1283,
         "output_tokens": 84,
-        "cost_usd": 0.00012142500000000001,
+        "cost_usd": 0.0008935,
         "thread_id": "1635021523"
     },
     {
@@ -644,7 +644,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 672,
-        "cost_usd": 0.0002073,
+        "cost_usd": 0.0017027999999999998,
         "thread_id": "1635021523"
     },
     {
@@ -653,7 +653,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 30806,
         "output_tokens": 2822,
-        "cost_usd": 0.00315705,
+        "cost_usd": 0.023869,
         "thread_id": "gui_session"
     },
     {
@@ -662,7 +662,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 52228,
         "output_tokens": 593,
-        "cost_usd": 0.004095,
+        "cost_usd": 0.027892999999999998,
         "thread_id": "gui_session"
     },
     {
@@ -671,7 +671,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 12029,
         "output_tokens": 159,
-        "cost_usd": 0.000949875,
+        "cost_usd": 0.0064915,
         "thread_id": "1635021523"
     },
     {
@@ -680,7 +680,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 11919,
         "output_tokens": 173,
-        "cost_usd": 0.0009458250000000001,
+        "cost_usd": 0.006478500000000001,
         "thread_id": "gui_session"
     },
     {
@@ -689,7 +689,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 44842,
         "output_tokens": 1389,
-        "cost_usd": 0.00377985,
+        "cost_usd": 0.026588,
         "thread_id": "gui_session"
     },
     {
@@ -698,7 +698,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 24714,
         "output_tokens": 323,
-        "cost_usd": 0.0019504499999999998,
+        "cost_usd": 0.013326,
         "thread_id": "1635021523"
     },
     {
@@ -707,7 +707,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 19402,
         "output_tokens": 142,
-        "cost_usd": 0.00149775,
+        "cost_usd": 0.010126999999999999,
         "thread_id": "1635021523"
     },
     {
@@ -716,7 +716,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 28138,
         "output_tokens": 293,
-        "cost_usd": 0.00219825,
+        "cost_usd": 0.014948,
         "thread_id": "1635021523"
     },
     {
@@ -725,7 +725,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 15089,
         "output_tokens": 221,
-        "cost_usd": 0.001197975,
+        "cost_usd": 0.0082075,
         "thread_id": "1635021523"
     },
     {
@@ -734,7 +734,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 23527,
         "output_tokens": 201,
-        "cost_usd": 0.001824825,
+        "cost_usd": 0.012366499999999999,
         "thread_id": "1635021523"
     },
     {
@@ -743,7 +743,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 24353,
         "output_tokens": 282,
-        "cost_usd": 0.001911075,
+        "cost_usd": 0.0130225,
         "thread_id": "1635021523"
     },
     {
@@ -752,7 +752,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 853,
-        "cost_usd": 0.00026159999999999996,
+        "cost_usd": 0.0021552999999999998,
         "thread_id": "1635021523"
     },
     {
@@ -761,7 +761,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 9560,
         "output_tokens": 162,
-        "cost_usd": 0.0007656000000000001,
+        "cost_usd": 0.002471,
         "thread_id": "gui_session"
     },
     {
@@ -770,7 +770,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 10196,
         "output_tokens": 209,
-        "cost_usd": 0.0008274,
+        "cost_usd": 0.0026535,
         "thread_id": "gui_session"
     },
     {
@@ -779,7 +779,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 70255,
         "output_tokens": 1560,
-        "cost_usd": 0.005737124999999999,
+        "cost_usd": 0.01834375,
         "thread_id": "gui_session"
     },
     {
@@ -788,7 +788,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 10358,
         "output_tokens": 157,
-        "cost_usd": 0.0008239499999999999,
+        "cost_usd": 0.002668,
         "thread_id": "gui_session"
     },
     {
@@ -797,7 +797,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 87199,
         "output_tokens": 1470,
-        "cost_usd": 0.006980924999999999,
+        "cost_usd": 0.02253475,
         "thread_id": "gui_session"
     },
     {
@@ -806,7 +806,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 1088,
-        "cost_usd": 0.00033209999999999994,
+        "cost_usd": 0.0027428,
         "thread_id": "1635021523"
     },
     {
@@ -815,7 +815,7 @@
         "model": "gemini-3.1-pro-preview",
         "input_tokens": 29178,
         "output_tokens": 3441,
-        "cost_usd": 0.0536775,
+        "cost_usd": 0.099648,
         "thread_id": "1635021523"
     },
     {
@@ -824,7 +824,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 936,
-        "cost_usd": 0.00028649999999999997,
+        "cost_usd": 0.0023628,
         "thread_id": "1635021523"
     },
     {
@@ -833,7 +833,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 13249,
         "output_tokens": 147,
-        "cost_usd": 0.0010377750000000001,
+        "cost_usd": 0.00338575,
         "thread_id": "1635021523"
     },
     {
@@ -842,7 +842,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 1172,
-        "cost_usd": 0.0003573,
+        "cost_usd": 0.0029528,
         "thread_id": "1635021523"
     },
     {
@@ -851,7 +851,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 22247,
         "output_tokens": 256,
-        "cost_usd": 0.0017453249999999998,
+        "cost_usd": 0.0056897499999999995,
         "thread_id": "1635021523"
     },
     {
@@ -860,7 +860,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 930,
-        "cost_usd": 0.0002847,
+        "cost_usd": 0.0023478,
         "thread_id": "1635021523"
     },
     {
@@ -869,7 +869,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 831,
-        "cost_usd": 0.00025499999999999996,
+        "cost_usd": 0.0021003,
         "thread_id": "1635021523"
     },
     {
@@ -878,7 +878,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 8272,
         "output_tokens": 327,
-        "cost_usd": 0.0007185,
+        "cost_usd": 0.0022315,
         "thread_id": "1635021523"
     },
     {
@@ -887,7 +887,7 @@
         "model": "gemini-3.1-flash-lite-preview",
         "input_tokens": 9743,
         "output_tokens": 366,
-        "cost_usd": 0.000840525,
+        "cost_usd": 0.00261875,
         "thread_id": "1635021523"
     },
     {
@@ -896,7 +896,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 765,
-        "cost_usd": 0.00023519999999999997,
+        "cost_usd": 0.0019352999999999998,
         "thread_id": "1635021523"
     },
     {
@@ -905,7 +905,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 1251,
-        "cost_usd": 0.00038099999999999994,
+        "cost_usd": 0.0031503,
         "thread_id": "1635021523"
     },
     {
@@ -914,7 +914,7 @@
         "model": "gemini-3-flash-preview",
         "input_tokens": 151613,
         "output_tokens": 1345,
-        "cost_usd": 0.011774475,
+        "cost_usd": 0.0798415,
         "thread_id": "gui_session"
     },
     {
@@ -923,7 +923,7 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 532,
-        "cost_usd": 0.0001653,
+        "cost_usd": 0.0013528,
         "thread_id": "1635021523"
     },
     {
@@ -932,7 +932,4453 @@
         "model": "gemini-2.5-flash",
         "input_tokens": 76,
         "output_tokens": 935,
-        "cost_usd": 0.00028619999999999996,
+        "cost_usd": 0.0023602999999999996,
         "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T18:08:22.694831+00:00",
+        "user_input": "Elimina la rutina del agua",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 20058,
+        "output_tokens": 96,
+        "cost_usd": 0.0050625,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T18:20:20.745763+00:00",
+        "user_input": "puedes darme un balance de este mes?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 62722,
+        "output_tokens": 119,
+        "cost_usd": 0.01574,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T18:26:20.840307+00:00",
+        "user_input": "puedes leer mis ultimos email?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 10590,
+        "output_tokens": 190,
+        "cost_usd": 0.0027425,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T18:29:45.099848+00:00",
+        "user_input": "puedes obtener los ultimos chat de linkedin?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3936,
+        "output_tokens": 61,
+        "cost_usd": 0.0010145,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:31:57.085607-03:00",
+        "user_input": "puedes obtener los ultimos chat de linkedin?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 947,
+        "output_tokens": 79,
+        "cost_usd": 0.00027625,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:33:49.259991-03:00",
+        "user_input": "puedes conectarte a linkedin?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 795,
+        "output_tokens": 112,
+        "cost_usd": 0.00025475,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:34:41.882725-03:00",
+        "user_input": "Coded: Buscar variables de entorno o configuraciones en archivos .env relacionadas con LinkedIn",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 309,
+        "output_tokens": 2215,
+        "cost_usd": 0.027198,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:36:22.975810-03:00",
+        "user_input": "puedes obtener los ultimos chat de linkedin?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 944,
+        "output_tokens": 100,
+        "cost_usd": 0.000286,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:37:24.192670-03:00",
+        "user_input": "elimina el agente de linkedin",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 27263,
+        "output_tokens": 231,
+        "cost_usd": 0.057298,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:41:35.565582-03:00",
+        "user_input": "creame un agente Apprecio, con esta informacion: # Prompt for API Integration with LLMs  ## Introduc",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 46890,
+        "output_tokens": 2278,
+        "cost_usd": 0.030279,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:46:15.223697-03:00",
+        "user_input": "Coded: Hacer una petición POST a https://api.apprecio.cl/api con accion=saldoEmpresa, public_token=d",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 473,
+        "output_tokens": 3215,
+        "cost_usd": 0.039526000000000006,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:50:38.670956-03:00",
+        "user_input": "public_token: da74a6cfa6233f8baab1abb9b3c96ff602b44125e9f4cdf82c9723d949567d3e private_token:435fb07",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 49360,
+        "output_tokens": 1101,
+        "cost_usd": 0.027983,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:51:32.162553-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api con los parámetros: accion='saldoEmp",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 359,
+        "output_tokens": 1460,
+        "cost_usd": 0.018238,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:51:46.859397-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api con los parámetros: accion='saldoE",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 231,
+        "output_tokens": 1527,
+        "cost_usd": 0.018786,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:52:14.735063-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Los par",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 391,
+        "output_tokens": 1266,
+        "cost_usd": 0.015974000000000002,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:52:39.756225-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Los p",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 263,
+        "output_tokens": 1503,
+        "cost_usd": 0.018562,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:52:46.234417-03:00",
+        "user_input": "puedes decirme cual es el saldo de mi empresa?",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 80351,
+        "output_tokens": 1237,
+        "cost_usd": 0.175546,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:54:44.601717-03:00",
+        "user_input": "puedes crearme un agente con la integracion de apprecio? este agente se llama apprecio",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 85242,
+        "output_tokens": 1384,
+        "cost_usd": 0.187092,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:55:36.337798-03:00",
+        "user_input": "preguntale a apprecio cual es mi saldo de empresa",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12408,
+        "output_tokens": 57,
+        "cost_usd": 0.0031305,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T15:56:59.715263-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 433,
+        "output_tokens": 1414,
+        "cost_usd": 0.017833999999999996,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:57:20.503004-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 148,
+        "output_tokens": 1409,
+        "cost_usd": 0.017204,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:57:34.272697-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 305,
+        "output_tokens": 1382,
+        "cost_usd": 0.017194,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:57:54.964859-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 440,
+        "output_tokens": 1365,
+        "cost_usd": 0.017259999999999998,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:58:07.409381-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 153,
+        "output_tokens": 1285,
+        "cost_usd": 0.015726,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:58:35.050892-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 88,
+        "output_tokens": 3021,
+        "cost_usd": 0.036428,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:58:52.708971-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 312,
+        "output_tokens": 1857,
+        "cost_usd": 0.022907999999999998,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:59:26.106512-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 504,
+        "output_tokens": 2249,
+        "cost_usd": 0.027996,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:59:37.884876-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 150,
+        "output_tokens": 1192,
+        "cost_usd": 0.014603999999999999,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T15:59:55.660377-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 376,
+        "output_tokens": 1981,
+        "cost_usd": 0.024524,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:00:19.982714-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 520,
+        "output_tokens": 1625,
+        "cost_usd": 0.02054,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:00:33.712429-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 146,
+        "output_tokens": 1253,
+        "cost_usd": 0.015328000000000001,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:00:53.528194-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 393,
+        "output_tokens": 2274,
+        "cost_usd": 0.028073999999999998,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:01:23.796178-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 532,
+        "output_tokens": 2203,
+        "cost_usd": 0.0275,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:01:35.101613-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 118,
+        "output_tokens": 1085,
+        "cost_usd": 0.013256,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:01:49.496176-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 404,
+        "output_tokens": 1583,
+        "cost_usd": 0.019804,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:02:28.376587-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 543,
+        "output_tokens": 2940,
+        "cost_usd": 0.036365999999999996,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:02:42.357679-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 143,
+        "output_tokens": 1385,
+        "cost_usd": 0.016906,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:02:56.531677-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 415,
+        "output_tokens": 1537,
+        "cost_usd": 0.019274,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:03:39.103582-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 554,
+        "output_tokens": 3739,
+        "cost_usd": 0.045976,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:04:27.635496-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 67,
+        "output_tokens": 5148,
+        "cost_usd": 0.06191,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:04:54.421999-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 116,
+        "output_tokens": 2894,
+        "cost_usd": 0.03496,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:05:09.824423-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 426,
+        "output_tokens": 1723,
+        "cost_usd": 0.021528,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:05:43.012675-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 559,
+        "output_tokens": 2420,
+        "cost_usd": 0.030157999999999997,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:05:49.401395-03:00",
+        "user_input": "Puedes decirme que reuniones tengo mañana?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 9988,
+        "output_tokens": 93,
+        "cost_usd": 0.0025435,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:06:25.660293-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 130,
+        "output_tokens": 1087,
+        "cost_usd": 0.013304,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:06:34.907282-03:00",
+        "user_input": "Cuál es el saldo de mi empresa",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4252,
+        "output_tokens": 66,
+        "cost_usd": 0.001096,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:07:07.070213-03:00",
+        "user_input": "Hoy gasté 17034 en almuerzo",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 2879,
+        "output_tokens": 94,
+        "cost_usd": 0.00076675,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:07:12.208415-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 101,
+        "output_tokens": 5203,
+        "cost_usd": 0.062638,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:07:32.714350-03:00",
+        "user_input": "Cuál es mi balance?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4118,
+        "output_tokens": 108,
+        "cost_usd": 0.0010835,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:07:32.958344-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 432,
+        "output_tokens": 2149,
+        "cost_usd": 0.026652,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:07:53.279111-03:00",
+        "user_input": "Y cuál es mi saldo?",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4789,
+        "output_tokens": 89,
+        "cost_usd": 0.00124175,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:08:09.636974-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 575,
+        "output_tokens": 3022,
+        "cost_usd": 0.037413999999999996,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:08:50.082083-03:00",
+        "user_input": "Quiero que me recuerdes cada 5 min que debo tomar agüita",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12578,
+        "output_tokens": 89,
+        "cost_usd": 0.003189,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:08:51.239940-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 69,
+        "output_tokens": 4575,
+        "cost_usd": 0.055038000000000004,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:09:07.126609-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 447,
+        "output_tokens": 1641,
+        "cost_usd": 0.020586,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:09:33.574900-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 589,
+        "output_tokens": 1823,
+        "cost_usd": 0.023053999999999998,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:09:49.285577-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 163,
+        "output_tokens": 1721,
+        "cost_usd": 0.020978,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:10:24.570888-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 58,
+        "output_tokens": 3664,
+        "cost_usd": 0.044084,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:10:56.778949-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 593,
+        "output_tokens": 2665,
+        "cost_usd": 0.033165999999999994,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:11:09.532279-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 149,
+        "output_tokens": 1180,
+        "cost_usd": 0.014458,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:11:25.390918-03:00",
+        "user_input": "Doc for: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parám",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 466,
+        "output_tokens": 1617,
+        "cost_usd": 0.020335999999999996,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:11:38.129370-03:00",
+        "user_input": "enviale por chat a alvaroagliati@dcanje.com la siguiente URL: https://akm.apprecio.com",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 54441,
+        "output_tokens": 119,
+        "cost_usd": 0.013669750000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T16:12:14.998442-03:00",
+        "user_input": "Coded: Realizar una petición POST a https://api.apprecio.cl/api usando la librería requests. Parámet",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 607,
+        "output_tokens": 4374,
+        "cost_usd": 0.05370200000000001,
+        "thread_id": "autocoder_system"
+    },
+    {
+        "timestamp": "2026-03-18T16:20:18.705916-03:00",
+        "user_input": "Routine: Recuerda tomar ...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 70,
+        "output_tokens": 1030,
+        "cost_usd": 0.0025960000000000002,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:26:44.515083-03:00",
+        "user_input": "dime que rutinas tengo activas",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 11899,
+        "output_tokens": 348,
+        "cost_usd": 0.0069935,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T16:31:10.752810-03:00",
+        "user_input": "Routine: Recuerda tomar ...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 70,
+        "output_tokens": 637,
+        "cost_usd": 0.0016135,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:36:13.219292-03:00",
+        "user_input": "Routine: Recuerda tomar ...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 70,
+        "output_tokens": 1146,
+        "cost_usd": 0.0028860000000000005,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:41:11.396688-03:00",
+        "user_input": "Routine: Recuerda tomar ...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 70,
+        "output_tokens": 785,
+        "cost_usd": 0.0019835,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:46:10.110750-03:00",
+        "user_input": "Routine: Recuerda tomar ...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 70,
+        "output_tokens": 642,
+        "cost_usd": 0.001626,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:51:11.143950-03:00",
+        "user_input": "Routine: Recuerda tomar ...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 70,
+        "output_tokens": 793,
+        "cost_usd": 0.0020035,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T16:58:17.192055-03:00",
+        "user_input": "Elimina el recordatorio del agüita",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 11310,
+        "output_tokens": 89,
+        "cost_usd": 0.005922,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-18T17:31:34.016274-03:00",
+        "user_input": "elimina el subagente apprecio, mario, nachi y nami",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 28268,
+        "output_tokens": 445,
+        "cost_usd": 0.015469,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T17:34:33.656385-03:00",
+        "user_input": "quiero que me ayudes a crear un subagente llamado apprecio, este debe tener las herramientas que te ",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 47449,
+        "output_tokens": 6361,
+        "cost_usd": 0.0428075,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T17:37:11.257387-03:00",
+        "user_input": "si, private_key: 3ed731985259c9377d9ad79f179083df8d513be3639d46f797b5608b7aeb1b6b  public_key:539c7f",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 22266,
+        "output_tokens": 281,
+        "cost_usd": 0.011976,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T17:37:54.716231-03:00",
+        "user_input": "puedes decirme el saldo del usuario: 167999387",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 22900,
+        "output_tokens": 133,
+        "cost_usd": 0.011849,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T17:41:22.140916-03:00",
+        "user_input": "apprecio puedes decirme cual es el saldo de mi empresa",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 23397,
+        "output_tokens": 97,
+        "cost_usd": 0.0119895,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T17:49:16.172453-03:00",
+        "user_input": "[supervisor] hola, puedes decirme cual es el saldo del usuario ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1463,
+        "output_tokens": 188,
+        "cost_usd": 0.0012955,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T17:49:17.799306-03:00",
+        "user_input": "[apprecio] hola, puedes decirme cual es el saldo del usuario ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1264,
+        "output_tokens": 26,
+        "cost_usd": 0.00035499999999999996,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T17:49:19.681916-03:00",
+        "user_input": "[apprecio] hola, puedes decirme cual es el saldo del usuario ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1320,
+        "output_tokens": 21,
+        "cost_usd": 0.0003615,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-18T17:49:20.752124-03:00",
+        "user_input": "[supervisor] hola, puedes decirme cual es el saldo del usuario ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1746,
+        "output_tokens": 46,
+        "cost_usd": 0.001011,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T09:53:39.708130-03:00",
+        "user_input": "[supervisor] Hola buenos días...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1446,
+        "output_tokens": 176,
+        "cost_usd": 0.001251,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T09:54:55.622964-03:00",
+        "user_input": "[supervisor] que podemos haver hoy?...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1467,
+        "output_tokens": 338,
+        "cost_usd": 0.0017475,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T09:55:19.621896-03:00",
+        "user_input": "[supervisor] puedes leerme los ultimos mensajes?...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1550,
+        "output_tokens": 189,
+        "cost_usd": 0.0013419999999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T09:55:25.619731-03:00",
+        "user_input": "[assistant] puedes leerme los ultimos mensajes?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4854,
+        "output_tokens": 20,
+        "cost_usd": 0.0012435,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T09:55:29.942037-03:00",
+        "user_input": "[assistant] puedes leerme los ultimos mensajes?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5871,
+        "output_tokens": 145,
+        "cost_usd": 0.0016852500000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T09:55:33.170996-03:00",
+        "user_input": "[supervisor] puedes leerme los ultimos mensajes?...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 2917,
+        "output_tokens": 389,
+        "cost_usd": 0.0026255000000000002,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:30.059398-03:00",
+        "user_input": "Transcript Audio",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 218,
+        "output_tokens": 25,
+        "cost_usd": 9.200000000000001e-05,
+        "thread_id": "audio_system"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:35.071988-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 2844,
+        "output_tokens": 279,
+        "cost_usd": 0.002259,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:36.965499-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6238,
+        "output_tokens": 26,
+        "cost_usd": 0.0015984999999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:39.723105-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6439,
+        "output_tokens": 63,
+        "cost_usd": 0.00170425,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:40.679224-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3403,
+        "output_tokens": 16,
+        "cost_usd": 0.0017495000000000002,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:41.989512-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6534,
+        "output_tokens": 36,
+        "cost_usd": 0.0016875,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:42.983379-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3471,
+        "output_tokens": 16,
+        "cost_usd": 0.0017835000000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:44.157298-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6602,
+        "output_tokens": 36,
+        "cost_usd": 0.0017045,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:45.125517-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3539,
+        "output_tokens": 16,
+        "cost_usd": 0.0018175,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:46.379031-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6670,
+        "output_tokens": 36,
+        "cost_usd": 0.0017215,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:47.352018-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3607,
+        "output_tokens": 16,
+        "cost_usd": 0.0018515,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:48.477446-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6738,
+        "output_tokens": 36,
+        "cost_usd": 0.0017385,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:49.570906-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3675,
+        "output_tokens": 16,
+        "cost_usd": 0.0018855,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:50.605460-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6806,
+        "output_tokens": 36,
+        "cost_usd": 0.0017555000000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:51.608337-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3743,
+        "output_tokens": 16,
+        "cost_usd": 0.0019195,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:52.697101-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6874,
+        "output_tokens": 36,
+        "cost_usd": 0.0017725,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:53.638548-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3811,
+        "output_tokens": 16,
+        "cost_usd": 0.0019535,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:54.820621-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6942,
+        "output_tokens": 36,
+        "cost_usd": 0.0017895,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:55.847064-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3879,
+        "output_tokens": 16,
+        "cost_usd": 0.0019875,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:57.145795-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7010,
+        "output_tokens": 36,
+        "cost_usd": 0.0018065,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:58.043846-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3947,
+        "output_tokens": 16,
+        "cost_usd": 0.0020215,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:20:59.159932-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7078,
+        "output_tokens": 36,
+        "cost_usd": 0.0018235,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:00.066310-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4015,
+        "output_tokens": 16,
+        "cost_usd": 0.0020555,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:01.148247-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7146,
+        "output_tokens": 36,
+        "cost_usd": 0.0018405,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:02.258403-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4083,
+        "output_tokens": 16,
+        "cost_usd": 0.0020894999999999998,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:03.649808-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7214,
+        "output_tokens": 36,
+        "cost_usd": 0.0018575,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:04.774463-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4151,
+        "output_tokens": 16,
+        "cost_usd": 0.0021235,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:05.981632-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7282,
+        "output_tokens": 52,
+        "cost_usd": 0.0018985,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:07.282945-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7473,
+        "output_tokens": 63,
+        "cost_usd": 0.00196275,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:08.306910-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4437,
+        "output_tokens": 16,
+        "cost_usd": 0.0022665,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:09.971599-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7568,
+        "output_tokens": 63,
+        "cost_usd": 0.0019865,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:11.300825-03:00",
+        "user_input": "[supervisor] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4532,
+        "output_tokens": 16,
+        "cost_usd": 0.0023139999999999997,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:13.337697-03:00",
+        "user_input": "[assistant] Envíale un chat a nFierro@precio.com que diga que ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7663,
+        "output_tokens": 63,
+        "cost_usd": 0.00201025,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:41.933826-03:00",
+        "user_input": "[supervisor] Es nfierro@apprecio.com...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4376,
+        "output_tokens": 112,
+        "cost_usd": 0.0025239999999999998,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:44.050117-03:00",
+        "user_input": "[assistant] Es nfierro@apprecio.com...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7603,
+        "output_tokens": 27,
+        "cost_usd": 0.00194125,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:45.510577-03:00",
+        "user_input": "[assistant] Es nfierro@apprecio.com...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7662,
+        "output_tokens": 47,
+        "cost_usd": 0.001986,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:47.762289-03:00",
+        "user_input": "[assistant] Es nfierro@apprecio.com...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7778,
+        "output_tokens": 41,
+        "cost_usd": 0.002006,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:21:49.761684-03:00",
+        "user_input": "[supervisor] Es nfierro@apprecio.com...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4720,
+        "output_tokens": 226,
+        "cost_usd": 0.003038,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:22:38.265204-03:00",
+        "user_input": "Transcript Audio",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 127,
+        "output_tokens": 11,
+        "cost_usd": 4.825e-05,
+        "thread_id": "audio_system"
+    },
+    {
+        "timestamp": "2026-03-19T10:22:41.545758-03:00",
+        "user_input": "[supervisor] Mándale otro y dile que no me interesa....",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4671,
+        "output_tokens": 148,
+        "cost_usd": 0.0027795,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:22:43.832909-03:00",
+        "user_input": "[assistant] Mándale otro y dile que no me interesa....",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7934,
+        "output_tokens": 37,
+        "cost_usd": 0.002039,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:22:45.917890-03:00",
+        "user_input": "[assistant] Mándale otro y dile que no me interesa....",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 8036,
+        "output_tokens": 29,
+        "cost_usd": 0.0020525,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:22:47.308272-03:00",
+        "user_input": "[supervisor] Mándale otro y dile que no me interesa....",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4966,
+        "output_tokens": 54,
+        "cost_usd": 0.0026449999999999998,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:52:25.966156-03:00",
+        "user_input": "[supervisor] puedes revisar mis ultimos 10 correos no leidos?...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4881,
+        "output_tokens": 190,
+        "cost_usd": 0.0030105,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:52:27.933300-03:00",
+        "user_input": "[assistant] puedes revisar mis ultimos 10 correos no leidos?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 8186,
+        "output_tokens": 21,
+        "cost_usd": 0.002078,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:52:32.635281-03:00",
+        "user_input": "[assistant] puedes revisar mis ultimos 10 correos no leidos?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 10188,
+        "output_tokens": 212,
+        "cost_usd": 0.002865,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:52:34.405619-03:00",
+        "user_input": "[supervisor] puedes revisar mis ultimos 10 correos no leidos?...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7301,
+        "output_tokens": 125,
+        "cost_usd": 0.0040255,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:55:43.526916-03:00",
+        "user_input": "[supervisor] Revisa mi agenda del 25 de marzo...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7204,
+        "output_tokens": 16,
+        "cost_usd": 0.00365,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:55:45.963731-03:00",
+        "user_input": "[assistant] Revisa mi agenda del 25 de marzo...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 10335,
+        "output_tokens": 24,
+        "cost_usd": 0.00261975,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:55:48.259093-03:00",
+        "user_input": "[assistant] Revisa mi agenda del 25 de marzo...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11333,
+        "output_tokens": 117,
+        "cost_usd": 0.0030087499999999997,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T10:55:50.445771-03:00",
+        "user_input": "[supervisor] Revisa mi agenda del 25 de marzo...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8351,
+        "output_tokens": 142,
+        "cost_usd": 0.0046015000000000006,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:10:04.544569-03:00",
+        "user_input": "[supervisor] Puedes revisar cada un 1 min los chat con sdangelo...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8499,
+        "output_tokens": 167,
+        "cost_usd": 0.0047504999999999995,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:10:06.325393-03:00",
+        "user_input": "[assistant] Puedes revisar cada un 1 min los chat con sdangelo...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11781,
+        "output_tokens": 26,
+        "cost_usd": 0.00298425,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:10:08.381272-03:00",
+        "user_input": "[assistant] Puedes revisar cada un 1 min los chat con sdangelo...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11839,
+        "output_tokens": 104,
+        "cost_usd": 0.00311575,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:10:09.670219-03:00",
+        "user_input": "[assistant] Puedes revisar cada un 1 min los chat con sdangelo...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12046,
+        "output_tokens": 50,
+        "cost_usd": 0.0030865,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:10:22.427573-03:00",
+        "user_input": "[supervisor] Puedes revisar cada un 1 min los chat con sdangelo...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8997,
+        "output_tokens": 75,
+        "cost_usd": 0.0047235,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:11.854075-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8949,
+        "output_tokens": 231,
+        "cost_usd": 0.0051675,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:13.906007-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12295,
+        "output_tokens": 35,
+        "cost_usd": 0.00312625,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:17.060494-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12458,
+        "output_tokens": 93,
+        "cost_usd": 0.003254,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:18.547473-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 9452,
+        "output_tokens": 16,
+        "cost_usd": 0.0047740000000000005,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:19.937282-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12583,
+        "output_tokens": 20,
+        "cost_usd": 0.00317575,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:22.360290-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12853,
+        "output_tokens": 98,
+        "cost_usd": 0.00336025,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:23.852971-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 13044,
+        "output_tokens": 35,
+        "cost_usd": 0.0033135,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:26.178163-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 13515,
+        "output_tokens": 90,
+        "cost_usd": 0.00351375,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:30.573559-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 10506,
+        "output_tokens": 16,
+        "cost_usd": 0.005301,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:32.033064-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 13637,
+        "output_tokens": 90,
+        "cost_usd": 0.00354425,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:33.180646-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 10628,
+        "output_tokens": 16,
+        "cost_usd": 0.0053620000000000004,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:34.485203-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 13759,
+        "output_tokens": 21,
+        "cost_usd": 0.00347125,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:36.125378-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 10681,
+        "output_tokens": 16,
+        "cost_usd": 0.0053885,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:37.295011-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 13812,
+        "output_tokens": 21,
+        "cost_usd": 0.0034844999999999998,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:38.693937-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 10734,
+        "output_tokens": 16,
+        "cost_usd": 0.0054150000000000005,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:39.975970-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 13865,
+        "output_tokens": 21,
+        "cost_usd": 0.00349775,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:43.533401-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 10787,
+        "output_tokens": 16,
+        "cost_usd": 0.0054415,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:44.745578-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 13918,
+        "output_tokens": 21,
+        "cost_usd": 0.003511,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:47.058636-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 10840,
+        "output_tokens": 16,
+        "cost_usd": 0.005468000000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:48.310102-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 13971,
+        "output_tokens": 21,
+        "cost_usd": 0.00352425,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:11:49.533097-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 10893,
+        "output_tokens": 16,
+        "cost_usd": 0.0054945,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:13.995182-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 10761,
+        "output_tokens": 464,
+        "cost_usd": 0.0067725,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:15.990059-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 14340,
+        "output_tokens": 35,
+        "cost_usd": 0.0036375,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:18.194943-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 14811,
+        "output_tokens": 63,
+        "cost_usd": 0.00379725,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:19.765600-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 11775,
+        "output_tokens": 16,
+        "cost_usd": 0.005935500000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:21.089053-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 14906,
+        "output_tokens": 21,
+        "cost_usd": 0.003758,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:22.438923-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 11828,
+        "output_tokens": 16,
+        "cost_usd": 0.005962,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:23.684436-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 14959,
+        "output_tokens": 21,
+        "cost_usd": 0.00377125,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:25.303962-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 11881,
+        "output_tokens": 16,
+        "cost_usd": 0.0059885,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:26.573977-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15012,
+        "output_tokens": 21,
+        "cost_usd": 0.0037844999999999997,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:28.197836-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 11934,
+        "output_tokens": 16,
+        "cost_usd": 0.006015,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:29.679620-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15065,
+        "output_tokens": 37,
+        "cost_usd": 0.00382175,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:31.254117-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15256,
+        "output_tokens": 38,
+        "cost_usd": 0.0038710000000000003,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:32.609111-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12195,
+        "output_tokens": 16,
+        "cost_usd": 0.0061455,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:33.837409-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15326,
+        "output_tokens": 47,
+        "cost_usd": 0.0039019999999999997,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:35.922164-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15436,
+        "output_tokens": 37,
+        "cost_usd": 0.0039145,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:12:37.842663-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12374,
+        "output_tokens": 62,
+        "cost_usd": 0.006373,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:13:12.007491-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12016,
+        "output_tokens": 234,
+        "cost_usd": 0.006710000000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:13:14.299283-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15365,
+        "output_tokens": 35,
+        "cost_usd": 0.00389375,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:13:16.496997-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15840,
+        "output_tokens": 67,
+        "cost_usd": 0.0040605,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:13:18.499075-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12808,
+        "output_tokens": 92,
+        "cost_usd": 0.00668,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:14:12.207532-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12710,
+        "output_tokens": 223,
+        "cost_usd": 0.007024000000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:14:14.258903-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 16048,
+        "output_tokens": 35,
+        "cost_usd": 0.0040644999999999995,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:14:16.817268-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 16523,
+        "output_tokens": 66,
+        "cost_usd": 0.00422975,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:14:18.743464-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 13490,
+        "output_tokens": 91,
+        "cost_usd": 0.007018,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:15:12.402663-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 13402,
+        "output_tokens": 220,
+        "cost_usd": 0.007361,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:15:14.943598-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 16737,
+        "output_tokens": 35,
+        "cost_usd": 0.004236749999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:15:17.320321-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 17212,
+        "output_tokens": 59,
+        "cost_usd": 0.0043915000000000004,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:15:19.625735-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 14172,
+        "output_tokens": 84,
+        "cost_usd": 0.007338,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:16:12.996072-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 14080,
+        "output_tokens": 417,
+        "cost_usd": 0.008291,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:16:15.796435-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 17612,
+        "output_tokens": 35,
+        "cost_usd": 0.004455499999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:16:18.412513-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 18087,
+        "output_tokens": 60,
+        "cost_usd": 0.0046117499999999995,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:16:20.603462-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 15048,
+        "output_tokens": 85,
+        "cost_usd": 0.007779,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:17:12.793079-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 14760,
+        "output_tokens": 251,
+        "cost_usd": 0.008133,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:17:15.260167-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 18126,
+        "output_tokens": 35,
+        "cost_usd": 0.0045839999999999995,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:17:17.452516-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 18601,
+        "output_tokens": 60,
+        "cost_usd": 0.00474025,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:17:19.642398-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 15562,
+        "output_tokens": 85,
+        "cost_usd": 0.008036,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:18:14.041382-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 15440,
+        "output_tokens": 400,
+        "cost_usd": 0.00892,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:18:16.625272-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 18955,
+        "output_tokens": 35,
+        "cost_usd": 0.0047912499999999995,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:18:19.144642-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 19430,
+        "output_tokens": 59,
+        "cost_usd": 0.004946,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:18:21.433249-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 16390,
+        "output_tokens": 88,
+        "cost_usd": 0.008459,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:19:12.016992-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 16122,
+        "output_tokens": 220,
+        "cost_usd": 0.008721,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:19:14.416926-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 19457,
+        "output_tokens": 35,
+        "cost_usd": 0.004916749999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:19:18.213089-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 19932,
+        "output_tokens": 63,
+        "cost_usd": 0.0050774999999999995,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:19:20.647079-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 16896,
+        "output_tokens": 88,
+        "cost_usd": 0.008712000000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:20:13.188648-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 16808,
+        "output_tokens": 397,
+        "cost_usd": 0.009595,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:20:15.501688-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 20320,
+        "output_tokens": 35,
+        "cost_usd": 0.0051325,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:20:17.536153-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 20659,
+        "output_tokens": 16,
+        "cost_usd": 0.00518875,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:20:19.474206-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 20850,
+        "output_tokens": 57,
+        "cost_usd": 0.005298,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:20:22.657681-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 20972,
+        "output_tokens": 95,
+        "cost_usd": 0.0053855000000000005,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:20:25.842237-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 17968,
+        "output_tokens": 16,
+        "cost_usd": 0.009032,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:20:27.509177-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 21099,
+        "output_tokens": 21,
+        "cost_usd": 0.00530625,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:20:33.593283-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 23204,
+        "output_tokens": 51,
+        "cost_usd": 0.0058775,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:20:35.561759-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 20156,
+        "output_tokens": 76,
+        "cost_usd": 0.010306000000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:21:12.870314-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 19879,
+        "output_tokens": 317,
+        "cost_usd": 0.010890500000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:21:15.434395-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 23311,
+        "output_tokens": 35,
+        "cost_usd": 0.005880249999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:21:18.055556-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 23664,
+        "output_tokens": 65,
+        "cost_usd": 0.006013500000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:22:02.522010-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 20630,
+        "output_tokens": 90,
+        "cost_usd": 0.010584999999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:22:12.569525-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 20447,
+        "output_tokens": 389,
+        "cost_usd": 0.0113905,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:22:15.230828-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 23951,
+        "output_tokens": 35,
+        "cost_usd": 0.00604025,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:22:17.678845-03:00",
+        "user_input": "[assistant] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 24304,
+        "output_tokens": 70,
+        "cost_usd": 0.006181,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T11:22:19.941776-03:00",
+        "user_input": "[supervisor] Revisa los últimos mensajes en el espacio spaces/3...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 21275,
+        "output_tokens": 93,
+        "cost_usd": 0.010916499999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T12:01:51.952390-03:00",
+        "user_input": "[supervisor] hola leygo...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1446,
+        "output_tokens": 159,
+        "cost_usd": 0.0012000000000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:09:58.001476-03:00",
+        "user_input": "[supervisor] leygo necesito que recuerdes que mi color favorito...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1479,
+        "output_tokens": 632,
+        "cost_usd": 0.0026355,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:10:02.435102-03:00",
+        "user_input": "[mcp] leygo necesito que recuerdes que mi color favorito...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8386,
+        "output_tokens": 487,
+        "cost_usd": 0.005653999999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:10:03.904444-03:00",
+        "user_input": "[mcp] leygo necesito que recuerdes que mi color favorito...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8914,
+        "output_tokens": 50,
+        "cost_usd": 0.004607,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:10:04.918667-03:00",
+        "user_input": "[supervisor] leygo necesito que recuerdes que mi color favorito...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 2706,
+        "output_tokens": 54,
+        "cost_usd": 0.001515,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:13:46.518007-03:00",
+        "user_input": "[supervisor] crea un subagente que sea experto en codereview, a...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1768,
+        "output_tokens": 663,
+        "cost_usd": 0.0028729999999999997,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:14:02.213107-03:00",
+        "user_input": "[dev] crea un subagente que sea experto en codereview, a...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 13649,
+        "output_tokens": 1374,
+        "cost_usd": 0.043786,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:14:09.713862-03:00",
+        "user_input": "[dev] crea un subagente que sea experto en codereview, a...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 15075,
+        "output_tokens": 376,
+        "cost_usd": 0.034662,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:14:13.318600-03:00",
+        "user_input": "[supervisor] crea un subagente que sea experto en codereview, a...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 4249,
+        "output_tokens": 458,
+        "cost_usd": 0.0034985,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:15:53.483820-03:00",
+        "user_input": "[supervisor] está perfecto, crea las herramientas...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 3046,
+        "output_tokens": 709,
+        "cost_usd": 0.00365,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:16:25.398928-03:00",
+        "user_input": "[dev] está perfecto, crea las herramientas...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 14908,
+        "output_tokens": 3171,
+        "cost_usd": 0.067868,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:16:32.630150-03:00",
+        "user_input": "[dev] está perfecto, crea las herramientas...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 18131,
+        "output_tokens": 277,
+        "cost_usd": 0.039586,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:16:38.635057-03:00",
+        "user_input": "[dev] está perfecto, crea las herramientas...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 18449,
+        "output_tokens": 273,
+        "cost_usd": 0.040174,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:16:42.040081-03:00",
+        "user_input": "[supervisor] está perfecto, crea las herramientas...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7585,
+        "output_tokens": 361,
+        "cost_usd": 0.0048755,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:17:37.411585-03:00",
+        "user_input": "[supervisor] quiero que el agente de codereview se llame Pugi...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 5300,
+        "output_tokens": 229,
+        "cost_usd": 0.003337,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:17:52.500545-03:00",
+        "user_input": "[dev] quiero que el agente de codereview se llame Pugi...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 16686,
+        "output_tokens": 1522,
+        "cost_usd": 0.051636,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:17:56.505211-03:00",
+        "user_input": "[dev] quiero que el agente de codereview se llame Pugi...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 18258,
+        "output_tokens": 49,
+        "cost_usd": 0.037104,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:18:01.127045-03:00",
+        "user_input": "[dev] quiero que el agente de codereview se llame Pugi...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 18352,
+        "output_tokens": 242,
+        "cost_usd": 0.039608,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:18:07.156722-03:00",
+        "user_input": "[dev] quiero que el agente de codereview se llame Pugi...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 18634,
+        "output_tokens": 87,
+        "cost_usd": 0.038312000000000006,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:18:12.615558-03:00",
+        "user_input": "[supervisor] quiero que el agente de codereview se llame Pugi...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7580,
+        "output_tokens": 664,
+        "cost_usd": 0.005782,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:19:23.038365-03:00",
+        "user_input": "[supervisor] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7273,
+        "output_tokens": 238,
+        "cost_usd": 0.0043505,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:19:25.550559-03:00",
+        "user_input": "[pugi] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 7693,
+        "output_tokens": 36,
+        "cost_usd": 0.00197725,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:19:27.980873-03:00",
+        "user_input": "[pugi] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 14890,
+        "output_tokens": 38,
+        "cost_usd": 0.0037795000000000003,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:19:30.059384-03:00",
+        "user_input": "[pugi] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15455,
+        "output_tokens": 34,
+        "cost_usd": 0.00391475,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:19:32.066602-03:00",
+        "user_input": "[pugi] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15535,
+        "output_tokens": 87,
+        "cost_usd": 0.0040142500000000005,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:19:38.169071-03:00",
+        "user_input": "[pugi] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 252293,
+        "output_tokens": 1404,
+        "cost_usd": 0.06517925,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:19:43.178103-03:00",
+        "user_input": "[pugi] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 253726,
+        "output_tokens": 1411,
+        "cost_usd": 0.065548,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:19:46.238718-03:00",
+        "user_input": "[pugi] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 255231,
+        "output_tokens": 40,
+        "cost_usd": 0.06386775,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:19:53.046062-03:00",
+        "user_input": "[pugi] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 266082,
+        "output_tokens": 120,
+        "cost_usd": 0.0667005,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:20:01.590248-03:00",
+        "user_input": "[pugi] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 266343,
+        "output_tokens": 368,
+        "cost_usd": 0.06713775,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:20:07.949632-03:00",
+        "user_input": "[supervisor] pugi puedes revisar este PR? https://github.com/dc...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 266546,
+        "output_tokens": 393,
+        "cost_usd": 0.13445200000000002,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:22:14.709072-03:00",
+        "user_input": "[supervisor] si y despues quiero que apruebes el PR...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 266706,
+        "output_tokens": 237,
+        "cost_usd": 0.134064,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:22:20.592059-03:00",
+        "user_input": "[pugi] si y despues quiero que apruebes el PR...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 267125,
+        "output_tokens": 324,
+        "cost_usd": 0.06726725,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:22:24.239337-03:00",
+        "user_input": "[pugi] si y despues quiero que apruebes el PR...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 267505,
+        "output_tokens": 195,
+        "cost_usd": 0.06716875,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:22:29.173317-03:00",
+        "user_input": "[supervisor] si y despues quiero que apruebes el PR...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 267535,
+        "output_tokens": 230,
+        "cost_usd": 0.1344575,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:23:26.422849-03:00",
+        "user_input": "[supervisor] si envia el comentario primero...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 267528,
+        "output_tokens": 362,
+        "cost_usd": 0.13485,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:23:30.918447-03:00",
+        "user_input": "[pugi] si envia el comentario primero...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 268072,
+        "output_tokens": 324,
+        "cost_usd": 0.067504,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:23:33.892465-03:00",
+        "user_input": "[pugi] si envia el comentario primero...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 268452,
+        "output_tokens": 334,
+        "cost_usd": 0.06761400000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:23:36.900990-03:00",
+        "user_input": "[pugi] si envia el comentario primero...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 268846,
+        "output_tokens": 163,
+        "cost_usd": 0.06745599999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:23:40.590898-03:00",
+        "user_input": "[supervisor] si envia el comentario primero...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 268844,
+        "output_tokens": 17,
+        "cost_usd": 0.134473,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:24:04.774731-03:00",
+        "user_input": "[mcp] si envia el comentario primero...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 275077,
+        "output_tokens": 316,
+        "cost_usd": 0.1384865,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:24:10.715575-03:00",
+        "user_input": "[mcp] si envia el comentario primero...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 276557,
+        "output_tokens": 266,
+        "cost_usd": 0.1390765,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:24:17.627791-03:00",
+        "user_input": "[supervisor] si envia el comentario primero...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 270624,
+        "output_tokens": 158,
+        "cost_usd": 0.135786,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:27:09.503931-03:00",
+        "user_input": "[supervisor] puedes hacer el merge ya esta aprobado para poder ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 270427,
+        "output_tokens": 97,
+        "cost_usd": 0.1355045,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:27:14.307611-03:00",
+        "user_input": "[mcp] puedes hacer el merge ya esta aprobado para poder ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 276740,
+        "output_tokens": 96,
+        "cost_usd": 0.138658,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:27:26.134855-03:00",
+        "user_input": "[mcp] puedes hacer el merge ya esta aprobado para poder ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 276964,
+        "output_tokens": 43,
+        "cost_usd": 0.13861099999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:27:30.762388-03:00",
+        "user_input": "[supervisor] puedes hacer el merge ya esta aprobado para poder ...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 270808,
+        "output_tokens": 98,
+        "cost_usd": 0.13569799999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:31:30.262250-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 270714,
+        "output_tokens": 185,
+        "cost_usd": 0.135912,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:40:36.651535-03:00",
+        "user_input": "[supervisor] como estas?...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1505,
+        "output_tokens": 177,
+        "cost_usd": 0.0012835,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:41:17.841058-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1526,
+        "output_tokens": 144,
+        "cost_usd": 0.0011949999999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:42:49.410804-03:00",
+        "user_input": "[supervisor] lee el Jenkinsfile del proyecto dcanje/incentivos-...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1569,
+        "output_tokens": 136,
+        "cost_usd": 0.0011925,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:42:53.517594-03:00",
+        "user_input": "[mcp] lee el Jenkinsfile del proyecto dcanje/incentivos-...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7921,
+        "output_tokens": 401,
+        "cost_usd": 0.0051635,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:43:08.868237-03:00",
+        "user_input": "[mcp] lee el Jenkinsfile del proyecto dcanje/incentivos-...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 17109,
+        "output_tokens": 741,
+        "cost_usd": 0.010777499999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:43:16.512714-03:00",
+        "user_input": "[supervisor] lee el Jenkinsfile del proyecto dcanje/incentivos-...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 11651,
+        "output_tokens": 129,
+        "cost_usd": 0.0062125,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:43:18.432854-03:00",
+        "user_input": "[assistant] lee el Jenkinsfile del proyecto dcanje/incentivos-...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 14828,
+        "output_tokens": 28,
+        "cost_usd": 0.0037489999999999997,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:43:21.220084-03:00",
+        "user_input": "[assistant] lee el Jenkinsfile del proyecto dcanje/incentivos-...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 14887,
+        "output_tokens": 241,
+        "cost_usd": 0.00408325,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:43:23.624336-03:00",
+        "user_input": "[assistant] lee el Jenkinsfile del proyecto dcanje/incentivos-...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15191,
+        "output_tokens": 45,
+        "cost_usd": 0.0038652499999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:43:25.501194-03:00",
+        "user_input": "[supervisor] lee el Jenkinsfile del proyecto dcanje/incentivos-...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12204,
+        "output_tokens": 64,
+        "cost_usd": 0.006294,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:44:32.799070-03:00",
+        "user_input": "[supervisor] lee mis ultimos emails...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 11285,
+        "output_tokens": 117,
+        "cost_usd": 0.0059935,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:44:34.208783-03:00",
+        "user_input": "[assistant] lee mis ultimos emails...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 14450,
+        "output_tokens": 20,
+        "cost_usd": 0.0036425,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:44:38.177992-03:00",
+        "user_input": "[assistant] lee mis ultimos emails...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 15517,
+        "output_tokens": 203,
+        "cost_usd": 0.00418375,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:44:40.749399-03:00",
+        "user_input": "[supervisor] lee mis ultimos emails...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12688,
+        "output_tokens": 228,
+        "cost_usd": 0.0070279999999999995,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:45:28.770708-03:00",
+        "user_input": "[supervisor] agendame una reunion con cvaldivia@apprecio.com pa...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12823,
+        "output_tokens": 211,
+        "cost_usd": 0.0070444999999999995,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:45:31.094875-03:00",
+        "user_input": "[assistant] agendame una reunion con cvaldivia@apprecio.com pa...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 16082,
+        "output_tokens": 99,
+        "cost_usd": 0.004169,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:45:32.706306-03:00",
+        "user_input": "[assistant] agendame una reunion con cvaldivia@apprecio.com pa...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 16209,
+        "output_tokens": 36,
+        "cost_usd": 0.0041062500000000005,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T12:45:34.667455-03:00",
+        "user_input": "[supervisor] agendame una reunion con cvaldivia@apprecio.com pa...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 13213,
+        "output_tokens": 61,
+        "cost_usd": 0.0067895,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T14:44:50.809631-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 13057,
+        "output_tokens": 206,
+        "cost_usd": 0.007146499999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T14:55:35.279448-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1503,
+        "output_tokens": 127,
+        "cost_usd": 0.0011325,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T15:28:23.496208-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1055,
+        "output_tokens": 152,
+        "cost_usd": 0.0009835,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T15:55:39.710264-03:00",
+        "user_input": "[supervisor] Cuántos puntos tiene el usuario 167999387...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1070,
+        "output_tokens": 153,
+        "cost_usd": 0.000994,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T15:55:41.502028-03:00",
+        "user_input": "[apprecio] Cuántos puntos tiene el usuario 167999387...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1225,
+        "output_tokens": 27,
+        "cost_usd": 0.00034675,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T15:55:51.380974-03:00",
+        "user_input": "[apprecio] Cuántos puntos tiene el usuario 167999387...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1284,
+        "output_tokens": 24,
+        "cost_usd": 0.000357,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T15:55:52.408122-03:00",
+        "user_input": "[supervisor] Cuántos puntos tiene el usuario 167999387...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1095,
+        "output_tokens": 18,
+        "cost_usd": 0.0006015,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T15:55:53.680912-03:00",
+        "user_input": "[apprecio] Cuántos puntos tiene el usuario 167999387...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1344,
+        "output_tokens": 48,
+        "cost_usd": 0.000408,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T15:55:54.610627-03:00",
+        "user_input": "[supervisor] Cuántos puntos tiene el usuario 167999387...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1144,
+        "output_tokens": 18,
+        "cost_usd": 0.000626,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T15:57:56.763236-03:00",
+        "user_input": "[supervisor] cuantos puntos tiene el usuario 167999387...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1083,
+        "output_tokens": 164,
+        "cost_usd": 0.0010335000000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T15:57:58.799010-03:00",
+        "user_input": "[apprecio] cuantos puntos tiene el usuario 167999387...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1249,
+        "output_tokens": 27,
+        "cost_usd": 0.00035275,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T15:58:00.306812-03:00",
+        "user_input": "[apprecio] cuantos puntos tiene el usuario 167999387...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1308,
+        "output_tokens": 24,
+        "cost_usd": 0.000363,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T15:58:01.288276-03:00",
+        "user_input": "[supervisor] cuantos puntos tiene el usuario 167999387...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1108,
+        "output_tokens": 18,
+        "cost_usd": 0.000608,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T15:58:02.437605-03:00",
+        "user_input": "[apprecio] cuantos puntos tiene el usuario 167999387...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1368,
+        "output_tokens": 24,
+        "cost_usd": 0.000378,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T15:58:03.449386-03:00",
+        "user_input": "[supervisor] cuantos puntos tiene el usuario 167999387...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 1133,
+        "output_tokens": 18,
+        "cost_usd": 0.0006205,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:08:34.932955-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1055,
+        "output_tokens": 42,
+        "cost_usd": 0.00032675,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:08:55.363531-03:00",
+        "user_input": "[supervisor] cual es tu nombre?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1079,
+        "output_tokens": 71,
+        "cost_usd": 0.00037625000000000007,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:09:30.862669-03:00",
+        "user_input": "[supervisor] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1147,
+        "output_tokens": 17,
+        "cost_usd": 0.00031225000000000003,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:09:32.723941-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7828,
+        "output_tokens": 33,
+        "cost_usd": 0.004013,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:09:36.725375-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8685,
+        "output_tokens": 80,
+        "cost_usd": 0.0045825,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:09:38.078909-03:00",
+        "user_input": "[supervisor] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1228,
+        "output_tokens": 85,
+        "cost_usd": 0.0004345,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:16:31.596599-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1324,
+        "output_tokens": 41,
+        "cost_usd": 0.00039250000000000005,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:16:48.012932-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7773,
+        "output_tokens": 468,
+        "cost_usd": 0.0052905,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:16:59.355469-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 9078,
+        "output_tokens": 558,
+        "cost_usd": 0.006213,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:17:02.364067-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12067,
+        "output_tokens": 104,
+        "cost_usd": 0.0063455,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:17:06.226407-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 23625,
+        "output_tokens": 264,
+        "cost_usd": 0.0126045,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:17:08.887380-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 30697,
+        "output_tokens": 120,
+        "cost_usd": 0.0157085,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:20:11.515885-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7754,
+        "output_tokens": 648,
+        "cost_usd": 0.005821,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:20:16.215189-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 9223,
+        "output_tokens": 512,
+        "cost_usd": 0.0061475,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:20:19.502725-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12144,
+        "output_tokens": 224,
+        "cost_usd": 0.006744,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:20:21.710144-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12458,
+        "output_tokens": 95,
+        "cost_usd": 0.006514,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:20:24.432505-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 24010,
+        "output_tokens": 179,
+        "cost_usd": 0.012542,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:23:53.205307-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 7754,
+        "output_tokens": 893,
+        "cost_usd": 0.006555999999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:23:57.014915-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 9467,
+        "output_tokens": 192,
+        "cost_usd": 0.0053095,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:24:01.110796-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12064,
+        "output_tokens": 325,
+        "cost_usd": 0.007007,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:24:03.704331-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 12481,
+        "output_tokens": 97,
+        "cost_usd": 0.006531500000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:24:07.467780-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 24036,
+        "output_tokens": 301,
+        "cost_usd": 0.012920999999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:24:10.381150-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 24387,
+        "output_tokens": 178,
+        "cost_usd": 0.0127275,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:24:14.190616-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 23679,
+        "output_tokens": 236,
+        "cost_usd": 0.0125475,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:24:17.131743-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 29814,
+        "output_tokens": 173,
+        "cost_usd": 0.015426,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:24:20.926201-03:00",
+        "user_input": "[mcp] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 36139,
+        "output_tokens": 372,
+        "cost_usd": 0.019185499999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:30:54.736054-03:00",
+        "user_input": "[apprecio] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1090,
+        "output_tokens": 27,
+        "cost_usd": 0.000313,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:30:59.799535-03:00",
+        "user_input": "[apprecio] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1149,
+        "output_tokens": 24,
+        "cost_usd": 0.00032325,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:31:01.012930-03:00",
+        "user_input": "[supervisor] puedes decirme cuantos puntos tiene el usuario 167...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3338,
+        "output_tokens": 49,
+        "cost_usd": 0.000908,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:32:20.835433-03:00",
+        "user_input": "[assistant] leygo puedes recordarme cada 10 min que me pare y ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4752,
+        "output_tokens": 63,
+        "cost_usd": 0.0012825,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:32:22.060786-03:00",
+        "user_input": "[assistant] leygo puedes recordarme cada 10 min que me pare y ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4873,
+        "output_tokens": 27,
+        "cost_usd": 0.0012587499999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:32:24.214132-03:00",
+        "user_input": "[assistant] leygo puedes recordarme cada 10 min que me pare y ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4899,
+        "output_tokens": 31,
+        "cost_usd": 0.00127125,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:32:26.565699-03:00",
+        "user_input": "[assistant] leygo puedes recordarme cada 10 min que me pare y ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4909,
+        "output_tokens": 40,
+        "cost_usd": 0.00128725,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:32:27.829954-03:00",
+        "user_input": "[supervisor] leygo puedes recordarme cada 10 min que me pare y ...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3574,
+        "output_tokens": 65,
+        "cost_usd": 0.000991,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:42:29.266769-03:00",
+        "user_input": "Routine: Recuerda a Jesu...",
+        "model": "gemini-2.5-flash",
+        "input_tokens": 76,
+        "output_tokens": 1292,
+        "cost_usd": 0.003914,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:53:15.730824-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3263,
+        "output_tokens": 41,
+        "cost_usd": 0.00087725,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:53:24.163139-03:00",
+        "user_input": "[supervisor] ayudame a crear un agente que sea mi entrenador de...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3409,
+        "output_tokens": 412,
+        "cost_usd": 0.00147025,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:54:22.950285-03:00",
+        "user_input": "[dev] si...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 12428,
+        "output_tokens": 4979,
+        "cost_usd": 0.084604,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:54:29.601998-03:00",
+        "user_input": "[dev] si...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 17457,
+        "output_tokens": 268,
+        "cost_usd": 0.03813,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:54:32.003138-03:00",
+        "user_input": "[supervisor] si...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4074,
+        "output_tokens": 134,
+        "cost_usd": 0.0012195,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:55:19.919638-03:00",
+        "user_input": "[dev] nami, cuantos km son 11500 pies...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 14794,
+        "output_tokens": 579,
+        "cost_usd": 0.036536,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T16:55:22.282467-03:00",
+        "user_input": "[supervisor] nami, cuantos km son 11500 pies...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4798,
+        "output_tokens": 162,
+        "cost_usd": 0.0014425,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:11:29.873916-03:00",
+        "user_input": "[nami] nami puedes calcularme el TOD desde 35000 a 1250 p...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1190,
+        "output_tokens": 36,
+        "cost_usd": 0.00035150000000000003,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:11:31.648685-03:00",
+        "user_input": "[nami] nami puedes calcularme el TOD desde 35000 a 1250 p...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1262,
+        "output_tokens": 148,
+        "cost_usd": 0.0005375,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:11:33.220444-03:00",
+        "user_input": "[supervisor] nami puedes calcularme el TOD desde 35000 a 1250 p...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3681,
+        "output_tokens": 115,
+        "cost_usd": 0.00109275,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:11:56.626934-03:00",
+        "user_input": "[nami] si...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1569,
+        "output_tokens": 27,
+        "cost_usd": 0.00043275000000000003,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:11:58.242309-03:00",
+        "user_input": "[nami] si...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1629,
+        "output_tokens": 123,
+        "cost_usd": 0.00059175,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:11:59.883235-03:00",
+        "user_input": "[supervisor] si...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3963,
+        "output_tokens": 90,
+        "cost_usd": 0.00112575,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:16:17.370913-03:00",
+        "user_input": "Routine: Recuerda a Jesu...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 76,
+        "output_tokens": 46,
+        "cost_usd": 8.8e-05,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:18:25.574876-03:00",
+        "user_input": "[dev] leygo necesito crear un subagente que registre mis...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 12729,
+        "output_tokens": 1456,
+        "cost_usd": 0.04293,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:18:29.433040-03:00",
+        "user_input": "[supervisor] leygo necesito crear un subagente que registre mis...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5688,
+        "output_tokens": 630,
+        "cost_usd": 0.002367,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:20:27.985962-03:00",
+        "user_input": "[dev] excelente idea el google sheets es https://docs.go...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 13833,
+        "output_tokens": 3152,
+        "cost_usd": 0.06548999999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:20:32.314650-03:00",
+        "user_input": "[dev] excelente idea el google sheets es https://docs.go...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 16975,
+        "output_tokens": 140,
+        "cost_usd": 0.03563,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:20:36.708717-03:00",
+        "user_input": "[dev] excelente idea el google sheets es https://docs.go...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 17065,
+        "output_tokens": 145,
+        "cost_usd": 0.03587,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:20:40.774051-03:00",
+        "user_input": "[dev] excelente idea el google sheets es https://docs.go...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 17142,
+        "output_tokens": 153,
+        "cost_usd": 0.03612,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:20:50.979497-03:00",
+        "user_input": "[dev] excelente idea el google sheets es https://docs.go...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 16103,
+        "output_tokens": 852,
+        "cost_usd": 0.042429999999999995,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:20:55.974782-03:00",
+        "user_input": "[dev] excelente idea el google sheets es https://docs.go...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 16819,
+        "output_tokens": 251,
+        "cost_usd": 0.03665,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:21:01.214842-03:00",
+        "user_input": "[dev] excelente idea el google sheets es https://docs.go...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 13908,
+        "output_tokens": 273,
+        "cost_usd": 0.031092,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:21:03.113816-03:00",
+        "user_input": "[supervisor] excelente idea el google sheets es https://docs.go...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5626,
+        "output_tokens": 246,
+        "cost_usd": 0.0017755,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:26:17.158575-03:00",
+        "user_input": "Routine: Recuerda a Jesu...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 76,
+        "output_tokens": 28,
+        "cost_usd": 6.1e-05,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:27:41.270242-03:00",
+        "user_input": "[nachi] nachi gaste 60000 en cariñosas con tarjeta de cred...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 2727,
+        "output_tokens": 116,
+        "cost_usd": 0.00085575,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:27:43.574351-03:00",
+        "user_input": "[nachi] nachi gaste 60000 en cariñosas con tarjeta de cred...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 2745,
+        "output_tokens": 124,
+        "cost_usd": 0.00087225,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:27:46.300514-03:00",
+        "user_input": "[nachi] nachi gaste 60000 en cariñosas con tarjeta de cred...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 2146,
+        "output_tokens": 121,
+        "cost_usd": 0.000718,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:27:47.344115-03:00",
+        "user_input": "[supervisor] nachi gaste 60000 en cariñosas con tarjeta de cred...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5218,
+        "output_tokens": 78,
+        "cost_usd": 0.0014215,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:28:33.289007-03:00",
+        "user_input": "[nachi] nachi me pagaron 120000...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1734,
+        "output_tokens": 110,
+        "cost_usd": 0.0005985000000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:28:35.073683-03:00",
+        "user_input": "[nachi] nachi me pagaron 120000...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1747,
+        "output_tokens": 69,
+        "cost_usd": 0.00054025,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:28:37.437530-03:00",
+        "user_input": "[nachi] nachi me pagaron 120000...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1697,
+        "output_tokens": 74,
+        "cost_usd": 0.0005352499999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:28:38.998823-03:00",
+        "user_input": "[supervisor] nachi me pagaron 120000...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4321,
+        "output_tokens": 98,
+        "cost_usd": 0.00122725,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:29:02.695620-03:00",
+        "user_input": "[nachi] nachi puedes darme un balance?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1588,
+        "output_tokens": 62,
+        "cost_usd": 0.00049,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:29:04.943516-03:00",
+        "user_input": "[nachi] nachi puedes darme un balance?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1621,
+        "output_tokens": 218,
+        "cost_usd": 0.00073225,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:29:06.613778-03:00",
+        "user_input": "[supervisor] nachi puedes darme un balance?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4300,
+        "output_tokens": 195,
+        "cost_usd": 0.0013675,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:32:51.463175-03:00",
+        "user_input": "[supervisor] leygo quiero que tu personalidad de ahora en adela...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3570,
+        "output_tokens": 101,
+        "cost_usd": 0.001044,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:33:09.818609-03:00",
+        "user_input": "[supervisor] que pasa waxo?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3653,
+        "output_tokens": 79,
+        "cost_usd": 0.00103175,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:33:44.084397-03:00",
+        "user_input": "[supervisor] leygo quiero que tus respuestas como Flaite sean m...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3722,
+        "output_tokens": 40,
+        "cost_usd": 0.0009905,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:34:24.558481-03:00",
+        "user_input": "[nachi] nachi, me equivoqué las cariñosas eran 80000 no 60...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1256,
+        "output_tokens": 62,
+        "cost_usd": 0.000407,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:34:26.504269-03:00",
+        "user_input": "[nachi] nachi, me equivoqué las cariñosas eran 80000 no 60...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1419,
+        "output_tokens": 120,
+        "cost_usd": 0.00053475,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:34:27.931246-03:00",
+        "user_input": "[nachi] nachi, me equivoqué las cariñosas eran 80000 no 60...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1476,
+        "output_tokens": 31,
+        "cost_usd": 0.0004155,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:34:30.342417-03:00",
+        "user_input": "[nachi] nachi, me equivoqué las cariñosas eran 80000 no 60...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1514,
+        "output_tokens": 38,
+        "cost_usd": 0.0004355,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:34:33.238713-03:00",
+        "user_input": "[nachi] nachi, me equivoqué las cariñosas eran 80000 no 60...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1552,
+        "output_tokens": 84,
+        "cost_usd": 0.000514,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:34:34.356818-03:00",
+        "user_input": "[supervisor] nachi, me equivoqué las cariñosas eran 80000 no 60...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3988,
+        "output_tokens": 52,
+        "cost_usd": 0.001075,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:35:33.926910-03:00",
+        "user_input": "[nachi] puedes revisar el archivo? porque no eliminaste el...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1494,
+        "output_tokens": 62,
+        "cost_usd": 0.0004665,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:35:36.536719-03:00",
+        "user_input": "[nachi] puedes revisar el archivo? porque no eliminaste el...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1546,
+        "output_tokens": 216,
+        "cost_usd": 0.0007105,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:35:39.607944-03:00",
+        "user_input": "[nachi] puedes revisar el archivo? porque no eliminaste el...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1739,
+        "output_tokens": 116,
+        "cost_usd": 0.00060875,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:35:41.157466-03:00",
+        "user_input": "[supervisor] puedes revisar el archivo? porque no eliminaste el...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4287,
+        "output_tokens": 109,
+        "cost_usd": 0.00123525,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:36:01.728285-03:00",
+        "user_input": "[nachi] sobre escribelo...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1840,
+        "output_tokens": 88,
+        "cost_usd": 0.0005920000000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:36:03.725171-03:00",
+        "user_input": "[nachi] sobre escribelo...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1895,
+        "output_tokens": 83,
+        "cost_usd": 0.00059825,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:36:05.120779-03:00",
+        "user_input": "[supervisor] sobre escribelo...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4329,
+        "output_tokens": 91,
+        "cost_usd": 0.0012187500000000002,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:36:54.909762-03:00",
+        "user_input": "[nachi] dame un balance...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1586,
+        "output_tokens": 62,
+        "cost_usd": 0.0004895,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:36:57.738753-03:00",
+        "user_input": "[nachi] dame un balance...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1576,
+        "output_tokens": 280,
+        "cost_usd": 0.0008139999999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:37:01.287286-03:00",
+        "user_input": "[nachi] dame un balance...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1806,
+        "output_tokens": 220,
+        "cost_usd": 0.0007815000000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:37:03.298573-03:00",
+        "user_input": "[nachi] dame un balance...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1806,
+        "output_tokens": 106,
+        "cost_usd": 0.0006105,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:37:04.820575-03:00",
+        "user_input": "[supervisor] dame un balance...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4336,
+        "output_tokens": 130,
+        "cost_usd": 0.0012789999999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:43:26.740772-03:00",
+        "user_input": "Routine: Recuerda a Jesu...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 76,
+        "output_tokens": 34,
+        "cost_usd": 7e-05,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:47:10.902644-03:00",
+        "user_input": "Routine: Recuerda a Jesu...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 76,
+        "output_tokens": 34,
+        "cost_usd": 7e-05,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:49:10.980181-03:00",
+        "user_input": "Routine: Recuerda a Jesu...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 76,
+        "output_tokens": 42,
+        "cost_usd": 8.2e-05,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T17:49:49.881325-03:00",
+        "user_input": "[assistant] Puedes eliminar el recordatorio de pararme...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4579,
+        "output_tokens": 41,
+        "cost_usd": 0.0012062499999999999,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:49:51.032601-03:00",
+        "user_input": "[assistant] Puedes eliminar el recordatorio de pararme...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4653,
+        "output_tokens": 42,
+        "cost_usd": 0.00122625,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:49:52.163216-03:00",
+        "user_input": "[assistant] Puedes eliminar el recordatorio de pararme...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4729,
+        "output_tokens": 30,
+        "cost_usd": 0.0012272499999999998,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:49:53.416627-03:00",
+        "user_input": "[assistant] Puedes eliminar el recordatorio de pararme...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4846,
+        "output_tokens": 53,
+        "cost_usd": 0.0012909999999999998,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:49:54.620392-03:00",
+        "user_input": "[assistant] Puedes eliminar el recordatorio de pararme...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4941,
+        "output_tokens": 12,
+        "cost_usd": 0.00125325,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:49:57.251594-03:00",
+        "user_input": "[assistant] Puedes eliminar el recordatorio de pararme...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4958,
+        "output_tokens": 39,
+        "cost_usd": 0.001298,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:49:58.597158-03:00",
+        "user_input": "[supervisor] Puedes eliminar el recordatorio de pararme...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3669,
+        "output_tokens": 60,
+        "cost_usd": 0.00100725,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:51:15.321827-03:00",
+        "user_input": "[assistant] Necesito que en la 1 min envíes una alerta al grup...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4962,
+        "output_tokens": 78,
+        "cost_usd": 0.0013575,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:51:16.502595-03:00",
+        "user_input": "[assistant] Necesito que en la 1 min envíes una alerta al grup...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5013,
+        "output_tokens": 40,
+        "cost_usd": 0.00131325,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:51:18.882499-03:00",
+        "user_input": "[assistant] Necesito que en la 1 min envíes una alerta al grup...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5002,
+        "output_tokens": 20,
+        "cost_usd": 0.0012805000000000002,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:51:20.403292-03:00",
+        "user_input": "[assistant] Necesito que en la 1 min envíes una alerta al grup...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5464,
+        "output_tokens": 43,
+        "cost_usd": 0.0014305,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:51:22.238446-03:00",
+        "user_input": "[assistant] Necesito que en la 1 min envíes una alerta al grup...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5481,
+        "output_tokens": 26,
+        "cost_usd": 0.00140925,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:51:24.413589-03:00",
+        "user_input": "[assistant] Necesito que en la 1 min envíes una alerta al grup...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5471,
+        "output_tokens": 17,
+        "cost_usd": 0.00139325,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:51:25.565354-03:00",
+        "user_input": "[supervisor] Necesito que en la 1 min envíes una alerta al grup...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3890,
+        "output_tokens": 42,
+        "cost_usd": 0.0010355,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:52:10.256250-03:00",
+        "user_input": "[assistant] Puedes leer los últimos 5 mensajes que tuve con iv...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5315,
+        "output_tokens": 28,
+        "cost_usd": 0.00137075,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:52:11.833648-03:00",
+        "user_input": "[assistant] Puedes leer los últimos 5 mensajes que tuve con iv...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4874,
+        "output_tokens": 37,
+        "cost_usd": 0.001274,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:52:14.921160-03:00",
+        "user_input": "[assistant] Puedes leer los últimos 5 mensajes que tuve con iv...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5298,
+        "output_tokens": 265,
+        "cost_usd": 0.001722,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:52:16.146820-03:00",
+        "user_input": "[supervisor] Puedes leer los últimos 5 mensajes que tuve con iv...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4095,
+        "output_tokens": 62,
+        "cost_usd": 0.00111675,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:52:18.393917-03:00",
+        "user_input": "[assistant] Buscar el espacio de chat llamado 'TI' y enviar el...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5550,
+        "output_tokens": 20,
+        "cost_usd": 0.0014175000000000001,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:52:19.872836-03:00",
+        "user_input": "[assistant] Buscar el espacio de chat llamado 'TI' y enviar el...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5996,
+        "output_tokens": 43,
+        "cost_usd": 0.0015634999999999998,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:52:21.885613-03:00",
+        "user_input": "[assistant] Buscar el espacio de chat llamado 'TI' y enviar el...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6019,
+        "output_tokens": 47,
+        "cost_usd": 0.00157525,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:52:23.083215-03:00",
+        "user_input": "[supervisor] Buscar el espacio de chat llamado 'TI' y enviar el...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4075,
+        "output_tokens": 60,
+        "cost_usd": 0.00110875,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:53:03.029284-03:00",
+        "user_input": "[assistant] Muéstrame los últimos 5 mensajes que tuve con ival...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5354,
+        "output_tokens": 28,
+        "cost_usd": 0.0013805,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:53:04.397386-03:00",
+        "user_input": "[assistant] Muéstrame los últimos 5 mensajes que tuve con ival...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5370,
+        "output_tokens": 37,
+        "cost_usd": 0.001398,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:53:06.997406-03:00",
+        "user_input": "[assistant] Muéstrame los últimos 5 mensajes que tuve con ival...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5397,
+        "output_tokens": 259,
+        "cost_usd": 0.00173775,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:53:09.264675-03:00",
+        "user_input": "[supervisor] Muéstrame los últimos 5 mensajes que tuve con ival...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4340,
+        "output_tokens": 276,
+        "cost_usd": 0.001499,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:53:58.435748-03:00",
+        "user_input": "[assistant] Revisa mi agenda de mañana...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5746,
+        "output_tokens": 24,
+        "cost_usd": 0.0014725,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:54:00.066093-03:00",
+        "user_input": "[assistant] Revisa mi agenda de mañana...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 6065,
+        "output_tokens": 66,
+        "cost_usd": 0.00161525,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:54:01.598719-03:00",
+        "user_input": "[supervisor] Revisa mi agenda de mañana...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4348,
+        "output_tokens": 93,
+        "cost_usd": 0.0012265000000000002,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-19T17:59:34.885667-03:00",
+        "user_input": "[supervisor] hola leygo...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3555,
+        "output_tokens": 46,
+        "cost_usd": 0.00095775,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T18:00:11.278041-03:00",
+        "user_input": "[supervisor] sabes cual es mi color favorito?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3586,
+        "output_tokens": 63,
+        "cost_usd": 0.0009910000000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T18:00:29.374038-03:00",
+        "user_input": "[dev] mi color favorito es el azul...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 12033,
+        "output_tokens": 325,
+        "cost_usd": 0.027966,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T18:00:32.222437-03:00",
+        "user_input": "[dev] mi color favorito es el azul...",
+        "model": "gemini-3.1-pro-preview",
+        "input_tokens": 12403,
+        "output_tokens": 85,
+        "cost_usd": 0.025826,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-19T18:00:33.391452-03:00",
+        "user_input": "[supervisor] mi color favorito es el azul...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3749,
+        "output_tokens": 36,
+        "cost_usd": 0.00099125,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T00:05:30.487422-03:00",
+        "user_input": "[mcp] Podemos agregarle un listado de tareas por hacer a...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8937,
+        "output_tokens": 330,
+        "cost_usd": 0.0054585,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-20T00:05:38.453055-03:00",
+        "user_input": "[mcp] Podemos agregarle un listado de tareas por hacer a...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 9942,
+        "output_tokens": 80,
+        "cost_usd": 0.0052109999999999995,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-20T00:05:39.728241-03:00",
+        "user_input": "[supervisor] Podemos agregarle un listado de tareas por hacer a...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4523,
+        "output_tokens": 83,
+        "cost_usd": 0.00125525,
+        "thread_id": "1635021523"
+    },
+    {
+        "timestamp": "2026-03-20T11:15:00.326258-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3689,
+        "output_tokens": 49,
+        "cost_usd": 0.00099575,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T11:42:33.485846-03:00",
+        "user_input": "[supervisor] hola leygo, que podemos hacer?...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3699,
+        "output_tokens": 90,
+        "cost_usd": 0.00105975,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T11:43:15.724818-03:00",
+        "user_input": "[nami] puedes decirme cuantos son 90 nudos en km/h...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1373,
+        "output_tokens": 26,
+        "cost_usd": 0.00038225,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T11:43:16.716657-03:00",
+        "user_input": "[nami] puedes decirme cuantos son 90 nudos en km/h...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 1352,
+        "output_tokens": 53,
+        "cost_usd": 0.0004175,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T11:43:17.902436-03:00",
+        "user_input": "[supervisor] puedes decirme cuantos son 90 nudos en km/h...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3781,
+        "output_tokens": 56,
+        "cost_usd": 0.00102925,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:01:53.115800-03:00",
+        "user_input": "[assistant] recuerdame cada 5 min que debo tomar un descanso d...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4830,
+        "output_tokens": 61,
+        "cost_usd": 0.001299,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:01:54.198211-03:00",
+        "user_input": "[assistant] recuerdame cada 5 min que debo tomar un descanso d...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4872,
+        "output_tokens": 34,
+        "cost_usd": 0.001269,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:01:56.646108-03:00",
+        "user_input": "[assistant] recuerdame cada 5 min que debo tomar un descanso d...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4913,
+        "output_tokens": 41,
+        "cost_usd": 0.0012897499999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:01:58.951125-03:00",
+        "user_input": "[assistant] recuerdame cada 5 min que debo tomar un descanso d...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4926,
+        "output_tokens": 39,
+        "cost_usd": 0.00129,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:02:01.267982-03:00",
+        "user_input": "[assistant] recuerdame cada 5 min que debo tomar un descanso d...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4899,
+        "output_tokens": 39,
+        "cost_usd": 0.0012832499999999999,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:02:03.480876-03:00",
+        "user_input": "[assistant] recuerdame cada 5 min que debo tomar un descanso d...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4936,
+        "output_tokens": 49,
+        "cost_usd": 0.0013075,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:02:04.601524-03:00",
+        "user_input": "[supervisor] recuerdame cada 5 min que debo tomar un descanso d...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 3905,
+        "output_tokens": 56,
+        "cost_usd": 0.00106025,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:27.842995-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4971,
+        "output_tokens": 117,
+        "cost_usd": 0.0014182499999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:29.150332-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5150,
+        "output_tokens": 70,
+        "cost_usd": 0.0013925,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:31.552373-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5233,
+        "output_tokens": 111,
+        "cost_usd": 0.00147475,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:32.782868-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5402,
+        "output_tokens": 74,
+        "cost_usd": 0.0014615,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:35.812216-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5466,
+        "output_tokens": 92,
+        "cost_usd": 0.0015045000000000002,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:38.465092-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5519,
+        "output_tokens": 118,
+        "cost_usd": 0.00155675,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:40.655375-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5413,
+        "output_tokens": 28,
+        "cost_usd": 0.00139525,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:42.828434-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5319,
+        "output_tokens": 109,
+        "cost_usd": 0.00149325,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:44.393888-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5234,
+        "output_tokens": 109,
+        "cost_usd": 0.001472,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:45.984161-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5313,
+        "output_tokens": 121,
+        "cost_usd": 0.00150975,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:48.516619-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5342,
+        "output_tokens": 109,
+        "cost_usd": 0.0014990000000000001,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:50.422214-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5433,
+        "output_tokens": 153,
+        "cost_usd": 0.0015877500000000002,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:53.017840-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5610,
+        "output_tokens": 155,
+        "cost_usd": 0.0016350000000000002,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:05:56.233093-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 5638,
+        "output_tokens": 229,
+        "cost_usd": 0.001753,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:06:02.700250-03:00",
+        "user_input": "[mcp] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8826,
+        "output_tokens": 662,
+        "cost_usd": 0.006399,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:06:16.734812-03:00",
+        "user_input": "[mcp] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 15586,
+        "output_tokens": 818,
+        "cost_usd": 0.010247,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:06:21.837142-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12101,
+        "output_tokens": 137,
+        "cost_usd": 0.00323075,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:06:23.907854-03:00",
+        "user_input": "[assistant] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12067,
+        "output_tokens": 72,
+        "cost_usd": 0.00312475,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:06:25.238191-03:00",
+        "user_input": "[supervisor] necesito que en 2 min revises el proyecto JesusMas...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4924,
+        "output_tokens": 95,
+        "cost_usd": 0.0013735000000000002,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:06:55.255568-03:00",
+        "user_input": "Routine: Recuerda a Jesu...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 75,
+        "output_tokens": 26,
+        "cost_usd": 5.7749999999999994e-05,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:20.886698-03:00",
+        "user_input": "[supervisor] hola...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4759,
+        "output_tokens": 41,
+        "cost_usd": 0.00125125,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:34.423235-03:00",
+        "user_input": "[supervisor] dime que hace nachi...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4092,
+        "output_tokens": 74,
+        "cost_usd": 0.001134,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:36.575822-03:00",
+        "user_input": "[mcp] 1. Obtener el contenido del archivo 'README.md' de...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8759,
+        "output_tokens": 965,
+        "cost_usd": 0.0072745,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:41.157178-03:00",
+        "user_input": "[mcp] 1. Usar herramientas MCP para obtener el contenido...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 8305,
+        "output_tokens": 1067,
+        "cost_usd": 0.0073535,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:49.314235-03:00",
+        "user_input": "[mcp] 1. Usar herramientas MCP para obtener el contenido...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 15469,
+        "output_tokens": 993,
+        "cost_usd": 0.0107135,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:52.684962-03:00",
+        "user_input": "[assistant] 1. Usar herramientas MCP para obtener el contenido...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11557,
+        "output_tokens": 28,
+        "cost_usd": 0.00293125,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:55.335567-03:00",
+        "user_input": "[assistant] 1. Usar herramientas MCP para obtener el contenido...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11599,
+        "output_tokens": 271,
+        "cost_usd": 0.00330625,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:55.833134-03:00",
+        "user_input": "[mcp] 1. Leer el archivo 'README.md' del repositorio 'Je...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 14417,
+        "output_tokens": 1477,
+        "cost_usd": 0.0116395,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:57.398440-03:00",
+        "user_input": "[mcp] 1. Obtener el contenido del archivo 'README.md' de...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 15477,
+        "output_tokens": 3264,
+        "cost_usd": 0.0175305,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:58.842441-03:00",
+        "user_input": "[assistant] 1. Usar herramientas MCP para obtener el contenido...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11845,
+        "output_tokens": 271,
+        "cost_usd": 0.00336775,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:07:59.809469-03:00",
+        "user_input": "[assistant] 1. Leer el archivo 'README.md' del repositorio 'Je...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11637,
+        "output_tokens": 264,
+        "cost_usd": 0.00330525,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:00.472644-03:00",
+        "user_input": "[assistant] 1. Obtener el contenido del archivo 'README.md' de...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11597,
+        "output_tokens": 28,
+        "cost_usd": 0.00294125,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:00.916624-03:00",
+        "user_input": "[mcp] 1. Leer el archivo 'README.md' del repositorio 'Je...",
+        "model": "gemini-3-flash-preview",
+        "input_tokens": 14536,
+        "output_tokens": 1461,
+        "cost_usd": 0.011651,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:01.077484-03:00",
+        "user_input": "[assistant] 1. Usar herramientas MCP para obtener el contenido...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 12102,
+        "output_tokens": 60,
+        "cost_usd": 0.0031154999999999998,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:01.934922-03:00",
+        "user_input": "[assistant] 1. Leer el archivo 'README.md' del repositorio 'Je...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11821,
+        "output_tokens": 38,
+        "cost_usd": 0.00301225,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:02.429228-03:00",
+        "user_input": "[supervisor] 1. Usar herramientas MCP para obtener el contenido...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4371,
+        "output_tokens": 80,
+        "cost_usd": 0.00121275,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:02.709562-03:00",
+        "user_input": "[assistant] 1. Obtener el contenido del archivo 'README.md' de...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11501,
+        "output_tokens": 224,
+        "cost_usd": 0.00321125,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:04.326745-03:00",
+        "user_input": "[assistant] 1. Leer el archivo 'README.md' del repositorio 'Je...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11629,
+        "output_tokens": 232,
+        "cost_usd": 0.0032552500000000003,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:04.932986-03:00",
+        "user_input": "[assistant] 1. Leer el archivo 'README.md' del repositorio 'Je...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11807,
+        "output_tokens": 64,
+        "cost_usd": 0.00304775,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:05.226739-03:00",
+        "user_input": "[assistant] 1. Obtener el contenido del archivo 'README.md' de...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11775,
+        "output_tokens": 106,
+        "cost_usd": 0.00310275,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:06.533486-03:00",
+        "user_input": "[supervisor] 1. Leer el archivo 'README.md' del repositorio 'Je...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4380,
+        "output_tokens": 55,
+        "cost_usd": 0.0011775000000000002,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:06.548941-03:00",
+        "user_input": "[assistant] 1. Leer el archivo 'README.md' del repositorio 'Je...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 11847,
+        "output_tokens": 45,
+        "cost_usd": 0.00302925,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:06.641504-03:00",
+        "user_input": "[supervisor] 1. Obtener el contenido del archivo 'README.md' de...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4520,
+        "output_tokens": 85,
+        "cost_usd": 0.0012575,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:08:08.175825-03:00",
+        "user_input": "[supervisor] 1. Leer el archivo 'README.md' del repositorio 'Je...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 4429,
+        "output_tokens": 50,
+        "cost_usd": 0.00118225,
+        "thread_id": "gui_session"
+    },
+    {
+        "timestamp": "2026-03-20T12:11:55.339824-03:00",
+        "user_input": "Routine: Recuerda a Jesu...",
+        "model": "gemini-3.1-flash-lite-preview",
+        "input_tokens": 75,
+        "output_tokens": 30,
+        "cost_usd": 6.375e-05,
+        "thread_id": "gui_session"
     }
 ]

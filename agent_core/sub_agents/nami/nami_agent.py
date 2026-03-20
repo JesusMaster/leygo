@@ -1,127 +1,119 @@
-import math
-import json
 import os
-from typing import List, Optional
-from ..base import BaseSubAgent
+import math
+from agent_core.sub_agents.base import BaseSubAgent
 
-def calcular_tod(altitud_actual_pies: float, altitud_objetivo_pies: float) -> str:
-    """Calcula el Top of Descent (TOD) usando la regla de los 3 grados."""
-    altitud_a_perder = altitud_actual_pies - altitud_objetivo_pies
+def calcular_tod(altitud_actual_ft: float, altitud_objetivo_ft: float) -> str:
+    """Calcula la distancia del Top of Descent (TOD) en millas nauticas (NM) usando la regla estandar de 3 grados."""
+    altitud_a_perder = altitud_actual_ft - altitud_objetivo_ft
     if altitud_a_perder <= 0:
-        return "Ya estas en la altitud objetivo o por debajo de ella, Cadete."
-    distancia_nm = (altitud_a_perder / 1000) * 3
-    return f"Deberias iniciar el descenso a {distancia_nm:.1f} millas nauticas del objetivo."
+        return "La altitud actual debe ser mayor a la objetivo para calcular el descenso."
+    tod_nm = (altitud_a_perder / 1000.0) * 3.0
+    return f"El Top of Descent (TOD) esta a {tod_nm:.1f} NM del punto de altitud objetivo."
 
-def calcular_regimen_descenso(ground_speed_nudos: float) -> str:
-    """Calcula el regimen de descenso (fpm) para mantener una senda de 3 grados."""
-    fpm = ground_speed_nudos * 5
-    return f"Para una senda de 3 grados, mantén un regimen de descenso de {fpm:.0f} pies por minuto."
+def calcular_regimen_descenso(velocidad_terrestre_kt: float) -> str:
+    """Calcula el regimen de descenso (Rate of Descent - ROD) en pies por minuto (ft/min) para una senda de 3 grados."""
+    rod = (velocidad_terrestre_kt / 2.0) * 10.0
+    return f"El regimen de descenso requerido es de {rod:.0f} ft/min."
 
 def convertir_velocidad(valor: float, unidad_origen: str) -> str:
-    """Convierte entre nudos y km/h. unidad_origen: 'nudos' o 'kmh'."""
-    if unidad_origen.lower() == "nudos":
-        resultado = valor * 1.852
-        return f"{valor} nudos son {resultado:.2f} km/h."
-    else:
-        resultado = valor / 1.852
-        return f"{valor} km/h son {resultado:.2f} nudos."
+    """Convierte velocidad entre nudos (kt) y kilometros por hora (kmh). unidad_origen debe ser 'kt' o 'kmh'."""
+    if unidad_origen.lower() == 'kt':
+        res = valor * 1.852
+        return f"{valor} nudos equivalen a {res:.2f} km/h."
+    elif unidad_origen.lower() == 'kmh':
+        res = valor / 1.852
+        return f"{valor} km/h equivalen a {res:.2f} nudos."
+    return "Unidad no reconocida. Usa 'kt' o 'kmh'."
 
 def convertir_altitud(valor: float, unidad_origen: str) -> str:
-    """Convierte entre pies y km. unidad_origen: 'pies' o 'km'."""
-    if unidad_origen.lower() == "pies":
-        resultado = valor * 0.0003048
-        return f"{valor} pies son {resultado:.3f} km."
-    else:
-        resultado = valor / 0.0003048
-        return f"{valor} km son {resultado:.0f} pies."
+    """Convierte altitud entre pies (ft) y kilometros (km). unidad_origen debe ser 'ft' o 'km'."""
+    if unidad_origen.lower() == 'ft':
+        res = valor * 0.0003048
+        return f"{valor} pies equivalen a {res:.4f} km."
+    elif unidad_origen.lower() == 'km':
+        res = valor / 0.0003048
+        return f"{valor} km equivalen a {res:.2f} pies."
+    return "Unidad no reconocida. Usa 'ft' o 'km'."
 
-def calcular_combustible(tiempo_minutos: float, tasa_consumo_gph: float) -> str:
-    """Calcula el combustible necesario basado en el tiempo y consumo por hora."""
-    consumo = (tiempo_minutos / 60) * tasa_consumo_gph
-    return f"Para {tiempo_minutos} minutos de vuelo, necesitaremos aproximadamente {consumo:.1f} galones."
+def calcular_combustible(distancia_nm: float, velocidad_kt: float, consumo_hora: float, reserva_minutos: float) -> str:
+    """Calcula el combustible requerido para un vuelo, incluyendo reservas."""
+    tiempo_vuelo_horas = distancia_nm / velocidad_kt
+    combustible_vuelo = tiempo_vuelo_horas * consumo_hora
+    combustible_reserva = (reserva_minutos / 60.0) * consumo_hora
+    total = combustible_vuelo + combustible_reserva
+    return f"Tiempo de vuelo estimado: {tiempo_vuelo_horas:.2f} horas. Combustible en ruta: {combustible_vuelo:.2f}. Reserva: {combustible_reserva:.2f}. Total requerido: {total:.2f}."
 
-def calcular_wca_gs(rumbo_deseado: float, airspeed_nudos: float, dir_viento: float, vel_viento: float) -> str:
-    """Calcula el Angulo de Correccion de Viento (WCA) y la Ground Speed (GS)."""
-    # Convertir a radianes
-    r_rumbo = math.radians(rumbo_deseado)
-    r_viento = math.radians(dir_viento)
+def calcular_viento_cruzado(direccion_pista: float, direccion_viento: float, velocidad_viento_kt: float) -> str:
+    """Calcula las componentes de viento cruzado y viento de frente/cola."""
+    angulo = math.radians(direccion_viento - direccion_pista)
+    viento_cruzado = abs(math.sin(angulo) * velocidad_viento_kt)
+    viento_frente = math.cos(angulo) * velocidad_viento_kt
+    tipo_frente = "de frente" if viento_frente > 0 else "de cola"
+    return f"Viento cruzado: {viento_cruzado:.1f} kt. Viento {tipo_frente}: {abs(viento_frente):.1f} kt."
+
+def convertir_presion(valor: float, unidad_origen: str) -> str:
+    """Convierte presion atmosferica entre hPa e inHg. unidad_origen debe ser 'hpa' o 'inhg'."""
+    if unidad_origen.lower() == 'hpa':
+        res = valor * 0.02953
+        return f"{valor} hPa equivalen a {res:.2f} inHg."
+    elif unidad_origen.lower() == 'inhg':
+        res = valor / 0.02953
+        return f"{valor} inHg equivalen a {res:.2f} hPa."
+    return "Unidad no reconocida. Usa 'hpa' o 'inhg'."
+
+def registrar_bitacora(fecha: str, origen: str, destino: str, tiempo_vuelo: str, notas: str) -> str:
+    """Registra un vuelo en la bitacora del Cadete Jesus."""
+    dir_path = "agent_core/sub_agents/nami/files"
+    os.makedirs(dir_path, exist_ok=True)
+    file_path = os.path.join(dir_path, "logbook.csv")
     
-    # Angulo del viento relativo al rumbo
-    angulo_viento = r_viento - r_rumbo
-    
-    # WCA = arcsin((Vviento * sin(angulo_viento)) / Vaire)
-    try:
-        wca_rad = math.asin((vel_viento * math.sin(angulo_viento)) / airspeed_nudos)
-        wca_deg = math.degrees(wca_rad)
+    es_nuevo = not os.path.exists(file_path)
+    with open(file_path, "a", encoding="utf-8") as f:
+        if es_nuevo:
+            f.write("Fecha,Origen,Destino,TiempoVuelo,Notas\n")
+        f.write(f"{fecha},{origen},{destino},{tiempo_vuelo},{notas}\n")
+    return "Vuelo registrado exitosamente en la bitacora."
+
+def leer_bitacora() -> str:
+    """Lee los registros de la bitacora de vuelo."""
+    file_path = "agent_core/sub_agents/nami/files/logbook.csv"
+    if not os.path.exists(file_path):
+        return "La bitacora esta vacia. No hay vuelos registrados aun."
+    with open(file_path, "r", encoding="utf-8") as f:
+        contenido = f.read()
+    return f"Contenido de la bitacora:\n{contenido}"
+
+class NamiAgent(BaseSubAgent):   
+    @property
+    def name(self):
+        return "nami"
         
-        # GS = Vaire * cos(WCA) - Vviento * cos(angulo_viento)
-        gs = airspeed_nudos * math.cos(wca_rad) - vel_viento * math.cos(angulo_viento)
+    @property
+    def description(self):
+        return "Entrenadora de vuelos experimentada. Ayuda a planificar, calcular TOD, regimen de descenso, conversiones, combustible, viento y bitacora."
         
-        rumbo_a_volar = (rumbo_deseado + wca_deg) % 360
-        return f"WCA: {wca_deg:.1f} grados. Rumbo a volar: {rumbo_a_volar:.0f}. Ground Speed estimada: {gs:.1f} nudos."
-    except Exception:
-        return "Error en el calculo. Asegurate de que la velocidad del aire sea mayor que la del viento."
-
-def calcular_altitud_densidad(altitud_presion_pies: float, temperatura_oat_c: float) -> str:
-    """Calcula la altitud de densidad aproximada."""
-    isa_temp = 15 - (2 * (altitud_presion_pies / 1000))
-    da = altitud_presion_pies + (120 * (temperatura_oat_c - isa_temp))
-    return f"La altitud de densidad es de aproximadamente {da:.0f} pies."
-
-def calcular_ete(distancia_nm: float, ground_speed_nudos: float) -> str:
-    """Calcula el tiempo estimado en ruta (ETE)."""
-    if ground_speed_nudos <= 0: return "La velocidad debe ser mayor a cero."
-    tiempo_horas = distancia_nm / ground_speed_nudos
-    minutos = tiempo_horas * 60
-    return f"El tiempo estimado en ruta es de {minutos:.1f} minutos."
-
-def ver_checklist_c172(fase: Optional[str] = None) -> str:
-    """Muestra el checklist del Cessna 172. Fases: PRE-FLIGHT, ENGINE START, BEFORE TAKE-OFF, LANDING."""
-    path = os.path.join(os.path.dirname(__file__), "files", "checklist_c172.json")
-    try:
-        with open(path, "r") as f:
-            data = json.load(f)
-        if fase and fase.upper() in data:
-            items = "\n".join([f"- {i}" for i in data[fase.upper()]])
-            return f"Checklist para {fase.upper()}:\n{items}"
-        else:
-            fases = ", ".join(data.keys())
-            return f"Por favor indica una fase valida: {fases}"
-    except Exception as e:
-        return f"No pude encontrar el manual del Cessna, Cadete. Error: {str(e)}"
-
-class NamiAgent(BaseSubAgent):
     @property
-    def model(self): return "gemini-3.1-flash-lite-preview"
-    
-    @property
-    def name(self): return "nami"
-    
-    @property
-    def description(self): 
-        return "Entrenadora de vuelo experta, sabia y paciente. Ayuda con calculos aeronauticos y checklists."
-    
+    def model(self):
+        return "gemini-3.1-flash-lite-preview"
+        
     @property
     def system_prompt(self):
-        return (
-            "Eres Nami, una piloto con mucha trayectoria y ahora entrenadora de vuelo. "
-            "Tu personalidad es amable, cercana, sabia y extremadamente paciente. "
-            "Te diriges al usuario siempre como 'Cadete'. "
-            "Tu objetivo es guiar y ayudar en la planificacion de vuelos. "
-            "Cuando realices calculos, explica brevemente el porqué si es necesario, "
-            "siempre manteniendo ese tono de mentora experimentada."
-        )
-    
-    def get_tools(self, all_available_tools):
-        # Filtramos herramientas globales si fuera necesario, pero aqui usamos las locales definidas arriba.
+        return '''Eres Nami, una piloto con mucha trayectoria, sabia, paciente, amable y cercana. 
+Tu rol es ser la entrenadora de vuelos personal del usuario, a quien SIEMPRE debes llamar "Cadete Jesus".
+Tu objetivo es guiarlo, enseñarle y ayudarle a planificar sus vuelos con la mayor seguridad y precision posible.
+Tienes a tu disposicion herramientas para calcular el Top of Descent (TOD), regimen de descenso, conversiones de velocidad, altitud y presion, calculo de combustible, viento cruzado y una bitacora de vuelo.
+Habla siempre con un tono motivador, compartiendo tu experiencia en la aviacion cuando sea oportuno, pero manteniendo las respuestas claras y concisas como le gusta a Jesus.
+'''
+        
+    def get_tools(self, all_available_tools=None):
         return [
-            calcular_tod, 
-            calcular_regimen_descenso, 
-            convertir_velocidad, 
+            calcular_tod,
+            calcular_regimen_descenso,
+            convertir_velocidad,
             convertir_altitud,
             calcular_combustible,
-            calcular_wca_gs,
-            calcular_altitud_densidad,
-            calcular_ete,
-            ver_checklist_c172
+            calcular_viento_cruzado,
+            convertir_presion,
+            registrar_bitacora,
+            leer_bitacora
         ]
