@@ -1,0 +1,115 @@
+<div class="mcp-hub-container">
+  <div class="header-banner">
+    <div class="header-titles">
+      <h2>Conexiones MCP (Model Context Protocol)</h2>
+      <p class="subtitle">Integra al Agente con cualquier base de datos, servicio o herramienta a través de servidores externos.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-primary create-btn" (click)="openNew()">+ Nuevo Nodo MCP</button>
+    </div>
+  </div>
+
+  <div *ngIf="successMsg" class="alert alert-success fadeIn">{{ successMsg }}</div>
+  <div *ngIf="errorMsg" class="alert alert-danger fadeIn">{{ errorMsg }}</div>
+
+  <div class="loading-state" *ngIf="loading && !showModal">
+    Cargando conexiones...
+  </div>
+
+  <div class="mcp-grid" *ngIf="!loading && servers.length > 0">
+    <div class="mcp-card glass-card" *ngFor="let server of servers">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="status-indicator"></div>
+          <h3>{{ server.name | titlecase }}</h3>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn edit-btn" (click)="openEdit(server)" title="Editar"><i class="ph ph-pencil-simple"></i></button>
+          <button class="icon-btn delete-btn" (click)="deleteServer(server.name)" title="Eliminar"><i class="ph ph-trash"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="detail-row">
+          <span class="detail-label">Comando:</span>
+          <span class="detail-value code-chip">{{ server.command }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Transporte:</span>
+          <span class="detail-value">{{ server.transport }}</span>
+        </div>
+        <div class="args-preview" *ngIf="server.args && server.args.length > 0">
+          <span class="arg-chip" *ngFor="let arg of server.args | slice:0:3">{{ arg }}</span>
+          <span class="arg-more" *ngIf="server.args.length > 3">+{{ server.args.length - 3 }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state glass-card" *ngIf="!loading && servers.length === 0">
+    <div class="empty-icon"><i class="ph ph-plugs"></i></div>
+    <h3>No hay Nodos Conectados</h3>
+    <p>Agrega tu primer servidor MCP para dotar a LeyGo de habilidades externas.</p>
+    <button class="btn-primary" (click)="openNew()">Configurar MCP</button>
+  </div>
+
+  <!-- MODAL / OFFCANVAS -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content glass-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ isEditing ? 'Editar Nodo: ' + originalName : 'Nueva Conexión MCP' }}</h3>
+        <button class="close-btn" (click)="closeModal()"><i class="ph ph-x"></i></button>
+      </div>
+      
+      <div class="modal-body form-step">
+        <div class="form-row split-form">
+           <div class="form-group">
+            <label>Nombre Identificador *</label>
+            <input type="text" [(ngModel)]="currentServer.name" placeholder="ej. mi-base-datos" [disabled]="isEditing">
+          </div>
+          <div class="form-group">
+            <label>Tipo de Transporte</label>
+            <select [(ngModel)]="currentServer.transport" class="dropdown-select">
+              <option value="stdio">Stdio (Local)</option>
+              <option value="sse">SSE (Networked)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group single-line">
+           <label>Comando Ejecutable</label>
+           <input type="text" [(ngModel)]="currentServer.command" placeholder="ej. npx, python, docker">
+        </div>
+
+        <div class="dynamic-group">
+          <label class="group-title">Argumentos de Ejecución (Args)</label>
+          <div class="dynamic-list">
+             <div class="dynamic-row" *ngFor="let arg of currentServer.args; let i = index; trackBy: trackByIndex">
+               <input type="text" [(ngModel)]="currentServer.args[i]" placeholder="Argumento (ej. -y o mcp-remote@latest)">
+               <button class="btn-danger-icon" (click)="removeArg(i)"><i class="ph ph-x"></i></button>
+             </div>
+             <button class="btn-secondary add-row-btn" (click)="addArg()">+ Añadir Argumento</button>
+          </div>
+        </div>
+
+        <div class="dynamic-group">
+          <label class="group-title">Variables de Entorno (Tokens Secretos)</label>
+          <div class="dynamic-list">
+             <div class="dynamic-row split-env" *ngFor="let env of currentServer.envPairs; let i = index; trackBy: trackByIndex">
+               <input type="text" [(ngModel)]="currentServer.envPairs[i].key" placeholder="Variable (ej. GITHUB_TOKEN)">
+               <input type="password" [(ngModel)]="currentServer.envPairs[i].value" placeholder="Contraseña/Valor">
+               <button class="btn-danger-icon" (click)="removeEnv(i)"><i class="ph ph-x"></i></button>
+             </div>
+             <button class="btn-secondary add-row-btn" (click)="addEnv()">+ Añadir Secreto</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn-primary" [disabled]="loading || !currentServer.name" (click)="saveServer()"> Guardar Conexión </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

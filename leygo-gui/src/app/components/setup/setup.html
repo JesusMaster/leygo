@@ -1,0 +1,240 @@
+<div class="onboarding-overlay">
+  <div class="glass-panel">
+    
+    <!-- HEADER -->
+    <div class="setup-header">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" class="logo-icon" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h2>Leygo<span>Setup</span></h2>
+      </div>
+      <div class="steps-indicator">
+        Paso {{currentStep}} de {{totalSteps}}
+      </div>
+    </div>
+
+    <div class="error-banner" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- BODY: Split Layout -->
+    <div class="setup-body">
+      
+      <!-- LEFT: Formulario -->
+      <div class="form-container">
+        
+        <!-- STEP 1: Admin Creation -->
+      <div class="step-content form-step" *ngIf="currentStep === 1">
+        <h3>Activación del Sistema</h3>
+        <p class="subtitle">La seguridad es primero. Crea la cuenta maestra del servidor.</p>
+        
+        <div class="form-group">
+          <label>Llave de Activación (Activation Key)</label>
+          <input type="text" [(ngModel)]="activationKey" placeholder="Pega tu código efímero aquí...">
+        </div>
+
+        <div class="form-group row">
+          <div class="col">
+            <label>Correo Electrónico</label>
+            <input type="email" [(ngModel)]="adminEmail" placeholder="tu@correo.com">
+          </div>
+          <div class="col">
+            <label>Contraseña</label>
+            <input type="password" [(ngModel)]="adminPass" placeholder="••••••••••••••">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Tu Nombre Real</label>
+          <input type="text" [(ngModel)]="userName" placeholder="Ej. Alex Rivera">
+        </div>
+
+      </div>
+
+      <!-- STEP 2: Agent Personalization -->
+      <div class="step-content form-step" *ngIf="currentStep === 2">
+        <h3>El Cerebro Artificial</h3>
+        <p class="subtitle">Dale vida a la Inteligencia Artificial asignándole una identidad.</p>
+        
+        <div class="form-group">
+          <label>¿Cómo nombrarás a tu IA?</label>
+          <input type="text" [(ngModel)]="agentName" placeholder="Ej. Leygo, JARVIS, Cortana...">
+        </div>
+
+        <div class="form-group">
+          <label>¿Cómo quieres que te llame la IA?</label>
+          <input type="text" [(ngModel)]="preferredName" placeholder="Tu Apodo/Nombre Corto (Ej: Jesus)">
+        </div>
+
+        <div class="form-group">
+          <label>Personalidad y Foco del Agente</label>
+          <textarea [(ngModel)]="agentPersonality" rows="3" placeholder="Describe cómo quieres que actúe tu asistente..."></textarea>
+        </div>
+      </div>
+        <!-- STEP 3: LLM & TZ -->
+        <div class="step-content form-step" *ngIf="currentStep === 3">
+          <h3>Cerebro Artificial y Tiempo</h3>
+          <p class="subtitle">Selecciona el motor que dará vida al agente y tu zona horaria.</p>
+
+          <div class="form-group tz-picker-group">
+            <label>Zona Horaria</label>
+            <div class="tz-picker" [class.open]="tzDropdownOpen">
+              <div class="tz-selected" (click)="toggleTzDropdown(); $event.stopPropagation()">
+                <span class="tz-value">{{ timezone }}</span>
+                <svg class="tz-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div class="tz-dropdown" *ngIf="tzDropdownOpen" (click)="$event.stopPropagation()">
+                <div class="tz-search-wrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input #tzSearch type="text" class="tz-search-input" [(ngModel)]="tzSearchQuery" placeholder="Buscar zona horaria..." (click)="$event.stopPropagation()">
+                </div>
+                <div class="tz-list">
+                  <div *ngFor="let tz of filteredTimezones()" class="tz-option" [class.selected]="tz === timezone" (click)="selectTimezone(tz)">
+                    {{ tz }}
+                  </div>
+                  <div *ngIf="filteredTimezones().length === 0" class="tz-empty">Sin resultados</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Proveedor Principal (LLM)</label>
+            <select [(ngModel)]="llmProvider">
+              <option value="Google">Google (Gemini)</option>
+              <option value="GPT">OpenAI (GPT-4)</option>
+              <option value="Anthropic">Anthropic (Claude)</option>
+            </select>
+          </div>
+
+          <div class="form-group" *ngIf="llmProvider === 'Google'">
+            <label>Google API Key</label>
+            <input type="password" [(ngModel)]="googleApiKey" placeholder="AIzaSy...">
+          </div>
+          <div class="form-group" *ngIf="llmProvider === 'GPT'">
+            <label>OpenAI API Key</label>
+            <input type="password" [(ngModel)]="openaiApiKey" placeholder="sk-...">
+          </div>
+          <div class="form-group" *ngIf="llmProvider === 'Anthropic'">
+            <label>Anthropic API Key</label>
+            <input type="password" [(ngModel)]="anthropicApiKey" placeholder="sk-ant-...">
+          </div>
+        </div>
+
+        <!-- STEP 4: Workspace -->
+        <div class="step-content form-step" *ngIf="currentStep === 4">
+          <h3>Integración: Google Workspace</h3>
+          <p class="subtitle">Opcional. Permite que el agente lea tu correo Calendar o Docs.</p>
+
+          <div class="form-group">
+            <label>Google Client ID</label>
+            <input type="text" [(ngModel)]="googleClientId" placeholder="Opcional...">
+          </div>
+          <div class="form-group">
+            <label>Google Client Secret</label>
+            <input type="password" [(ngModel)]="googleClientSecret" placeholder="Opcional...">
+          </div>
+          
+          <div style="margin-top:20px; text-align:center" *ngIf="googleClientId && googleClientSecret">
+             <button class="btn-primary" style="width:100%; max-width: 300px;" (click)="connectGoogle()" type="button" [disabled]="loading">
+               <span *ngIf="!googleAuthRequested">🔐 Conectar con Google en vivo</span>
+               <span *ngIf="googleAuthRequested">Vuelve a pulsar si falló la ventana</span>
+            </button>
+             <p *ngIf="googleAuthRequested" style="color: green; margin-top: 10px; font-size:0.85rem"><i>Revisa la ventana emergente, valídate y luego presiona Siguiente.</i></p>
+          </div>
+        </div>
+
+        <!-- STEP 5: Telegram -->
+        <div class="step-content form-step" *ngIf="currentStep === 5">
+          <h3>Canal Principal: Telegram</h3>
+          <p class="subtitle">Opcional. Configura el bot para hablar desde tu móvil.</p>
+
+          <div class="form-group">
+            <label>Telegram Token</label>
+            <input type="password" [(ngModel)]="telegramToken" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11">
+          </div>
+          <div class="form-group">
+            <label>Tu Chat ID</label>
+            <input type="text" [(ngModel)]="telegramChatId" placeholder="Ej. 987654321">
+          </div>
+          <div class="form-group">
+            <label>URL del Webhook (Sugerida por tu red)</label>
+            <input type="text" [(ngModel)]="webhookUrl" placeholder="https://tudominio.com:8000/webhook">
+          </div>
+        </div>
+
+        <!-- FOOTER / BUTTONS -->
+        <div class="setup-controls">
+          <button class="btn-secondary" (click)="prevStep()" [disabled]="currentStep === 1 || loading">
+            Atrás
+          </button>
+          
+          <div class="right-controls">
+            <!-- Botones SKIP -->
+            <button class="btn-ghost" *ngIf="currentStep === 4" (click)="skipWorkspace()" [disabled]="loading">Omitir</button>
+            <button class="btn-ghost" *ngIf="currentStep === 5" (click)="skipTelegram()" [disabled]="loading">Omitir Telegram</button>
+
+            <!-- Botones Principales -->
+            <button class="btn-primary" *ngIf="currentStep < totalSteps" (click)="nextStep()" [disabled]="loading">
+              {{ loading ? 'Conectando...' : 'Siguiente' }}
+            </button>
+            <button class="btn-primary finish-btn" *ngIf="currentStep === totalSteps" (click)="finishSetup()" [disabled]="loading">
+              {{ loading ? 'Aplicando Config...' : 'Terminar Setup' }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Context Panel (Ayuda Dinámica) -->
+      <div class="context-panel">
+        <div class="info-card" *ngIf="currentStep === 1">
+          <h4>🔐 Validando Servidor</h4>
+          <p>La Llave de Activación previene que visitantes no autorizados tomen el control de tu infraestructura.</p>
+          <ul>
+            <li>Mira en la consola donde ejecutaste <code>docker-compose</code>.</li>
+            <li>Copia la clave exacta.</li>
+            <li>Guarda bien tu usuario Administrador.</li>
+          </ul>
+        </div>
+
+        <div class="info-card" *ngIf="currentStep === 2">
+          <h4>🧠 Cerebro Re-programable</h4>
+          <p>La IA aprende contigo cada día. Puedes editar su memoria o su personalidad dictándole naturalmente por chat:</p>
+          <ul>
+            <li style="margin-bottom: 12px; font-size: 0.85rem"><em>"Leygo, recuerda que mi color favorito es el azul"</em></li>
+            <li style="font-size: 0.85rem"><em>"Leygo, ahora quiero que tu personalidad sea de un experto en marketing con muchos años de experiencia, cercano y muy jovial"</em></li>
+          </ul>
+        </div>
+
+        <div class="info-card" *ngIf="currentStep === 3">
+          <h4>🤖 Obtén tu Llave</h4>
+          <p>Si optas por Google Gemini (Recomendado):</p>
+          <a href="https://aistudio.google.com/api-keys" target="_blank" class="help-link">Obtén tu API Key Gratuita en AI Studio ↗</a>
+        </div>
+
+        <div class="info-card" *ngIf="currentStep === 4">
+          <h4>📧 Poderes de Workspace</h4>
+          <p>Requiere crear un proyecto OAuth2 en Google Cloud con acceso a Gmail y Calendar. Si no lo tienes configurado aún, puedes omitir este paso.</p>
+          <div style="margin-top: 10px; padding: 10px; border: 1px dashed var(--accent-primary); border-radius: 6px; background: rgba(99, 102, 241, 0.05);">
+             <p style="margin:0; font-size:0.85rem">⚠️ Para el botón en vivo, debes añadir exactamente esta red de retorno en tu consola de Google Cloud:</p>
+             <code style="font-size:0.75rem; word-break: break-all; margin-top:5px; display:block">
+               http://localhost:8000/api/setup/google-callback
+             </code>
+          </div>
+        </div>
+
+        <div class="info-card" *ngIf="currentStep === 5">
+          <h4>📱 Configurando Telegram</h4>
+          <p>Sigue estos pasos rápidos:</p>
+          <ol>
+            <li>Busca a <strong>@BotFather</strong> en Telegram.</li>
+            <li>Usa <code>/newbot</code> y copia el Token.</li>
+            <li>Busca a <strong>@userinfobot</strong> para ver tu Chat ID.</li>
+          </ol>
+          <p class="warning-text">⚠️ Telegram exige <strong>HTTPS</strong> para el Webhook. Si estás en localhost sin túnel, el bot no recibirá mensajes móviles.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

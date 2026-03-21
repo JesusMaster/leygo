@@ -4,12 +4,20 @@ import { AgentsComponent } from './components/agents/agents';
 import { ConfigComponent } from './components/config/config';
 import { TasksComponent } from './components/tasks/tasks';
 import { UsageComponent } from './components/usage/usage';
+import { SetupComponent } from './components/setup/setup';
+import { LoginComponent } from './components/login/login';
+import { McpSettingsComponent } from './components/mcp-settings/mcp-settings';
+import { setupGuard } from './guards/setup.guard';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'setup', component: SetupComponent },
   { path: '', redirectTo: 'chat', pathMatch: 'full' },
-  { path: 'chat', component: ChatComponent },
-  { path: 'agents', component: AgentsComponent },
-  { path: 'tasks', component: TasksComponent },
-  { path: 'config', component: ConfigComponent },
-  { path: 'usage', component: UsageComponent }
+  { path: 'chat', component: ChatComponent, canActivate: [setupGuard, authGuard] },
+  { path: 'agents', component: AgentsComponent, canActivate: [setupGuard, authGuard] },
+  { path: 'tasks', component: TasksComponent, canActivate: [setupGuard, authGuard] },
+  { path: 'config', component: ConfigComponent, canActivate: [setupGuard, authGuard] },
+  { path: 'mcp-settings', component: McpSettingsComponent, canActivate: [setupGuard, authGuard] },
+  { path: 'usage', component: UsageComponent, canActivate: [setupGuard, authGuard] }
 ];

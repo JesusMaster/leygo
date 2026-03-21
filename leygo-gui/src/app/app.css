@@ -137,15 +137,29 @@
   color: #111827;
 }
 
-.user-plan {
-  font-size: 12px;
-  color: var(--text-dim);
+.logout-mini-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  margin-top: 4px;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-family: inherit;
 }
 
-.settings-gear {
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 18px;
+.logout-mini-btn:hover {
+  color: #dc2626;
+  text-decoration: underline;
+}
+
+.logout-mini-btn i {
+  font-size: 14px;
 }
 
 /* Main Content Area */

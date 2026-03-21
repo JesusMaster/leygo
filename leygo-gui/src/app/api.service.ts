@@ -44,6 +44,12 @@ export class ApiService {
     return this.http.post<{ response: string, usage?: any }>(`${this.baseUrl}/chat`, { message, thread_id: threadId });
   }
 
+  uploadFile(file: File): Observable<{ status: string, filepath: string, filename: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ status: string, filepath: string, filename: string }>(`${this.baseUrl}/upload`, formData);
+  }
+
   getUsageHistory(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/usage`);
   }

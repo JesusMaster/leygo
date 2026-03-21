@@ -12,8 +12,14 @@ export class MarkdownPipe implements PipeTransform {
   transform(value: string): SafeHtml {
     if (!value) return '';
     
+    let processedValue = value;
+    
+    // Auto-convert QuickChart URLs to images if sent as raw URLs or standard links.
+    processedValue = processedValue.replace(/(?<!\!)\[([^\]]+)\]\((https:\/\/quickchart\.io\/chart\?[^\)]+)\)/g, '![$1]($2)');
+    processedValue = processedValue.replace(/(?<!\()https:\/\/quickchart\.io\/chart\?[^\s<]+/g, (match) => `![](${match})`);
+    
     // Convert markdown to HTML (Default marked.parse is synchronous)
-    const html = marked.parse(value, { async: false }) as string;
+    const html = marked.parse(processedValue, { async: false }) as string;
     
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }

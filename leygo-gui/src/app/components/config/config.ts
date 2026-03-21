@@ -197,4 +197,37 @@ export class ConfigComponent implements OnInit {
   getEnvKeys() {
     return Object.keys(this.config());
   }
+
+  getEnvGroups() {
+    const config = this.config();
+    const groups = [];
+    const keys = Object.keys(config);
+
+    const googleKeys = keys.filter(k => k.startsWith('GOOGLE_'));
+    if (googleKeys.length > 0) {
+      groups.push({ title: 'Autenticación: Google Workspace', icon: 'ph-google-logo', keys: googleKeys });
+    }
+
+    const telegramKeys = keys.filter(k => k.startsWith('TELEGRAM_') || k === 'WEBHOOK_URL');
+    if (telegramKeys.length > 0) {
+      groups.push({ title: 'Integración: Bot de Telegram', icon: 'ph-telegram-logo', keys: telegramKeys });
+    }
+
+    const modelKeys = keys.filter(k => k.startsWith('MODEL_'));
+    if (modelKeys.length > 0) {
+      groups.push({ title: 'Configuración LLM por Agente', icon: 'ph-brain', keys: modelKeys });
+    }
+
+    const otherKeys = keys.filter(k => 
+      !k.startsWith('GOOGLE_') && 
+      !k.startsWith('TELEGRAM_') && 
+      k !== 'WEBHOOK_URL' && 
+      !k.startsWith('MODEL_')
+    );
+    if (otherKeys.length > 0) {
+      groups.push({ title: 'Ajustes Globales del Sistema', icon: 'ph-gear-six', keys: otherKeys });
+    }
+
+    return groups;
+  }
 }

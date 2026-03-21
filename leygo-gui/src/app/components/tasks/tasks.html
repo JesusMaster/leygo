@@ -15,7 +15,7 @@
     <div class="tasks-list">
       @if (tasks().length === 0) {
         <div class="empty-state glass">
-          <div class="empty-icon">📅</div>
+          <div class="empty-icon"><i class="ph ph-calendar"></i></div>
           <h3>No hay tareas pendientes</h3>
           <p>Tus recordatorios y rutinas aparecerán aquí.</p>
         </div>
@@ -25,10 +25,15 @@
             <div class="task-info">
               <div class="task-header">
                 <span class="type-badge" [ngClass]="task.type">
-                  {{ task.type === 'date' ? '⏰ Una Vez' : (task.type === 'cron' ? '📆 Diario' : '🔄 Recurrente') }}
+                  <i *ngIf="task.type === 'date'" class="ph ph-clock"></i>
+                  <i *ngIf="task.type === 'cron'" class="ph ph-calendar-blank"></i>
+                  <i *ngIf="task.type === 'interval'" class="ph ph-arrows-clockwise"></i>
+                  {{ task.type === 'date' ? 'Una Vez' : (task.type === 'cron' ? 'Diario' : 'Recurrente') }}
                 </span>
                 <span class="type-badge" [ngClass]="task.func_name === 'execute_agent_task' ? 'agent-badge' : 'text-badge'">
-                  {{ task.func_name === 'execute_agent_task' ? '🤖 Acción de Agente' : '📝 Solo Aviso' }}
+                  <i *ngIf="task.func_name === 'execute_agent_task'" class="ph ph-robot"></i>
+                  <i *ngIf="task.func_name !== 'execute_agent_task'" class="ph ph-note"></i>
+                  {{ task.func_name === 'execute_agent_task' ? 'Acción de Agente' : 'Solo Aviso' }}
                 </span>
               </div>
               <h3>{{ task.name }}</h3>

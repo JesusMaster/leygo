@@ -1,28 +1,30 @@
 <div class="usage-wrapper">
   <div class="header">
-    <h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-activity"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Historial de Uso de IA</h2>
+    <h2>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Historial de Uso de IA
+    </h2>
     <p>Revisa el consumo de tokens y costo estimado interactuando con Leygo AI.</p>
   </div>
 
   <div class="summary-cards">
     <!-- Presupuesto -->
     <div class="card shadow-sm glass-panel budget-card">
-      <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>
+      <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>
       <div class="card-content" style="width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <h3>Cuota Mensual (Límite)</h3>
           <button class="icon-btn edit-btn" (click)="toggleEditBudget()" title="Editar Cuota">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
           </button>
         </div>
-        
         @if (isEditingBudget()) {
           <div class="edit-budget-form">
             <input type="number" step="0.5" min="0" [(ngModel)]="editBudgetValue" class="budget-input">
             <button class="btn btn-sm save-btn" (click)="saveBudget()" [disabled]="budgetLoading()">Guardar</button>
           </div>
         } @else {
-          <p class="amount">${{ monthlyBudget() | number:'1.2-2' }}</p>
+          <p class="amount" style="font-size: 24px; margin: 4px 0;">${{ monthlyBudget() | number:'1.2-2' }}</p>
           <div class="progress-bar-container" style="margin-top: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; height: 6px; width: 100%; overflow: hidden;">
             <div class="progress-bar-fill" [style.width.%]="(totalCost() / monthlyBudget() * 100) > 100 ? 100 : (totalCost() / monthlyBudget() * 100)" [style.background]="totalCost() >= monthlyBudget() ? '#ff4b4b' : '#4CAF50'" style="height: 100%;"></div>
           </div>
@@ -33,19 +35,19 @@
 
     <!-- Gasto Actual -->
     <div class="card shadow-sm glass-panel">
-      <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-coins"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></div>
+      <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></div>
       <div class="card-content">
         <h3>Gasto Usado Este Mes</h3>
-        <p class="amount" [class.danger]="totalCost() >= monthlyBudget()">${{ totalCost() | number:'1.5-5' }}</p>
+        <p class="amount" style="font-size: 24px;" [class.danger]="totalCost() >= monthlyBudget()">${{ totalCost() | number:'1.2-2' }}</p>
       </div>
     </div>
-    
+
     <!-- Tokens -->
     <div class="card shadow-sm glass-panel">
-      <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div>
+      <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div>
       <div class="card-content">
         <h3>Tokens Este Mes</h3>
-        <p class="amount">{{ totalTokens() | number }}</p>
+        <p class="amount" style="font-size: 24px;">{{ totalTokens() | number }}</p>
       </div>
     </div>
   </div>
@@ -64,7 +66,7 @@
         }
       </select>
     </div>
-    
+
     <div class="filter-group">
       <label>
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
@@ -72,7 +74,7 @@
       </label>
       <input type="date" [ngModel]="filterDateFrom()" (ngModelChange)="filterDateFrom.set($event); onFilterChange()">
     </div>
-    
+
     <div class="filter-group">
       <label>
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
@@ -80,17 +82,32 @@
       </label>
       <input type="date" [ngModel]="filterDateTo()" (ngModelChange)="filterDateTo.set($event); onFilterChange()">
     </div>
-    
+
     @if (filterModel() || filterDateFrom() || filterDateTo()) {
       <button class="clear-filters-btn" (click)="clearFilters()">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         Limpiar
       </button>
     }
-    
+
+    <!-- Toggle vista -->
+    <button class="view-toggle-btn" (click)="toggleViewMode()" [class.active]="groupedView()" title="Alternar vista agrupada / detalle">
+      @if (groupedView()) {
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Vista Detalle
+      } @else {
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+        Vista Agrupada
+      }
+    </button>
+
     <div class="filter-summary">
       <span class="filter-label">{{ activeFilterLabel() }}</span>
-      <span class="filter-stats">{{ filteredHistory().length }} registros · ${{ filteredCost() | number:'1.4-4' }} · {{ filteredTokens() | number }} tokens</span>
+      @if (groupedView()) {
+        <span class="filter-stats">{{ groupedOperations().length }} operaciones · ${{ filteredCost() | number:'1.5-5' }} · {{ filteredTokens() | number }} tokens</span>
+      } @else {
+        <span class="filter-stats">{{ filteredHistory().length }} registros · ${{ filteredCost() | number:'1.5-5' }} · {{ filteredTokens() | number }} tokens</span>
+      }
     </div>
   </div>
 
@@ -101,49 +118,101 @@
         <p>Cargando registros...</p>
       </div>
     } @else {
-      @if (filteredHistory().length === 0) {
-        <div class="empty-state">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-          @if (filterModel() || filterDateFrom() || filterDateTo()) {
-            <p>No hay registros que coincidan con los filtros aplicados.</p>
+      <table class="usage-table">
+        <thead>
+          <tr>
+            <th style="width: 180px;">Fecha y Hora</th>
+            <th>{{ groupedView() ? 'Operación / Tarea' : 'Prompt Corto' }}</th>
+            <th style="width: 220px;">Modelo Utilizado</th>
+            <th style="width: 100px;">Tokens In</th>
+            <th style="width: 100px;">Tokens Out</th>
+            <th style="width: 120px;">Costo ($)</th>
+          </tr>
+        </thead>
+        
+        <!-- ====== VISTA AGRUPADA (Table Body) ====== -->
+        @if (groupedView()) {
+          @if (groupedOperations().length === 0) {
+            <tbody>
+              <tr><td colspan="6" class="empty-cell">Aún no hay interacciones con Leygo AI.</td></tr>
+            </tbody>
           } @else {
-            <p>Aún no hay interacciones con Leygo AI.</p>
+            @for (group of groupedOperations(); track group.id) {
+              <tbody class="op-group-body" [class.expanded]="group.expanded">
+                <!-- Fila Resumen del Grupo -->
+                <tr class="op-summary-row" (click)="toggleGroup(group)">
+                  <td class="timestamp-cell">
+                    <div class="timestamp-with-chevron">
+                      <div class="op-chevron" [class.rotated]="group.expanded">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
+                      {{ group.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+                    </div>
+                  </td>
+                  <td class="prompt-text">
+                    <span class="op-label">{{ group.label }}</span>
+                    <span class="op-calls-badge">{{ group.records.length }} llamadas</span>
+                  </td>
+                  <td>
+                    <div class="models-container">
+                      @for (m of group.models; track m) {
+                        <span class="badge model-badge">{{ m }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="num-cell">{{ group.total_input_tokens | number }}</td>
+                  <td class="num-cell">{{ group.total_output_tokens | number }}</td>
+                  <td class="cost-col">${{ group.total_cost | number:'1.5-5' }}</td>
+                </tr>
+
+                <!-- Filas de Detalle (Visibles solo si expanded) -->
+                @if (group.expanded) {
+                  @for (r of group.records; track $index) {
+                    <tr class="detail-row">
+                      <td class="timestamp-cell sub-info">{{ r.timestamp | date:'HH:mm:ss' }}</td>
+                      <td class="prompt-text sub-info italic">
+                        <span class="agent-tag">{{ getAgentPrefix(r.user_input) }}</span>
+                        {{ r.user_input }}
+                      </td>
+                      <td><span class="badge model-badge model-badge-sm">{{ r.model }}</span></td>
+                      <td class="num-cell sub-info">{{ r.input_tokens | number }}</td>
+                      <td class="num-cell sub-info">{{ r.output_tokens | number }}</td>
+                      <td class="cost-col sub-info">${{ r.cost_usd | number:'1.5-5' }}</td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            }
           }
-        </div>
-      } @else {
-        <table class="usage-table">
-          <thead>
-            <tr>
-              <th>Fecha y Hora</th>
-              <th>Prompt Corto</th>
-              <th>Modelo Utilizado</th>
-              <th>Tokens In</th>
-              <th>Tokens Out</th>
-              <th>Costo ($)</th>
-            </tr>
-          </thead>
+
+        <!-- ====== VISTA DETALLE ORIGINAL (Table Body) ====== -->
+        } @else {
           <tbody>
-            @for (record of filteredHistory(); track $index) {
-              <tr>
-                <td>{{ record.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</td>
-                <td class="prompt-text">{{ record.user_input || 'N/A' }}{{ (record.user_input && record.user_input.length > 40) ? '...' : '' }}</td>
-                <td><span class="badge model-badge">{{ record.model }}</span></td>
-                <td>{{ record.input_tokens | number }}</td>
-                <td>{{ record.output_tokens | number }}</td>
-                <td class="cost-col">${{ record.cost_usd | number:'1.5-5' }}</td>
-              </tr>
+            @if (filteredHistory().length === 0) {
+              <tr><td colspan="6" class="empty-cell">No hay registros que coincidan.</td></tr>
+            } @else {
+              @for (record of filteredHistory(); track $index) {
+                <tr>
+                  <td>{{ record.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                  <td class="prompt-text">{{ record.user_input || 'N/A' }}{{ (record.user_input && record.user_input.length > 40) ? '...' : '' }}</td>
+                  <td><span class="badge model-badge">{{ record.model }}</span></td>
+                  <td>{{ record.input_tokens | number }}</td>
+                  <td>{{ record.output_tokens | number }}</td>
+                  <td class="cost-col">${{ record.cost_usd | number:'1.5-5' }}</td>
+                </tr>
+              }
             }
           </tbody>
-        </table>
-        
-        @if (canLoadMore()) {
-          <div class="load-more-container">
-            <button class="load-more-btn" (click)="loadMore()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
-              Cargar más registros
-            </button>
-          </div>
         }
+      </table>
+
+      @if (canLoadMore()) {
+        <div class="load-more-container">
+          <button class="load-more-btn" (click)="loadMore()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>
+            Cargar más registros
+          </button>
+        </div>
       }
     }
   </div>

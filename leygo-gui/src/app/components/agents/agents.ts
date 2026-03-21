@@ -15,7 +15,7 @@ export class AgentsComponent implements OnInit {
   customAgents = signal<Agent[]>([]);
   loading = signal(true);
 
-  private readonly BASE_AGENTS = ['assistant', 'dev', 'mcp', 'researcher'];
+  private readonly BASE_AGENTS = ['assistant', 'dev', 'mcp', 'researcher', 'file_reader'];
 
   ngOnInit() {
     this.api.getAgents().subscribe({

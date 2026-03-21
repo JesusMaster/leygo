@@ -10,28 +10,32 @@
     
     <nav class="nav-menu">
       <a routerLink="/chat" routerLinkActive="active" class="nav-item">
-        <span class="icon">💬</span>
+        <span class="icon"><i class="ph ph-chat-circle-dots"></i></span>
         <span class="label">Chat Assistant</span>
       </a>
-      <a routerLink="/agents" routerLinkActive="active" class="nav-item">
-        <span class="icon">🤖</span>
-        <span class="label">Agents Library</span>
-      </a>
       <a routerLink="/tasks" routerLinkActive="active" class="nav-item">
-        <span class="icon">📅</span>
+        <span class="icon"><i class="ph ph-calendar-blank"></i></span>
         <span class="label">Scheduled Tasks</span>
       </a>
-      <a routerLink="/config" routerLinkActive="active" class="nav-item">
-        <span class="icon">⚙️</span>
-        <span class="label">Configuration</span>
-      </a>
       <a routerLink="/usage" routerLinkActive="active" class="nav-item">
-        <span class="icon">📊</span>
+        <span class="icon"><i class="ph ph-chart-bar"></i></span>
         <span class="label">Token Usage</span>
+      </a>
+      <a routerLink="/agents" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="ph ph-robot"></i></span>
+        <span class="label">Agents Library</span>
+      </a>
+      <a routerLink="/mcp-settings" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="ph ph-plug"></i></span>
+        <span class="label">Conectores MCP</span>
+      </a>
+      <a routerLink="/config" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="ph ph-gear"></i></span>
+        <span class="label">Configuration</span>
       </a>
     </nav>
 
-    <div class="favorites-section">
+    <!-- <div class="favorites-section">
       <p class="section-title">FAVORITES</p>
       <div class="favorite-item">
         <span class="dot green"></span>
@@ -41,18 +45,19 @@
         <span class="dot orange"></span>
         <span class="label">Creative Writing</span>
       </div>
-    </div>
+    </div> -->
     
     <div class="sidebar-footer">
       <div class="user-profile">
         <div class="avatar-container">
-          <img src="https://ui-avatars.com/api/?name=Alex+Rivera&background=0D8ABC&color=fff" alt="User">
+          <img [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=0ea5e9&color=fff&bold=true'" alt="User Avatar">
         </div>
         <div class="user-details">
-          <span class="user-name">Jesús Leiva</span>
-          <span class="user-plan">MIT License</span>
+          <span class="user-name">{{ userName }}</span>
+          <button class="logout-mini-btn" (click)="logout()" title="Cerrar sesión de forma segura">
+            <i class="ph ph-sign-out"></i> Cerrar Sesión
+          </button>
         </div>
-        <div class="settings-gear">⚙️</div>
       </div>
     </div>
   </aside>
@@ -67,10 +72,10 @@
           Agent Online
         </div>
       </div>
-      <div class="header-actions">
+      <!-- <div class="header-actions">
         <button class="icon-btn">share</button>
         <button class="btn-primary">Deploy Agent</button>
-      </div>
+      </div> -->
     </header>
     <div class="view-container">
       <router-outlet></router-outlet>

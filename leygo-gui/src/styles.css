@@ -72,8 +72,25 @@ h1, h2, h3, h4 {
   transform: translateY(-1px);
 }
 
+.btn-secondary {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+}
+
+
 /* Base expands for all route components */
-app-chat, app-agents, app-config, app-tasks, app-usage {
+app-chat, app-agents, app-config, app-tasks, app-usage, app-mcp-settings {
   display: flex !important;
   flex: 1 !important;
   width: 100% !important;

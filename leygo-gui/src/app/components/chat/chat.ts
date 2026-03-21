@@ -21,6 +21,16 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
   
   userInput = signal('');
   isTyping = signal(false);
+  selectedFile = signal<{name: string, path: string} | null>(null);
+  
+  userName = 'Admin';
+
+  constructor() {
+    const user = localStorage.getItem('leygo_user');
+    if (user) {
+      this.userName = user;
+    }
+  }
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
   private observer?: MutationObserver;
@@ -48,21 +58,34 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
   }
 
   async sendMessage() {
-    const text = this.userInput().trim();
-    if (!text) return;
+    let text = this.userInput().trim();
+    const file = this.selectedFile();
+    
+    // Si hay archivo pero no hay texto, dar un texto por defecto
+    if (!text && file) {
+      text = "Analiza este archivo por favor.";
+    }
+    
+    if (!text && !file) return;
 
-    // Agregar mensaje del usuario al store global
+    // Si hay un archivo adjunto, agregar la nota visible para el LLM
+    const finalPrompt = file 
+      ? `[Archivo adjunto: ${file.path}]\n\n${text}` 
+      : text;
+
+    // Agregar mensaje visual sin el path feo para mejor UI al usuario
     this.chatService.addMessage({
-      text,
+      text: file ? `📎 **${file.name}**\n\n${text}` : text,
       sender: 'user',
       timestamp: new Date()
     });
 
     this.userInput.set('');
+    this.selectedFile.set(null);
     this.isTyping.set(true);
 
-    // Llamada a la API
-    this.api.sendMessage(text).subscribe({
+    // Llamada a la API con el texto y la ruta del archivo ya incrustados
+    this.api.sendMessage(finalPrompt).subscribe({
       next: (res) => {
         this.chatService.addMessage({
           text: res.response,
@@ -83,6 +106,30 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
         this.isTyping.set(false);
       }
     });
+  }
+
+  // File Upload Handlers
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.isTyping.set(true);
+      this.api.uploadFile(file).subscribe({
+        next: (res) => {
+          this.selectedFile.set({ name: res.filename, path: res.filepath });
+          this.isTyping.set(false);
+        },
+        error: (err) => {
+          console.error("Error subiendo archivo", err);
+          this.isTyping.set(false);
+        }
+      });
+    }
+    // Limpiar input para permitir seleccionar el mismo archivo de nuevo
+    event.target.value = '';
+  }
+
+  removeFile() {
+    this.selectedFile.set(null);
   }
 
   // Opcionalmente podemos añadir funcionalidad para limpiar

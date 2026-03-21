@@ -23,7 +23,7 @@
 
         @if (msg.sender === 'user') {
           <div class="avatar img-avatar">
-            <img src="https://ui-avatars.com/api/?name=Alex+Rivera&background=0D8ABC&color=fff" alt="User">
+            <img [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=0ea5e9&color=fff&bold=true'" alt="User">
           </div>
         }
       </div>
@@ -43,7 +43,15 @@
 
   <div class="input-container">
     <div class="floating-input shadow-md">
-      <button class="action-btn">📎</button>
+      @if (selectedFile()) {
+        <div class="file-badge">
+          <i class="ph ph-file-text"></i>
+          <span>{{ selectedFile()?.name }}</span>
+          <button (click)="removeFile()"><i class="ph ph-x"></i></button>
+        </div>
+      }
+      <button class="action-btn" (click)="fileInput.click()"><i class="ph ph-paperclip"></i></button>
+      <input type="file" #fileInput hidden (change)="onFileSelected($event)">
       <input 
         type="text" 
         [(ngModel)]="userInput" 
@@ -51,7 +59,9 @@
         placeholder="Ask leygo AI anything..."
       >
       <div class="input-actions">
-        <button class="settings-btn">⌥</button>
+        <button class="clear-btn" (click)="clearChat()" title="Limpiar historial de chat">
+          <i class="ph ph-broom"></i>
+        </button>
         <button class="send-btn" (click)="sendMessage()">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </button>
