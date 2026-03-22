@@ -162,8 +162,24 @@ def format_telegram_html(text: str) -> str:
     
     return text
 
+def get_bot():
+    """Fallback dinámico para obtener la instancia del bot, evitando problemas de scope __main__."""
+    global bot
+    if bot:
+        return bot
+    token = os.environ.get("TELEGRAM_TOKEN", "").strip()
+    if token:
+        from telegram import Bot
+        return Bot(token=token)
+    return None
+
 async def handle_message_background(chat_id: int, text: str):
     """Procesar el mensaje con el Agente en segundo plano para no bloquear el ACK del webhook."""
+    current_bot = get_bot()
+    if not current_bot:
+        print("[Telegram Error] No hay token configurado para responder.")
+        return
+        
     try:
         # Check monthly quota first
         from utils.token_tracker import check_budget_exceeded
@@ -174,13 +190,13 @@ async def handle_message_background(chat_id: int, text: str):
                 # telegram markdown doesn't like some characters unescaped, but since we only use basic bold, we format basic
                 alert_html = alert_msg.replace('*', '<b>').replace(' \n', '\n').replace('\n\n', '<br><br>')
                 # Let's just use text to avoid parsing errors
-                await bot.send_message(chat_id=chat_id, text=alert_msg)
+                await current_bot.send_message(chat_id=chat_id, text=alert_msg)
             except Exception:
-                await bot.send_message(chat_id=chat_id, text=alert_msg)
+                await current_bot.send_message(chat_id=chat_id, text=alert_msg)
             return
 
         # Enviar estado "Escribiendo..." para dar feedback visual
-        await bot.send_chat_action(chat_id=chat_id, action="typing")
+        await current_bot.send_chat_action(chat_id=chat_id, action="typing")
         
         # Procesar con la IA reteniendo el hilo de conversación usando el chat_id
         thread_id = str(chat_id)
@@ -191,21 +207,22 @@ async def handle_message_background(chat_id: int, text: str):
         
         try:
             from telegram.constants import ParseMode
-            await bot.send_message(chat_id=chat_id, text=html_response, parse_mode=ParseMode.HTML)
+            await current_bot.send_message(chat_id=chat_id, text=html_response, parse_mode=ParseMode.HTML)
         except Exception as parse_e:
             print(f"Error parseando HTML para Telegram: {parse_e}. Enviando como texto plano.")
-            await bot.send_message(chat_id=chat_id, text=respuesta)
+            await current_bot.send_message(chat_id=chat_id, text=respuesta)
             
     except Exception as e:
         print(f"Error en el procesamiento del agente: {e}")
-        await bot.send_message(chat_id=chat_id, text=f"Ups, ocurrió un error interno: {e}")
+        await current_bot.send_message(chat_id=chat_id, text=f"Ups, ocurrió un error interno: {e}")
 
 @app.post("/webhook")
 async def process_update(request: Request):
     """Endpoint que Telegram llamará cada vez que alguien interactúe con el bot."""
     try:
         data = await request.json()
-        update = Update.de_json(data, bot)
+        current_bot = get_bot()
+        update = Update.de_json(data, current_bot)
         
         chat_id = None
         text_to_process = None
@@ -225,7 +242,7 @@ async def process_update(request: Request):
                 print(f"\n[Telegram] Recibido audio de {user_name} (ID: {chat_id})")
                 
                 # Feedback inicial
-                await bot.send_chat_action(chat_id=chat_id, action="record_voice")
+                await current_bot.send_chat_action(chat_id=chat_id, action="record_voice")
                 
                 # Crear carpeta de descargas temporal
                 download_dir = "/tmp/leygo_downloads"
@@ -233,7 +250,7 @@ async def process_update(request: Request):
                 
                 # Obtener el archivo de Telegram
                 file_id = audio_obj.file_id
-                telegram_file = await bot.get_file(file_id)
+                telegram_file = await current_bot.get_file(file_id)
                 
                 # Generar ruta local
                 ext = ".ogg" if update.message.voice else os.path.splitext(telegram_file.file_path)[1]
@@ -249,10 +266,10 @@ async def process_update(request: Request):
                 if transcription:
                     print(f"[Telegram] Audio transcrito: {transcription}")
                     # Enviar un mensajito de feedback de lo que entendió (opcional, pero ayuda a la experiencia)
-                    # await bot.send_message(chat_id=chat_id, text=f"🎤 _Entendí: {transcription}_", parse_mode="Markdown")
+                    # await current_bot.send_message(chat_id=chat_id, text=f"🎤 _Entendí: {transcription}_", parse_mode="Markdown")
                     text_to_process = transcription
                 else:
-                    await bot.send_message(chat_id=chat_id, text="Lo siento, no pude procesar el audio correctamente.")
+                    await current_bot.send_message(chat_id=chat_id, text="Lo siento, no pude procesar el audio correctamente.")
                 
                 # Limpiar archivo temporal
                 try: os.remove(local_path)

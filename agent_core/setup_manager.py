@@ -237,10 +237,17 @@ async def save_preferences(req: PreferencesRequest, request: FastAPIRequest):
             request.app.state.agent_ready = True
             print("✅ Agente inicializado correctamente tras el setup.\\n")
             
-        # Refrescar silenciosamente el webhook/bot de telegram
+        # Refrescar silenciosamente el webhook/bot de telegram accediendo al module principal
+        # para no duplicar el scope globals() por efecto de los imports absolutos.
         try:
-            from agent_core.telegram_bot import reload_telegram_bot
-            await reload_telegram_bot()
+            import sys
+            main_mod = sys.modules.get('__main__')
+            if hasattr(main_mod, 'reload_telegram_bot'):
+                await main_mod.reload_telegram_bot()
+            else:
+                # Fallback si no está ejecutándose como script principal (ej. pytest u otro entrypoint)
+                from agent_core.telegram_bot import reload_telegram_bot
+                await reload_telegram_bot()
         except Exception as e:
             print(f"⚠️  Aviso: falló recarga del telegram bot en on-the-fly -> {e}")
             
