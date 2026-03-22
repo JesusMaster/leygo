@@ -7,34 +7,69 @@ def get_history_path():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_dir, "memoria", "usage_history.json")
 
-def log_token_usage(user_input: str, model: str, input_tokens: int, output_tokens: int, thread_id: str = "system"):
+def get_prices_from_json(model_id: str) -> tuple[float, float]:
     """
-    Registra el uso de tokens y el costo en el archivo historico.
-    El costo se deduce dinámicamente según la familia del modelo ingresado.
+    Busca el precio por cada 1M de tokens en gemini_cost.json para el modelo específico.
+    Retorna: (precio_in, precio_out)
     """
-    # Tabla de precios por 1,000,000 de tokens (actualizada Q1 2026 para Serie 3.1)
-    # Valores default por si no hace match
+    # Defaults de seguridad
     precio_in = 0.50
     precio_out = 3.00
     
-    _lower_model = model.lower()
+    json_path = os.path.join(os.path.dirname(__file__), "gemini_cost.json")
+    if not os.path.exists(json_path):
+        return precio_in, precio_out
+        
+    try:
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            
+        for model in data.get("models", []):
+            if model_id in model.get("model_ids", []):
+                standard = model.get("pricing", {}).get("standard", {})
+                
+                # Extraer input
+                in_data = standard.get("input", standard.get("input_text", standard.get("input_text_image", precio_in)))
+                if isinstance(in_data, dict):
+                    # Soporte para estructuras variables (<=200k vs texto plano)
+                    precio_in = in_data.get("<=200k_prompt_tokens", 
+                                in_data.get("text_image_video", 
+                                in_data.get("text_per_1M_tokens", 
+                                in_data.get("text", precio_in))))
+                else:
+                    precio_in = float(in_data)
+                    
+                # Extraer output
+                out_data = standard.get("output_including_thinking", standard.get("output_text_and_thinking", standard.get("output", precio_out)))
+                if isinstance(out_data, dict):
+                    precio_out = out_data.get("<=200k_prompt_tokens", 
+                                 out_data.get("text", precio_out))
+                else:
+                    precio_out = float(out_data)
+                    
+                return float(precio_in), float(precio_out)
+    except Exception as e:
+        print(f"Error parseando gemini_cost.json: {e}")
+        
+    return precio_in, precio_out
+
+def log_token_usage(user_input: str, model: str, input_tokens: int, output_tokens: int, thread_id: str = "system"):
+    """
+    Registra el uso de tokens y el costo en el archivo historico.
+    El costo se deduce dinámicamente desde gemini_cost.json.
+    """
+    # Buscar precios oficiales en el JSON
+    precio_in, precio_out = get_prices_from_json(model)
     
-    if "image" in _lower_model:
-        # Precios de Imágenes (ej. gemini-3-pro-image-preview o gemini-3.1-flash-image-preview)
-        precio_in = 2.00
-        precio_out = 120.00
-    elif "pro" in _lower_model:
-        # Precios para gemini-3.1-pro-preview (<200k context)
-        precio_in = 2.00
-        precio_out = 12.00
-    elif "lite" in _lower_model:
-        # Precios para gemini-3.1-flash-lite-preview (texto)
-        precio_in = 0.25
-        precio_out = 1.50
-    elif "flash" in _lower_model:
-        # Precios para gemini-3-flash-preview (y variantes estándar)
-        precio_in = 0.50
-        precio_out = 3.00
+    # Si la búsqueda fallara y devolviese 0 (salvaguarda por seguridad)
+    if precio_in <= 0.0 or precio_out <= 0.0:
+        _lower = model.lower()
+        if "lite" in _lower:
+            precio_in, precio_out = 0.25, 1.50
+        elif "pro" in _lower:
+            precio_in, precio_out = 2.00, 12.00
+        else:
+            precio_in, precio_out = 0.50, 3.00
         
     input_cost = (input_tokens / 1_000_000) * precio_in
     output_cost = (output_tokens / 1_000_000) * precio_out

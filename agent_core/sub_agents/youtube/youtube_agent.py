@@ -195,7 +195,7 @@ class YoutubeAgent(BaseSubAgent):
 
     @property
     def model(self) -> str:
-        return "gemini-2.0-flash-lite"
+        return "gemini-2.5-flash-lite"
 
     def get_tools(self, all_available_tools: list = None) -> list:
         return [extraer_transcripcion_youtube]

@@ -15,7 +15,7 @@ class ChartAgent(BaseSubAgent):
 
     @property
     def model(self) -> str:
-        return "gemini-3.1-flash-lite-preview"
+        return "gemini-2.5-flash-lite"
 
     @property
     def system_prompt(self) -> str:

@@ -29,7 +29,7 @@ Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
 - Heredar de BaseSubAgent (from agent_core.sub_agents.base import BaseSubAgent)
 - Propiedades requeridas (ES OBLIGATORIO USAR @property): model, name, description, system_prompt
 - El metodo get_tools DEBE tener la firma exacta: def get_tools(self, all_available_tools: list = None):
-- model por defecto: "gemini-3.1-flash-lite-preview"
+- model por defecto: "gemini-2.5-flash-lite"
 - name: minusculas, solo a-z ASCII
 - Archivos generados (CSV/JSON) van en: agent_core/sub_agents/<nombre>/files/
 - Para memoria/personalidad usar administrar_memoria_episodica/procedimental, NO modificar .py

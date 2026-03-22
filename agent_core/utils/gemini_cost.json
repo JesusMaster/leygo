@@ -1,0 +1,477 @@
+{
+  "source": "https://ai.google.dev/gemini-api/docs/pricing",
+  "currency": "USD",
+  "unit": "per_1M_tokens_unless_noted",
+  "models": [
+    {
+      "name": "Gemini 3.1 Pro Preview",
+      "model_ids": ["gemini-3.1-pro-preview", "gemini-3.1-pro-preview-customtools"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input": {
+            "<=200k_prompt_tokens": 2.0,
+            ">200k_prompt_tokens": 4.0
+          },
+          "output_including_thinking": {
+            "<=200k_prompt_tokens": 12.0,
+            ">200k_prompt_tokens": 18.0
+          },
+          "context_caching": {
+            "cache_price": {
+              "<=200k_prompt_tokens": 0.2,
+              ">200k_prompt_tokens": 0.4
+            },
+            "storage_per_hour": 4.5
+          },
+          "grounding_google_search": "5000 prompts/month free, then 14 USD per 1000 search queries",
+          "grounding_google_maps": "5000 prompts/month free, then 14 USD per 1000 search queries"
+        },
+        "batch": {
+          "input": {
+            "<=200k_prompt_tokens": 1.0,
+            ">200k_prompt_tokens": 2.0
+          },
+          "output_including_thinking": {
+            "<=200k_prompt_tokens": 6.0,
+            ">200k_prompt_tokens": 9.0
+          },
+          "context_caching": {
+            "cache_price": {
+              "<=200k_prompt_tokens": 0.2,
+              ">200k_prompt_tokens": 0.4
+            },
+            "storage_per_hour": 4.5
+          },
+          "grounding_google_search": "1500 RPD free, then 14 USD per 1000 search queries",
+          "grounding_google_maps": "1500 RPD free, then 14 USD per 1000 search queries"
+        }
+      }
+    },
+    {
+      "name": "Gemini 3.1 Flash-Lite Preview",
+      "model_ids": ["gemini-3.1-flash-lite-preview"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input": {
+            "text_image_video": 0.25,
+            "audio": 0.5
+          },
+          "output_including_thinking": 1.5,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.025,
+              "audio": 0.05
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "5000 prompts/month free, then 14 USD per 1000 search queries",
+          "grounding_google_maps": "5000 prompts/month free, then 14 USD per 1000 search queries"
+        },
+        "batch": {
+          "input": {
+            "text_image_video": 0.125,
+            "audio": 0.25
+          },
+          "output_including_thinking": 0.75,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.0125,
+              "audio": 0.025
+            },
+            "storage_per_hour": 0.5
+          },
+          "grounding_google_search": "5000 prompts/month free, then 14 USD per 1000 search queries",
+          "grounding_google_maps": "5000 prompts/month free, then 14 USD per 1000 search queries"
+        }
+      }
+    },
+    {
+      "name": "Gemini 3.1 Flash Image Preview",
+      "model_ids": ["gemini-3.1-flash-image-preview"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input_text_image": 0.5,
+          "output_text_and_thinking": 3.0,
+          "output_images": {
+            "per_1M_tokens": 60.0,
+            "per_image_equivalent": {
+              "0.5K": 0.045,
+              "1K": 0.067,
+              "2K": 0.101,
+              "4K": 0.151
+            }
+          },
+          "grounding_google_search": "5000 prompts/month free, then 14 USD per 1000 search queries"
+        },
+        "batch": {
+          "input_text_image": 0.25,
+          "output_text_and_thinking": 1.5,
+          "output_images": {
+            "per_1M_tokens": 30.0,
+            "per_image_equivalent": {
+              "0.5K": 0.022,
+              "1K": 0.034,
+              "2K": 0.05,
+              "4K": 0.076
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Gemini 3 Flash Preview",
+      "model_ids": ["gemini-3-flash-preview"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input": {
+            "text_image_video": 0.5,
+            "audio": 1.0
+          },
+          "output_including_thinking": 3.0,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.05,
+              "audio": 0.1
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "5000 prompts/month free, then 14 USD per 1000 search queries",
+          "grounding_google_maps": "5000 prompts/month free, then 14 USD per 1000 search queries"
+        },
+        "batch": {
+          "input": {
+            "text_image_video": 0.25,
+            "audio": 0.5
+          },
+          "output_including_thinking": 1.5,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.05,
+              "audio": 0.1
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "1500 RPD free, then 14 USD per 1000 search queries",
+          "grounding_google_maps": "1500 RPD free, then 14 USD per 1000 search queries"
+        }
+      }
+    },
+    {
+      "name": "Gemini 3 Pro Image Preview",
+      "model_ids": ["gemini-3-pro-image-preview"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input_text_image": {
+            "per_1M_tokens": 2.0,
+            "image_input_equivalent_per_image": 0.0011
+          },
+          "output_text_and_thinking": 12.0,
+          "output_images": {
+            "per_1M_tokens": 120.0,
+            "per_image_equivalent": {
+              "1K_or_2K": 0.134,
+              "4K": 0.24
+            }
+          },
+          "grounding_google_web_and_image_search": "5000 prompts/month free, then 14 USD per 1000 search queries"
+        },
+        "batch": {
+          "input": {
+            "text_per_1M_tokens": 1.0,
+            "image_input_equivalent_per_image": 0.0006
+          },
+          "output": {
+            "text_and_thinking_per_1M_tokens": 6.0,
+            "images_per_image_equivalent": {
+              "1K_or_2K": 0.067,
+              "4K": 0.12
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.5 Pro",
+      "model_ids": ["gemini-2.5-pro"],
+      "status": "stable",
+      "pricing": {
+        "standard": {
+          "input": {
+            "<=200k_prompt_tokens": 1.25,
+            ">200k_prompt_tokens": 2.5
+          },
+          "output_including_thinking": {
+            "<=200k_prompt_tokens": 10.0,
+            ">200k_prompt_tokens": 15.0
+          },
+          "context_caching": {
+            "cache_price": {
+              "<=200k_prompt_tokens": 0.125,
+              ">200k_prompt_tokens": 0.25
+            },
+            "storage_per_hour": 4.5
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts",
+          "grounding_google_maps": "10000 RPD free, then 25 USD per 1000 grounded prompts"
+        },
+        "batch": {
+          "input": {
+            "<=200k_prompt_tokens": 0.625,
+            ">200k_prompt_tokens": 1.25
+          },
+          "output_including_thinking": {
+            "<=200k_prompt_tokens": 5.0,
+            ">200k_prompt_tokens": 7.5
+          },
+          "context_caching": {
+            "cache_price": {
+              "<=200k_prompt_tokens": 0.125,
+              ">200k_prompt_tokens": 0.25
+            },
+            "storage_per_hour": 4.5
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts",
+          "grounding_google_maps": null
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.5 Flash",
+      "model_ids": ["gemini-2.5-flash"],
+      "status": "stable",
+      "pricing": {
+        "standard": {
+          "input": {
+            "text_image_video": 0.3,
+            "audio": 1.0
+          },
+          "output_including_thinking": 2.5,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.03,
+              "audio": 0.1
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts",
+          "grounding_google_maps": "1500 RPD free, then 25 USD per 1000 grounded prompts"
+        },
+        "batch": {
+          "input": {
+            "text_image_video": 0.15,
+            "audio": 0.5
+          },
+          "output_including_thinking": 1.25,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.03,
+              "audio": 0.1
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts",
+          "grounding_google_maps": null
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.5 Flash-Lite",
+      "model_ids": ["gemini-2.5-flash-lite"],
+      "status": "stable",
+      "pricing": {
+        "standard": {
+          "input": {
+            "text_image_video": 0.1,
+            "audio": 0.3
+          },
+          "output_including_thinking": 0.4,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.01,
+              "audio": 0.03
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts",
+          "grounding_google_maps": "1500 RPD free, then 25 USD per 1000 grounded prompts"
+        },
+        "batch": {
+          "input": {
+            "text_image_video": 0.05,
+            "audio": 0.15
+          },
+          "output_including_thinking": 0.2,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.01,
+              "audio": 0.03
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts",
+          "grounding_google_maps": null
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.5 Flash-Lite Preview",
+      "model_ids": ["gemini-2.5-flash-lite-preview-09-2025"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input": {
+            "text_image_video": 0.1,
+            "audio": 0.3
+          },
+          "output_including_thinking": 0.4,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.01,
+              "audio": 0.03
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts"
+        },
+        "batch": {
+          "input": {
+            "text_image_video": 0.05,
+            "audio": 0.15
+          },
+          "output_including_thinking": 0.2,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.01,
+              "audio": 0.03
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts"
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.5 Flash Native Audio (Live API)",
+      "model_ids": ["gemini-2.5-flash-native-audio-preview-12-2025"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input": {
+            "text": 0.5,
+            "audio_video": 3.0
+          },
+          "output": {
+            "text": 2.0,
+            "audio": 12.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.5 Flash Image",
+      "model_ids": ["gemini-2.5-flash-image"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input_text_image": 0.3,
+          "output_per_image": 0.039
+        },
+        "batch": {
+          "input_text_image": 0.15,
+          "output_per_image": 0.0195
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.5 Flash Preview TTS",
+      "model_ids": ["gemini-2.5-flash-preview-tts"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input_text": 0.5,
+          "output_audio": 10.0
+        },
+        "batch": {
+          "input_text": 0.25,
+          "output_audio": 5.0
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.5 Pro Preview TTS",
+      "model_ids": ["gemini-2.5-pro-preview-tts"],
+      "status": "preview",
+      "pricing": {
+        "standard": {
+          "input_text": 1.0,
+          "output_audio": 20.0
+        },
+        "batch": {
+          "input_text": 0.5,
+          "output_audio": 10.0
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.0 Flash",
+      "model_ids": ["gemini-2.0-flash"],
+      "status": "deprecated",
+      "shutdown_date": "2026-06-01",
+      "pricing": {
+        "standard": {
+          "input": {
+            "text_image_video": 0.1,
+            "audio": 0.7
+          },
+          "output": 0.4,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.025,
+              "audio": 0.175
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts",
+          "grounding_google_maps": "1500 RPD free, then 25 USD per 1000 grounded prompts"
+        },
+        "batch": {
+          "input": {
+            "text_image_video": 0.05,
+            "audio": 0.35
+          },
+          "output": 0.2,
+          "context_caching": {
+            "cache_price": {
+              "text_image_video": 0.025,
+              "audio": 0.175
+            },
+            "storage_per_hour": 1.0
+          },
+          "grounding_google_search": "1500 RPD free, then 35 USD per 1000 grounded prompts",
+          "grounding_google_maps": null
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.0 Flash-Lite",
+      "model_ids": ["gemini-2.0-flash-lite"],
+      "status": "deprecated",
+      "shutdown_date": "2026-06-01",
+      "pricing": {
+        "standard": {
+          "input": 0.075,
+          "output": 0.3
+        },
+        "batch": {
+          "input": 0.0375,
+          "output": 0.15
+        }
+      }
+    }
+  ]
+}
