@@ -59,6 +59,24 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
     return `${window.location.protocol}//${window.location.hostname}:8443`;
   }
 
+  stopMessage() {
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
+    this.isTyping.set(false);
+    this.statusHistory.set([...this.statusHistory(), "🔴 *Ejecución abortada por el usuario*"]);
+    setTimeout(() => {
+      this.chatService.addMessage({
+        text: this.streamingText() || "🔴 Ejecución abortada",
+        sender: 'bot',
+        timestamp: new Date()
+      });
+      this.streamingText.set('');
+      this.statusHistory.set([]);
+    }, 500);
+  }
+
   async sendMessage() {
     let text = this.userInput().trim();
     const file = this.selectedFile();

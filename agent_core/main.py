@@ -667,24 +667,12 @@ class SelfExtendingAgent:
             error_traceback = traceback.format_exc()
             print(f"\\n[CRITICAL FATAL] Error del Sistema. Inicializando auto-curacion...\\n{str(e)}")
             
-            # Lanzamos Background Task (Modo Médico) para @dev
-            repair_msg = f"@dev URGENTE FALLO DE RED: El sistema sufrió este crash. Ubica el sub-agente o archivo fallido y usa tus herramientas para reparar el codigo fuente inmediatamente:\\n```python\\n{error_traceback}\\n```"
-            async def auto_repair():
-                print(f"[SEAL TEAM] Dev enviado a reparar en las sombras el error...")
-                heal_config = {"configurable": {"thread_id": f"repair_{thread_id}"}, "recursion_limit": 100}
-                try:
-                    async for _ in self.graph.astream({"messages": [HumanMessage(content=repair_msg)]}, config=heal_config, stream_mode="updates"):
-                        pass
-                    print("[SEAL TEAM] Reparación asíncrona concluida - Dev finalizado.")
-                except Exception as inner_e:
-                    print(f"[REPAIR FATAL SQUAD FAILED] Dev también falló al intentar repararlo: {inner_e}")
-                    
-            asyncio.create_task(auto_repair())
-            
-            final_answer = ("He detectado un error técnico grave al procesar tu solicitud o llamar a mis herramientas internas. "
-                            "Activé un protocolo de auto-reparación y le envié el diagnóstico completo en vivo a mi subagente desarrollador "
-                            "(`dev`) para que inspeccione y parchee el código fuente en segundo plano de manera autónoma.\\n"
-                            "Por favor, intenta la consulta de nuevo en unos momentos.")
+            # Auto-reparación desactivada temporalmente: esperamos confirmación interactiva
+            final_answer = (
+                f"⚠️ He detectado un error técnico grave (posible bucle o fallo de herramientas). "
+                f"Para que evalúe y ejecute un protocolo de auto-reparación sobre mi código, envíame textualmente el siguiente comando:\\n\\n"
+                f"`@dev repara este error:`\\n```\\n{str(e)}\\n```\\n\\n*(Error más detallado se guardó en la consola del servidor)*"
+            )
 
         if return_usage:
             return final_answer, usage_record

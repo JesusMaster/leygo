@@ -269,6 +269,14 @@
   background-color: var(--accent-hover);
 }
 
+.send-btn.stop-action {
+  background-color: #ef4444; /* red-500 */
+}
+
+.send-btn.stop-action:hover {
+  background-color: #dc2626; /* red-600 */
+}
+
 .input-footer {
   width: 100%;
   display: flex;
