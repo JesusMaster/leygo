@@ -232,13 +232,21 @@ async def save_preferences(req: PreferencesRequest, request: FastAPIRequest):
         
         agent = request.app.state.agent
         if agent and not getattr(request.app.state, 'agent_ready', False):
-            print("\n🚀 Setup completado. Inicializando agente automáticamente...")
+            print("\\n🚀 Setup completado. Inicializando agente automáticamente...")
             await agent.initialize()
             request.app.state.agent_ready = True
-            print("✅ Agente inicializado correctamente tras el setup.\n")
+            print("✅ Agente inicializado correctamente tras el setup.\\n")
+            
+        # Refrescar silenciosamente el webhook/bot de telegram
+        try:
+            from agent_core.telegram_bot import reload_telegram_bot
+            await reload_telegram_bot()
+        except Exception as e:
+            print(f"⚠️  Aviso: falló recarga del telegram bot en on-the-fly -> {e}")
+            
     except Exception as e:
         print(f"⚠️  No se pudo inicializar el agente tras el setup: {e}")
-        print("⚠️  Reinicia el contenedor manualmente para completar la inicialización.\n")
+        print("⚠️  Reinicia el contenedor manualmente para completar la inicialización.\\n")
     
     return {"status": "ok", "message": "Memorias guardadas. Setup erradicado con éxito."}
 

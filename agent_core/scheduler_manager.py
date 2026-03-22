@@ -330,6 +330,13 @@ def stop_scheduler():
         scheduler.shutdown()
         print("=> Sistema APScheduler detenido.")
 
+def update_scheduler_bot(bot_instance: Bot):
+    """Actualiza la instancia del bot que corre en segundo plano en el scheduler."""
+    global TELEGRAM_BOT_INSTANCE
+    TELEGRAM_BOT_INSTANCE = bot_instance
+    if bot_instance:
+        print("[Scheduler] 🔄 Referencia al bot de Telegram actualizada dinámicamente.")
+
 @tool
 def crear_recordatorio_solo_texto_para_usuario(mensaje: str, chat_id: str, minutos_desde_ahora: int = None, hora_exacta_iso: str = None) -> str:
     """

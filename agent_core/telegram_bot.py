@@ -81,6 +81,44 @@ async def lifespan(app: FastAPI):
         except Exception:
             pass
 
+async def reload_telegram_bot():
+    """Recarga el bot, el webhook y el scheduler post-setup sin reiniciar Docker."""
+    global bot
+    import os
+    from dotenv import dotenv_values
+    from aiogram import Bot
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    new_config = dotenv_values(env_path)
+    
+    tk = new_config.get("TELEGRAM_TOKEN", "").strip()
+    wh = new_config.get("WEBHOOK_URL", "").strip()
+    
+    try:
+        # Si ya había un bot vivo, limpiamos el webhook viejo si es posible
+        if bot:
+            try:
+                await bot.delete_webhook()
+            except:
+                pass
+                
+        if tk:
+            bot = Bot(token=tk)
+            if wh:
+                webhook_endpoint = f"{wh.rstrip('/')}/webhook"
+                print(f"\\n=> 🔄 Setup Terminado: Configurando Webhook en Telegram: {webhook_endpoint}")
+                await bot.set_webhook(url=webhook_endpoint)
+            else:
+                print("\\n=> 🔄 Setup Terminado: Telegram activado pero sin Webhook.")
+            
+            # Actualizamos también el scheduler para que el bot pueda enviar recordatorios
+            from agent_core.scheduler_manager import update_scheduler_bot
+            update_scheduler_bot(bot)
+            
+        else:
+            bot = None
+    except Exception as e:
+        print(f"\\n⚠️  No se pudo recargar el bot de Telegram al Vuelo: {e}")
+
 app = FastAPI(lifespan=lifespan)
 app.state.agent = agent
 
