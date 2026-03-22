@@ -19,3 +19,4 @@ argon2-cffi
 PyJWT
 yt-dlp
 webvtt-py
+youtube-transcript-api
