@@ -14,7 +14,7 @@ export interface McpServer {
   providedIn: 'root'
 })
 export class McpService {
-  private apiUrl = 'http://localhost:8000/api/mcp';
+  private apiUrl = `${window.location.protocol}//${window.location.hostname}:8000/api/mcp`;
 
   constructor(private http: HttpClient) { }
 

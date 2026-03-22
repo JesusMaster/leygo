@@ -11,7 +11,7 @@ export interface SetupStatus {
   providedIn: 'root'
 })
 export class SetupService {
-  private apiUrl = 'http://localhost:8000/api/setup';
+  private apiUrl = `${window.location.protocol}//${window.location.hostname}:8000/api/setup`;
 
   constructor(private http: HttpClient) { }
 

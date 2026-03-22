@@ -56,9 +56,7 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
 
   /** URL base del backend, auto-detectada */
   private get backendUrl(): string {
-    return window.location.hostname === 'localhost'
-      ? 'http://localhost:8000'
-      : `${window.location.protocol}//${window.location.hostname}`;
+    return `${window.location.protocol}//${window.location.hostname}:8000`;
   }
 
   async sendMessage() {
