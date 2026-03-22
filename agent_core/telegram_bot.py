@@ -195,14 +195,58 @@ async def handle_message_background(chat_id: int, text: str):
                 await current_bot.send_message(chat_id=chat_id, text=alert_msg)
             return
 
-        # Enviar estado "Escribiendo..." para dar feedback visual
-        await current_bot.send_chat_action(chat_id=chat_id, action="typing")
+        # Enviar estado inicial
+        status_msg = await current_bot.send_message(chat_id=chat_id, text="⏳ Procesando solicitud...")
         
-        # Procesar con la IA reteniendo el hilo de conversación usando el chat_id
-        thread_id = str(chat_id)
-        respuesta = await agent.process_message(text, thread_id=thread_id)
+        import status_bus
+        import asyncio
+        q = status_bus.subscribe()
         
-        # Parsear la respuesta y enviar usando HTML mode
+        async def update_status_msg():
+            last_text = "⏳ Procesando solicitud..."
+            while True:
+                try:
+                    # Esperar estados y agregar debounce para no exceder limites de Telegram
+                    msg = await asyncio.wait_for(q.get(), timeout=1.5)
+                    
+                    # Consumir todo lo que haya llegado rápido en ese lapso
+                    while not q.empty():
+                        msg = q.get_nowait()
+                        
+                    new_text = f"{last_text}\n├ {msg}"
+                    
+                    # Limitar lineas para evitar overflow
+                    lines = new_text.split('\n')
+                    if len(lines) > 8:
+                        new_text = "⏳ Procesando solicitud...\n... (estados anteriores)\n" + "\n".join(lines[-5:])
+                        
+                    last_text = new_text
+                    await current_bot.edit_message_text(chat_id=chat_id, message_id=status_msg.message_id, text=new_text)
+                    
+                except asyncio.TimeoutError:
+                    continue # Sigue esperando
+                except asyncio.CancelledError:
+                    break
+                except Exception as ex:
+                    # Ignorar errores menores de parseo o ratelimit corto
+                    await asyncio.sleep(2.0)
+        
+        updater_task = asyncio.create_task(update_status_msg())
+        
+        try:
+            # Procesar con la IA reteniendo el hilo de conversación usando el chat_id
+            thread_id = str(chat_id)
+            respuesta = await agent.process_message(text, thread_id=thread_id)
+        finally:
+            updater_task.cancel()
+            status_bus.unsubscribe(q)
+            # Borrar mensaje temporal de estado
+            try:
+                await current_bot.delete_message(chat_id=chat_id, message_id=status_msg.message_id)
+            except Exception:
+                pass
+        
+        # Parsear la respuesta final y enviar usando HTML mode
         html_response = format_telegram_html(respuesta)
         
         try:

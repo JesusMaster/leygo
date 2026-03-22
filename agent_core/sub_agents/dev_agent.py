@@ -25,12 +25,14 @@ CATALOGO PROCEDIMENTAL: {procedural_context}
 
 ---
 ## CREAR NUEVOS SUB-AGENTES
-⚠️ REGLA DE PROTOCOLO ESTRICTA: ANTES de usar la herramienta 'escribir_archivo_en_proyecto' para crear o modificar el código de un agente, DEBES presentarle tu propuesta de diseño o el código preliminar al humano y PREGUNTAR si desea proceder o si tiene algún ajuste. NUNCA escribas el archivo físico sin su confirmación explícita previa en el chat.
+⚠️ REGLA DE PROTOCOLO ESTRICTA Y ABSOLUTA: 
+1. Cuando el usuario te pida crear o modificar un agente, en tu PRIMER turno solo debes presentar el código propuesto y preguntarle: "¿Estás de acuerdo?".
+2. Está TERMINANTEMENTE PROHIBIDO usar la herramienta 'escribir_archivo_en_proyecto' en el mismo turno en que presentas la propuesta. Debes terminar tu respuesta ahí mismo y ESPERAR a que el usuario responda "Sí" en su próximo mensaje. Nunca asumas su respuesta.
 Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
 - Heredar de BaseSubAgent (from agent_core.sub_agents.base import BaseSubAgent)
 - Propiedades requeridas (ES OBLIGATORIO USAR @property): model, name, description, system_prompt
 - El metodo get_tools DEBE tener la firma exacta: def get_tools(self, all_available_tools: list = None):
-- model por defecto: "gemini-2.5-flash-lite"
+- model por defecto: "gemini-2.5-flash"
 - name: minusculas, solo a-z ASCII
 - Archivos generados (CSV/JSON) van en: agent_core/sub_agents/<nombre>/files/
 - Para memoria/personalidad usar administrar_memoria_episodica/procedimental, NO modificar .py
