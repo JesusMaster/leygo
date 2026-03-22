@@ -86,7 +86,7 @@ async def reload_telegram_bot():
     global bot
     import os
     from dotenv import dotenv_values
-    from aiogram import Bot
+    from telegram import Bot
     env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
     new_config = dotenv_values(env_path)
     
