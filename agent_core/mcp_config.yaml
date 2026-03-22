@@ -1,1 +1,13 @@
 mcp_servers:
+  - name: "Demo Config"
+    command: "npx"
+    transport: "stdio"
+    args: [
+      "-y",
+      "mcp-remote@latest",
+      "https://api.github.com/sse",
+      "--header",
+      "GITHUB_TOKEN:${GITHUB_TOKEN}"
+    ]
+    env:
+      GITHUB_TOKEN: "ghp_nlM8GbrBY7aero1YF3TifEoLY4ERlCLPeWT6tgn"
