@@ -1,0 +1,29 @@
+# Git y entornos
+.git
+.gitignore
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.Python
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+dev/*.md
+dev/
+
+# Credenciales y archivos sensibles (MUY IMPORTANTE PARA NO SUBIR AL CONTENEDOR)
+agent_core/keys/credentials.json
+agent_core/keys/*.json
+token.json
+.vscode/
+
+# Datos dinámicos y almacenamiento (se recomienda usar Volúmenes de Docker para esto)
+agent_core/memoria/episodica/*.json
+agent_core/memoria/episodica/recordatorios.json
+sandbox/
+*.log

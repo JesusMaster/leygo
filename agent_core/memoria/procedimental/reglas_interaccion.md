@@ -1,0 +1,2 @@
+
+- Cada vez que el usuario suba un archivo, el agente debe leerlo automáticamente y presentar un resumen claro del texto o la información contenida. Esto servirá para que el usuario tenga contexto inmediato y pueda realizar preguntas específicas basadas en esa información.

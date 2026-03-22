@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "angular-best-practices": {
+      "source": "alfredoperez/angular-best-practices",
+      "sourceType": "github",
+      "computedHash": "a45015c76bdc0223ed6fd78c135692f9e0044fb24a296abd1cc5b39ed271da60"
+    }
+  }
+}

@@ -1,0 +1,233 @@
+import { Component, inject, signal, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../api.service';
+
+declare var google: any;
+
+@Component({
+  selector: 'app-config',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './config.html',
+  styleUrl: './config.css'
+})
+export class ConfigComponent implements OnInit {
+  private api = inject(ApiService);
+  
+  config = signal<any>({});
+  authStatus = signal<any>({ authenticated: false });
+  loading = signal(true);
+  
+  newKey = '';
+  newValue = '';
+
+  ngOnInit() {
+    this.loadData();
+  }
+
+  loadData() {
+    this.api.getConfig().subscribe(data => this.config.set(data));
+    this.api.getAuthStatus().subscribe(status => {
+      let restored = false;
+      if (typeof localStorage !== 'undefined') {
+        const storedAuth = localStorage.getItem('google_auth_session');
+        if (storedAuth) {
+          try {
+            const authData = JSON.parse(storedAuth);
+            this.authStatus.set({
+              ...status,
+              authenticated: true,
+              user: authData.user,
+              message: 'Sesión restaurada localmente.',
+              workspaceConnected: status.workspaceConnected // Always take the freshed backend info for this
+            });
+            restored = true;
+          } catch(e) { }
+        }
+      }
+      
+      if (!restored) {
+        this.authStatus.set(status);
+      }
+      
+      // Siempre inyectar el script de Google si tenemos clientId
+      // Es necesario para que "google.accounts.oauth2" funcione en el click azul
+      if (status.clientId) {
+        setTimeout(() => this.initGoogleAuth(status.clientId), 100);
+      }
+    });
+    this.loading.set(false);
+  }
+
+  initGoogleAuth(clientId: string) {
+    if (typeof document !== 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        if (typeof google !== 'undefined') {
+          google.accounts.id.initialize({
+            client_id: clientId,
+            callback: (response: any) => this.handleCredentialResponse(response)
+          });
+          
+          const buttonDiv = document.getElementById("google-buttonDiv");
+          if (buttonDiv) {
+            google.accounts.id.renderButton(buttonDiv, {
+              theme: "outline", 
+              size: "large", 
+              type: "standard", 
+              text: "continue_with",
+              shape: "rectangular"
+            });
+          }
+        }
+      };
+      document.head.appendChild(script);
+    }
+  }
+
+  authorizeWorkspace() {
+    const clientId = this.authStatus().clientId;
+    if (!clientId) {
+      alert("No se encontró el Client ID de Google");
+      return;
+    }
+    
+    // Scopes match the backend configuration to generate token.pickle
+    const client = google.accounts.oauth2.initCodeClient({
+      client_id: clientId,
+      scope: 'https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/chat.spaces.readonly https://www.googleapis.com/auth/chat.messages.readonly https://www.googleapis.com/auth/chat.messages',
+      ux_mode: 'popup',
+      callback: (response: any) => {
+        if (response.error !== undefined) {
+          console.error("Error en autorización OAuth", response);
+          return;
+        }
+        
+        // Send the authorization code to backend API
+        this.api.exchangeGoogleCode(response.code).subscribe({
+          next: (res) => {
+            alert("¡Permisos otorgados exitosamente! Workspace conectado.");
+            const currentStatus = this.authStatus();
+            this.authStatus.set({ ...currentStatus, workspaceConnected: true });
+          },
+          error: (err) => {
+            console.error(err);
+            alert("Hubo un error al conectar el Workspace en el backend.");
+          }
+        });
+      },
+    });
+    
+    client.requestCode();
+  }
+
+  handleCredentialResponse(response: any) {
+    try {
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      
+      const payload = JSON.parse(jsonPayload);
+      const currentStatus = this.authStatus();
+      const authData = { 
+        ...currentStatus,
+        authenticated: true, 
+        user: payload,
+        message: 'Conectado de forma segura.' 
+      };
+      
+      this.authStatus.set(authData);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('google_auth_session', JSON.stringify({
+          authenticated: true,
+          user: payload
+        }));
+      }
+      alert(`¡Sesión iniciada con éxito! Bienvenido, ${payload.name}`);
+    } catch (e) {
+      console.error("Error al procesar el JWT de Google:", e);
+      alert("Hubo un error al iniciar sesión.");
+    }
+  }
+
+  logoutGoogle() {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('google_auth_session');
+    }
+    
+    // Revoke Google Workspace Backend Token
+    this.api.revokeGoogleWorkspace().subscribe({
+      next: () => {
+        this.api.getAuthStatus().subscribe(status => {
+          this.authStatus.set(status);
+          if (status.clientId) {
+            setTimeout(() => this.initGoogleAuth(status.clientId), 100);
+          }
+        });
+      },
+      error: (err) => {
+        console.error("Error revocando el token:", err);
+        // Force state reset anyway
+        this.authStatus.set({ authenticated: false, workspaceConnected: false });
+      }
+    });
+  }
+
+  updateVar(key: string, value: string) {
+    if (!value) return;
+    this.api.updateConfig(key, value).subscribe(() => {
+      alert(`Variable ${key} actualizada exitosamente.`);
+      this.loadData();
+    });
+  }
+
+  addNewVar() {
+    if (!this.newKey || !this.newValue) return;
+    this.updateVar(this.newKey, this.newValue);
+    this.newKey = '';
+    this.newValue = '';
+  }
+
+  getEnvKeys() {
+    return Object.keys(this.config());
+  }
+
+  getEnvGroups() {
+    const config = this.config();
+    const groups = [];
+    const keys = Object.keys(config);
+
+    const googleKeys = keys.filter(k => k.startsWith('GOOGLE_'));
+    if (googleKeys.length > 0) {
+      groups.push({ title: 'Autenticación: Google Workspace', icon: 'ph-google-logo', keys: googleKeys });
+    }
+
+    const telegramKeys = keys.filter(k => k.startsWith('TELEGRAM_') || k === 'WEBHOOK_URL');
+    if (telegramKeys.length > 0) {
+      groups.push({ title: 'Integración: Bot de Telegram', icon: 'ph-telegram-logo', keys: telegramKeys });
+    }
+
+    const modelKeys = keys.filter(k => k.startsWith('MODEL_'));
+    if (modelKeys.length > 0) {
+      groups.push({ title: 'Configuración LLM por Agente', icon: 'ph-brain', keys: modelKeys });
+    }
+
+    const otherKeys = keys.filter(k => 
+      !k.startsWith('GOOGLE_') && 
+      !k.startsWith('TELEGRAM_') && 
+      k !== 'WEBHOOK_URL' && 
+      !k.startsWith('MODEL_')
+    );
+    if (otherKeys.length > 0) {
+      groups.push({ title: 'Ajustes Globales del Sistema', icon: 'ph-gear-six', keys: otherKeys });
+    }
+
+    return groups;
+  }
+}

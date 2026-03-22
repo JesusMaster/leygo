@@ -1,0 +1,39 @@
+<div class="onboarding-overlay">
+    <div class="glass-panel login-panel">
+      <!-- HEADER -->
+      <div class="setup-header">
+        <div class="logo">
+          <svg viewBox="0 0 24 24" fill="none" class="logo-icon" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h2>Leygo<span>Login</span></h2>
+        </div>
+      </div>
+  
+      <div class="error-banner" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+  
+      <!-- BODY -->
+      <div class="setup-body single-col">
+        <div class="step-content form-step">
+          <h3>Bienvenido de vuelta</h3>
+          <p class="subtitle">Ingresa tus credenciales maestras.</p>
+          
+          <div class="form-group">
+            <label>Usuario (Admin)</label>
+            <input type="text" [(ngModel)]="username" placeholder="Tu cuenta corporativa..." (keyup.enter)="doLogin()">
+          </div>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" [(ngModel)]="password" placeholder="••••••••" (keyup.enter)="doLogin()">
+          </div>
+  
+          <!-- CONTROLS -->
+          <div class="setup-controls center-controls">
+            <button class="btn-primary" (click)="doLogin()" [disabled]="loading">
+              {{ loading ? 'Autenticando (Argon2)...' : 'Ingresar al Portal' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,380 @@
+.chat-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: var(--bg-main);
+  height: 100%;
+  width: 100%; /* Explicit width */
+  overflow: hidden;
+}
+
+.messages-container {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 40px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.message-group {
+  display: flex;
+  gap: 16px;
+  width: 95%;
+  max-width: 1400px;
+}
+
+.message-group.user {
+  justify-content: flex-end;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.icon-avatar {
+  border: 1px solid var(--border-light);
+  color: var(--accent-primary);
+  background: white;
+}
+
+.img-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.message-bubble {
+  max-width: 80%;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background-color: white;
+  border: 1px solid var(--border-light);
+  position: relative;
+}
+
+.user .message-bubble {
+  background-color: white;
+  border-color: var(--border-light);
+}
+
+.message-content {
+  font-size: 15px;
+  color: #1f2937;
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+::ng-deep .message-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 12px 0;
+  display: block;
+}
+
+::ng-deep .message-content p {
+  margin: 0 0 12px 0;
+}
+
+::ng-deep .message-content p:last-child {
+  margin-bottom: 0;
+}
+
+::ng-deep .message-content h1, ::ng-deep .message-content h2, ::ng-deep .message-content h3 {
+  margin: 16px 0 8px 0;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+::ng-deep .message-content h1 { font-size: 1.5em; }
+::ng-deep .message-content h2 { font-size: 1.3em; }
+::ng-deep .message-content h3 { font-size: 1.1em; }
+
+::ng-deep .message-content ul, ::ng-deep .message-content ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+::ng-deep .message-content li {
+  margin-bottom: 4px;
+}
+
+::ng-deep .message-content code {
+  background-color: #f3f4f6;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+
+::ng-deep .message-content pre {
+  background-color: #f3f4f6;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+::ng-deep .message-content pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 13px;
+}
+
+::ng-deep .message-content blockquote {
+  border-left: 4px solid var(--border-light);
+  padding-left: 12px;
+  color: var(--text-dim);
+  margin: 12px 0;
+}
+
+.message-meta {
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.usage-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(13, 138, 188, 0.1);
+  color: var(--accent-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  text-transform: none;
+  font-weight: 500;
+  border: 1px solid rgba(13, 138, 188, 0.2);
+}
+
+.user .message-meta {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+/* Typing indicator dots */
+.typing {
+  padding: 12px 20px;
+}
+
+.dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dots span {
+  width: 6px;
+  height: 6px;
+  background-color: #d1d5db;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.dots span:nth-child(2) { animation-delay: 0.2s; }
+.dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}
+/* Input area */
+.input-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 40px 10px 40px;
+  box-sizing: border-box;
+  background-color: #f9fafb;
+  border-top: 1px solid var(--border-light);
+}
+
+.floating-input {
+  width: 100%;
+  max-width: 1400px; /* Increased for better large screen support */
+  background: white;
+  border-radius: 16px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border-light);
+}
+
+.action-btn, .clear-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #9ca3af;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.clear-btn:hover {
+  color: #ef4444;
+  opacity: 1;
+}
+
+.floating-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #1f2937;
+}
+
+.input-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.send-btn {
+  width: 40px;
+  height: 40px;
+  background-color: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.send-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+.input-footer {
+  width: 100%;
+  display: flex;
+  gap: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  padding: 0 16px;
+}
+
+.input-footer .count {
+  margin-left: auto;
+}
+
+.disclaimer {
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+/* ── Status Steps (Live Agent Thinking) ───────────────────────── */
+.status-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.status-step {
+  font-size: 12px;
+  color: #9ca3af;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* El último paso (activo) se resalta */
+.status-step.active {
+  color: var(--accent-primary, #0ea5e9);
+  background: rgba(14, 165, 233, 0.08);
+  border-color: rgba(14, 165, 233, 0.3);
+  font-weight: 600;
+  animation: step-pulse 1.5s ease-in-out infinite;
+}
+
+/* Eliminar estilos de párrafo dentro de status-step (viene del markdown pipe) */
+.status-step p {
+  margin: 0;
+  display: inline;
+}
+
+@keyframes step-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+/* Dots pequeños cuando hay pasos visibles */
+.dots-mini {
+  display: flex;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+.dots-mini span {
+  width: 5px;
+  height: 5px;
+  background-color: var(--accent-primary, #0ea5e9);
+  border-radius: 50%;
+  display: inline-block;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dots-mini span:nth-child(1) { animation-delay: -0.32s; }
+.dots-mini span:nth-child(2) { animation-delay: -0.16s; }
+
+/* ── Streaming text (token-by-token response) ─────────────────── */
+.streaming-text {
+  font-size: 15px;
+  color: #1f2937;
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap; /* Respeta saltos de línea en texto plano durante el stream */
+}
+
+.streaming-text p:last-child {
+  display: inline; /* Para que el cursor quede pegado al texto */
+}
+
+/* Cursor parpadeante tipo terminal */
+.cursor-blink {
+  display: inline-block;
+  color: var(--accent-primary, #0ea5e9);
+  font-weight: 300;
+  animation: blink-cursor 0.8s step-end infinite;
+  vertical-align: bottom;
+  margin-left: 1px;
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}

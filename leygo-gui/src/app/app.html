@@ -1,0 +1,84 @@
+<div class="layout-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo-section">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+      </div>
+      <h1>LeyGo AI</h1>
+    </div>
+    
+    <nav class="nav-menu">
+      <a routerLink="/chat" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="ph ph-chat-circle-dots"></i></span>
+        <span class="label">Chat Assistant</span>
+      </a>
+      <a routerLink="/tasks" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="ph ph-calendar-blank"></i></span>
+        <span class="label">Scheduled Tasks</span>
+      </a>
+      <a routerLink="/usage" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="ph ph-chart-bar"></i></span>
+        <span class="label">Token Usage</span>
+      </a>
+      <a routerLink="/agents" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="ph ph-robot"></i></span>
+        <span class="label">Agents Library</span>
+      </a>
+      <a routerLink="/mcp-settings" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="ph ph-plug"></i></span>
+        <span class="label">Conectores MCP</span>
+      </a>
+      <a routerLink="/config" routerLinkActive="active" class="nav-item">
+        <span class="icon"><i class="ph ph-gear"></i></span>
+        <span class="label">Configuration</span>
+      </a>
+    </nav>
+
+    <!-- <div class="favorites-section">
+      <p class="section-title">FAVORITES</p>
+      <div class="favorite-item">
+        <span class="dot green"></span>
+        <span class="label">Data Analysis Pro</span>
+      </div>
+      <div class="favorite-item">
+        <span class="dot orange"></span>
+        <span class="label">Creative Writing</span>
+      </div>
+    </div> -->
+    
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="avatar-container">
+          <img [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=0ea5e9&color=fff&bold=true'" alt="User Avatar">
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ userName }}</span>
+          <button class="logout-mini-btn" (click)="logout()" title="Cerrar sesión de forma segura">
+            <i class="ph ph-sign-out"></i> Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content-area">
+    <header class="main-header">
+      <div class="project-info">
+        <h2 class="project-name">Project</h2>
+        <div class="status">
+          <span class="dot green"></span>
+          Agent Online
+        </div>
+      </div>
+      <!-- <div class="header-actions">
+        <button class="icon-btn">share</button>
+        <button class="btn-primary">Deploy Agent</button>
+      </div> -->
+    </header>
+    <div class="view-container">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

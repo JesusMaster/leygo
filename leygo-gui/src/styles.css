@@ -1,0 +1,108 @@
+:root {
+  --bg-main: #f9fafb;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --border-light: #e5e7eb;
+  --accent-primary: #6366f1; /* Indigo/Purple */
+  --accent-hover: #4f46e5;
+  --text-main: #111827;
+  --text-dim: #6b7280;
+  --bg-input: #ffffff;
+  --font-main: 'Inter', sans-serif;
+  --font-title: 'Outfit', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  line-height: 1.5;
+  overflow: hidden;
+  height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-title);
+  font-weight: 600;
+  color: #111827;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+}
+
+
+/* Base expands for all route components */
+app-chat, app-agents, app-config, app-tasks, app-usage, app-mcp-settings {
+  display: flex !important;
+  flex: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
+::ng-deep{
+  ol{
+      margin-left: 3em;
+  }
+  ul{
+    margin-left: 3em;
+  }
+}

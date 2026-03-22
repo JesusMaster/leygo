@@ -1,0 +1,33 @@
+services:
+  leygo-bot:
+    build: .
+    container_name: leygo-bot
+    restart: unless-stopped
+    env_file:
+      - agent_core/.env
+    volumes:
+      - ./agent_core:/app/agent_core
+    ports:
+      - "8000:8000"
+    command: python agent_core/telegram_bot.py
+
+  leygo-cli:
+    build: .
+    container_name: leygo-cli
+    env_file:
+      - agent_core/.env
+    volumes:
+      - ./agent_core:/app/agent_core
+    stdin_open: true
+    tty: true
+    command: python agent_core/main.py
+
+  leygo-gui:
+    build: 
+      context: ./leygo-gui
+    container_name: leygo-gui
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - leygo-bot
