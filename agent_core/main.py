@@ -211,12 +211,12 @@ MEMORIA EPISÓDICA RELACIONADA CON TU IDENTIDAD/PREFERENCIAS:
 
 Tu trabajo es analizar la petición del usuario, leer SIEMPRE TODO EL HISTORIAL para revisar si alguno de tus sub-agentes acaba de completar una parte del trabajo, y DELEGAR el resto usando la herramienta 'Route'.
 {agent_rules}
-REGLAS:
-1. SI EL USUARIO PIDE AGENDAR, MOSTRAR O PROGRAMAR ALGO PARA EL FUTURO (ej. "en 1 min", "mañana", "recuérdame", "cada x horas"): **DEBES ENVIARLO INMEDIATAMENTE AL AGENTE 'assistant'**, ya que SOLO ÉL tiene las herramientas del Scheduler. No intentes enviar la tarea a otros agentes ni ejecutarla ahora.
-2. DEBES usar la herramienta `Route` devolviendo el 'next_node' si la tarea requiere acción o **si un sub-agente completó un paso pero falta otro** (ejemplo: 'mcp' leyó un archivo, pero falta enviarlo por correo, entonces asigna 'assistant').
-3. PRIORIZACIÓN (Para acciones en TIEMPO REAL): El agente MCP ('mcp') contiene integraciones (GitHub, KPIs). Dale prioridad al MCP para preguntas sobre proyectos o repositorios, SIEMPRE Y CUANDO no estén pidiendo que se programe para el futuro.
-4. SI LA TAREA FUE COMPLETADA por los agentes previos (ej. un agente ya consiguió la información, analizó el archivo o hizo el resumen): DEBES usar la herramienta `Route` con `next_node`='FINISH' y DEJAR EL CAMPO `respuesta_conversacional` VACÍO. El sistema le mostrará la respuesta exacta y completa del sub-agente al usuario de forma automática (no la resumas tú, o el usuario perderá la información).
-5. SÓLO usa el campo `respuesta_conversacional` si TÚ directamente le vas a responder al usuario sin delegar a nadie (ej. charlas generales, saludos).
+REGLAS ESTRICTAS PARA EVITAR BUCLES:
+1. DELEGACIÓN INICIAL: Delega tareas al sub-agente correcto según sus herramientas (ej. 'assistant' para agendar/emails, 'mcp' para repositorios/datos, 'youtube' para videos).
+2. VERIFICA EL ÚLTIMO MENSAJE: Si el último AIMessage de un sub-agente en el historial indica que YA ATENDIÓ la solicitud del usuario (ej. dice "Ok, agendado", "Acá está el resumen", "Te lo recordaré", etc.), entonces **LA TAREA HA FINALIZADO**.
+3. FINISH (¡MUY IMPORTANTE!): SI LA TAREA FUE COMPLETADA por el agente previo, **DEBES usar `next_node`='FINISH'** obligatoriamente y DEJAR EL CAMPO `respuesta_conversacional` VACÍO. 
+4. NUNCA DELEGUES LA MISMA TAREA 2 VECES SEGUIDAS AL MISMO AGENTE si este acaba de responder. Si lo haces, crearás un bucle infinito y romperás el sistema.
+5. SÓLO usa el campo `respuesta_conversacional` si TÚ directamente vas a responder algo sencillo (saludos informales) y el 'next_node' es 'FINISH'.
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
