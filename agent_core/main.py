@@ -435,7 +435,16 @@ class SelfExtendingAgent:
             
         self._all_tools = tools  # Guardamos para hot-reload
         self._sub_agents_snapshot = self._get_sub_agents_snapshot()
-        self.graph = self._build_graph(tools)
+        
+        if self.llm is None:
+            print("=> ADVERTENCIA CRÍTICA: No se puede construir el grafo LangGraph (LLM=None). El bot inició en modo configuración (API Keys pendientes).")
+            self.graph = None
+        else:
+            try:
+                self.graph = self._build_graph(tools)
+            except Exception as e:
+                print(f"=> ERROR: Falló la construcción del grafo: {e}")
+                self.graph = None
 
     def _get_sub_agents_snapshot(self) -> frozenset:
         """Devuelve un snapshot de (nombre, mtime) de los archivos en sub_agents/."""

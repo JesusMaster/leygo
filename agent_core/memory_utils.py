@@ -95,8 +95,12 @@ def check_and_run_setup_wizard():
     print("Vamos a conocernos un poco para personalizar tu experiencia.")
     print("=========================================================\n")
     
-    user_name = input("¿Cómo te gusta que te llamen? ")
-    bot_name = input("¿Qué nombre te gustaría ponerme a mí (el IA)? ")
+    try:
+        user_name = input("¿Cómo te gusta que te llamen? ").strip()
+        bot_name = input("¿Qué nombre te gustaría ponerme a mí (el IA)? ").strip()
+    except EOFError:
+        user_name = "Usuario"
+        bot_name = "Leygo"
     
     print("\n¡Gracias! Creando perfil de memoria semántica inicial...\n")
     
@@ -123,7 +127,10 @@ def check_and_run_env_wizard():
         print("Puedes obtener una API Key gratuita en: https://aistudio.google.com/")
         print("=========================================================\n")
         
-        google_api_key = input("Pega aquí tu GOOGLE_API_KEY (o presiona Enter para omitir): ").strip()
+        try:
+            google_api_key = input("Pega aquí tu GOOGLE_API_KEY (o presiona Enter para omitir): ").strip()
+        except EOFError:
+            google_api_key = ""
         
         if google_api_key:
             if not os.path.exists(env_file):
@@ -140,10 +147,18 @@ def check_and_run_env_wizard():
         print("\n=========================================================")
         print("📱 CONFIGURACIÓN DE TELEGRAM (Opcional)")
         print("=========================================================\n")
-        resp = input("¿Deseas configurar el bot de Telegram ahora? (s/n): ").strip().lower()
+        try:
+            resp = input("¿Deseas configurar el bot de Telegram ahora? (s/n): ").strip().lower()
+        except EOFError:
+            resp = 'n'
+            
         if resp == 's':
-            telegram_token = input("Ingresa tu TELEGRAM_TOKEN: ").strip()
-            telegram_chat_id = input("Ingresa tu TELEGRAM_CHAT_ID (opcional, presiona Enter para omitir): ").strip()
+            try:
+                telegram_token = input("Ingresa tu TELEGRAM_TOKEN: ").strip()
+                telegram_chat_id = input("Ingresa tu TELEGRAM_CHAT_ID (opcional, presiona Enter para omitir): ").strip()
+            except EOFError:
+                telegram_token = ""
+                telegram_chat_id = ""
             
             if telegram_token:
                 if not os.path.exists(env_file):
