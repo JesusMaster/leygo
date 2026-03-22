@@ -41,6 +41,11 @@
         <h3>{{ agent.name }}</h3>
         <span class="model-badge">{{ agent.model || 'Default' }}</span>
       </div>
+      @if (!['assistant', 'dev', 'mcp', 'researcher', 'file_reader'].includes(agent.name)) {
+        <button class="delete-btn" (click)="deleteAgent(agent.name)" title="Eliminar agente">
+          <i class="ph ph-trash"></i>
+        </button>
+      }
     </div>
     
     <p class="description">{{ agent.description }}</p>

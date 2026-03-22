@@ -18,6 +18,11 @@ export class AgentsComponent implements OnInit {
   private readonly BASE_AGENTS = ['assistant', 'dev', 'mcp', 'researcher', 'file_reader'];
 
   ngOnInit() {
+    this.loadAgents();
+  }
+
+  loadAgents() {
+    this.loading.set(true);
     this.api.getAgents().subscribe({
       next: (data) => {
         this.systemAgents.set(data.filter(a => this.BASE_AGENTS.includes(a.name)));
@@ -26,5 +31,19 @@ export class AgentsComponent implements OnInit {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  deleteAgent(agentName: string) {
+    if (confirm(`¿Estás seguro de que deseas eliminar permanentemente el agente '${agentName}'?`)) {
+      this.api.deleteAgent(agentName).subscribe({
+        next: (res) => {
+          this.loadAgents();
+        },
+        error: (err) => {
+          console.error('Error al borrar el sub-agente', err);
+          alert('Error al intentar borrar el sub-agente.');
+        }
+      });
+    }
   }
 }

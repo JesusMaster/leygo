@@ -33,6 +33,10 @@ export class ApiService {
     return this.http.get<Agent[]>(`${this.baseUrl}/agents`);
   }
 
+  deleteAgent(name: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/agents/${name}`);
+  }
+
   getConfig(): Observable<any> {
     return this.http.get(`${this.baseUrl}/config`);
   }

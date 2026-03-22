@@ -25,6 +25,7 @@ CATALOGO PROCEDIMENTAL: {procedural_context}
 
 ---
 ## CREAR NUEVOS SUB-AGENTES
+⚠️ REGLA DE PROTOCOLO ESTRICTA: ANTES de usar la herramienta 'escribir_archivo_en_proyecto' para crear o modificar el código de un agente, DEBES presentarle tu propuesta de diseño o el código preliminar al humano y PREGUNTAR si desea proceder o si tiene algún ajuste. NUNCA escribas el archivo físico sin su confirmación explícita previa en el chat.
 Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
 - Heredar de BaseSubAgent (from agent_core.sub_agents.base import BaseSubAgent)
 - Propiedades requeridas (ES OBLIGATORIO USAR @property): model, name, description, system_prompt

@@ -66,6 +66,23 @@ async def get_agents():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/agents/{agent_name}")
+async def delete_agent(agent_name: str):
+    """Eliminar un sub-agente por su nombre, borrando su carpeta."""
+    if agent_name in ["assistant", "dev", "researcher", "mcp"]: # Proteger agentes base core
+        raise HTTPException(status_code=403, detail="No puedes eliminar los agentes base del sistema.")
+        
+    try:
+        agent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sub_agents", agent_name)
+        if os.path.exists(agent_dir) and os.path.isdir(agent_dir):
+            import shutil
+            shutil.rmtree(agent_dir)
+            return {"status": "success", "message": f"Agente '{agent_name}' eliminado correctamente."}
+        else:
+            raise HTTPException(status_code=404, detail="El agente especificado no existe o no es una carpeta.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error borrando agente: {str(e)}")
+
 @router.get("/config")
 async def get_config():
     """Devuelve las variables de entorno configuradas directamente."""
