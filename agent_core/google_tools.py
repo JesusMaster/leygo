@@ -237,14 +237,33 @@ def listar_eventos_calendario(dias_a_futuro: int = 7) -> str:
             event_id = event.get('id', 'N/A')
             status = event.get('status', 'N/A') # confirmado, tentativo, cancelado
             
-            # Buscar la respuesta del usuario principal (self) si existe
             user_response = "N/A"
+            otros_invitados = []
+            
             for attendee in event.get('attendees', []):
+                email_invitado = attendee.get('email', 'N/A')
+                status_invitado = attendee.get('responseStatus', 'N/A')
+                
                 if attendee.get('self'):
-                    user_response = attendee.get('responseStatus', 'N/A')
-                    break
+                    user_response = status_invitado
+                else:
+                    otros_invitados.append(f"{email_invitado} ({status_invitado})")
                     
-            lista_eventos.append(f"- [{start}] {event.get('summary', 'Sin título')} (ID: {event_id}) [Tu respuesta: {user_response}]")
+            invitados_str = f" | Invitados: {', '.join(otros_invitados)}" if otros_invitados else " | Sin más invitados"
+            
+            # Buscar links e ubicaciones
+            meet_link = event.get('hangoutLink')
+            location = event.get('location')
+            
+            conexion_str = ""
+            if meet_link:
+                conexion_str += f" | 💻 Reunion Virtual: {meet_link}"
+            if location:
+                conexion_str += f" | 📍 Ubicación: {location}"
+            if not meet_link and not location:
+                conexion_str += f" | Sin ubicación/link"
+            
+            lista_eventos.append(f"- [{start}] {event.get('summary', 'Sin título')} (ID: {event_id}) [Tu respuesta: {user_response}]{invitados_str}{conexion_str}")
 
         return f"Próximos eventos (Próximos {dias_a_futuro} días):\\n" + "\\n".join(lista_eventos)
 
