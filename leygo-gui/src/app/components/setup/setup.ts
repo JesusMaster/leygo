@@ -16,7 +16,7 @@ export class SetupComponent implements OnInit {
   totalSteps = 5;
   loading = false;
   errorMessage = '';
-  backendBaseUrl = `${window.location.protocol}//${window.location.hostname}:8000`;
+  backendBaseUrl = `${window.location.protocol}//${window.location.hostname}:2083`;
 
   // --- MODELOS DE DATOS ---
   // Paso 1
@@ -133,7 +133,7 @@ export class SetupComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.webhookUrl = `${window.location.protocol}//${window.location.hostname}:8000`;
+    this.webhookUrl = `${window.location.protocol}//${window.location.hostname}:2083`;
     
     this.setupService.getStatus().subscribe(status => {
       if(status.admin_created && !status.setup_completed) {
@@ -210,7 +210,7 @@ export class SetupComponent implements OnInit {
     this.errorMessage = '';
     
     // Aquí obligamos a coincidir con el puerto Backend donde está escuchando FastAPI ciegamente
-    const redirectUri = `${window.location.protocol}//${window.location.hostname}:8000/api/setup/google-callback`;
+    const redirectUri = `${window.location.protocol}//${window.location.hostname}:2083/api/setup/google-callback`;
 
     this.loading = true;
     this.cdr.detectChanges();
