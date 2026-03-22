@@ -15,3 +15,7 @@ google-auth-oauthlib
 apscheduler
 pytz
 google-generativeai
+argon2-cffi
+PyJWT
+yt-dlp
+webvtt-py

@@ -3,7 +3,7 @@ import sys
 import asyncio
 from typing import Annotated, TypedDict, Literal, List
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage, AIMessage
 from langchain_core.runnables.config import RunnableConfig
 from pydantic import BaseModel, Field
 from langgraph.graph import StateGraph, START, END
@@ -18,12 +18,14 @@ load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 # Import local modules
 import memory_utils
 from mcp_client import MCPClientManager
-from auto_coder import crear_y_ejecutar_herramienta_local, usar_herramienta_local, escribir_archivo_en_proyecto, eliminar_archivo_en_proyecto
+from auto_coder import crear_y_ejecutar_herramienta_local, usar_herramienta_local, escribir_archivo_en_proyecto, eliminar_archivo_en_proyecto, instalar_dependencia_python
 from web_tools import buscar_en_internet
 from scheduler_manager import crear_recordatorio_solo_texto_para_usuario, listar_tareas_programadas, start_scheduler, stop_scheduler, crear_rutina_texto_periodica_para_usuario, eliminar_tarea_programada, agendar_accion_autonoma_agente, agendar_rutina_autonoma_agente
-from google_tools import leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo
-# Máximo de mensajes recientes a enviar al LLM para evitar inflar tokens
-MAX_CONTEXT_MESSAGES = 10
+from google_tools import leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo, leer_google_doc, buscar_archivos_drive
+MAX_CONTEXT_MESSAGES = 15
+MAX_MESSAGE_CHARS = 20000 # ~5000 tokens por mensaje individual como máximo
+
+import status_bus
 
 import logging
 import warnings
@@ -126,27 +128,36 @@ def get_dynamic_route_model(sub_agents: List[BaseSubAgent], all_tools: list = No
     )
 
 def _sanitize_messages_for_gemini(messages):
-    """Sanitiza la lista de mensajes después de truncar para mantener secuencias válidas para Gemini.
+    """Sanitiza y RECORTA el contenido de los mensajes para evitar explosiones de tokens.
     
-    Gemini requiere:
-    - Un ToolMessage SIEMPRE debe ir precedido por un AIMessage con tool_calls
-    - Un AIMessage con tool_calls SIEMPRE debe ir seguido por su(s) ToolMessage(s) de respuesta
-    
-    Si la truncación cortó en medio de una secuencia, esta función limpia los huérfanos.
+    1. Asegura secuencias válidas para Gemini (AIMessage -> ToolMessage).
+    2. Recorta mensajes individuales que excedan MAX_MESSAGE_CHARS para proteger el contexto.
     """
     if not messages:
         return messages
     
-    sanitized = list(messages)
+    sanitized = []
+    for m in messages:
+        # --- Lógica de Recorte (Memory Optimization) ---
+        content = getattr(m, "content", "")
+        if isinstance(content, str) and len(content) > MAX_MESSAGE_CHARS:
+            truncated_content = content[:MAX_MESSAGE_CHARS] + f"\n\n[... CONTENIDO RECORTADO ({len(content)} chars) para optimizar memoria ...]"
+            # Creamos una copia del mensaje con el contenido recortado
+            if isinstance(m, ToolMessage):
+                m = ToolMessage(content=truncated_content, tool_call_id=m.tool_call_id, name=m.name)
+            elif isinstance(m, AIMessage):
+                m = AIMessage(content=truncated_content, tool_calls=m.tool_calls, usage_metadata=m.usage_metadata)
+            elif isinstance(m, HumanMessage):
+                m = HumanMessage(content=truncated_content, name=m.name)
+        
+        sanitized.append(m)
     
-    # 1. Remover ToolMessages huérfanos al inicio (fueron separados de su AIMessage previo)
+    # --- Lógica de Secuencia (Validación Gemini) ---
+    # 1. Remover ToolMessages huérfanos al inicio
     while sanitized and isinstance(sanitized[0], ToolMessage):
         sanitized.pop(0)
     
-    # 2. Si la lista quedó vacía, o si empieza con un AIMessage, 
-    # insertamos un HumanMessage de contexto. Gemini exige que las secuencias de funciones 
-    # SIEMPRE tengan un HumanMessage o ToolMessage predecesor. Si un AIMessage queda de primero, crashea.
-    from langchain_core.messages import HumanMessage, AIMessage
+    # 2. Asegurar que no empiece con un AIMessage (Gemini requiere Human/Tool/System primero)
     if not sanitized or isinstance(sanitized[0], AIMessage):
         sanitized.insert(0, HumanMessage(content="Continúa con la tarea pendiente usando tu contexto y herramientas.", name="WorkerContext"))
     
@@ -204,7 +215,8 @@ REGLAS:
 1. SI EL USUARIO PIDE AGENDAR, MOSTRAR O PROGRAMAR ALGO PARA EL FUTURO (ej. "en 1 min", "mañana", "recuérdame", "cada x horas"): **DEBES ENVIARLO INMEDIATAMENTE AL AGENTE 'assistant'**, ya que SOLO ÉL tiene las herramientas del Scheduler. No intentes enviar la tarea a otros agentes ni ejecutarla ahora.
 2. DEBES usar la herramienta `Route` devolviendo el 'next_node' si la tarea requiere acción o **si un sub-agente completó un paso pero falta otro** (ejemplo: 'mcp' leyó un archivo, pero falta enviarlo por correo, entonces asigna 'assistant').
 3. PRIORIZACIÓN (Para acciones en TIEMPO REAL): El agente MCP ('mcp') contiene integraciones (GitHub, KPIs). Dale prioridad al MCP para preguntas sobre proyectos o repositorios, SIEMPRE Y CUANDO no estén pidiendo que se programe para el futuro.
-4. SI TODAS LAS TAREAS FUERON COMPLETADAS por los agentes previos, O SI SÓLO ES CHARLA (preguntas generales, la hora, saludos): DEBES usar la herramienta `Route` con `next_node`='FINISH'. Y usar el campo `respuesta_conversacional` de la herramienta para escribirle el texto al usuario.
+4. SI LA TAREA FUE COMPLETADA por los agentes previos (ej. un agente ya consiguió la información, analizó el archivo o hizo el resumen): DEBES usar la herramienta `Route` con `next_node`='FINISH' y DEJAR EL CAMPO `respuesta_conversacional` VACÍO. El sistema le mostrará la respuesta exacta y completa del sub-agente al usuario de forma automática (no la resumas tú, o el usuario perderá la información).
+5. SÓLO usa el campo `respuesta_conversacional` si TÚ directamente le vas a responder al usuario sin delegar a nadie (ej. charlas generales, saludos).
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
@@ -225,6 +237,7 @@ REGLAS:
             lightweight_messages = lightweight_messages[-MAX_CONTEXT_MESSAGES:]
         
         print(f">> Supervisor evaluando (historial: {len(lightweight_messages)} msjs, filtrados de {len(clean_messages)})...")
+        status_bus.publish_status("🧠 Supervisor analizando la solicitud...")
         response = await supervisor_llm.ainvoke([system_prompt] + lightweight_messages)
         
         next_step = "FINISH"
@@ -237,6 +250,7 @@ REGLAS:
                 
             if next_step in ("finish", "end"):
                 print(f"[Supervisor] El flujo general está completo según el Supervisor. Terminando (END).")
+                status_bus.publish_status("✅ Tarea completada")
                 from langchain_core.messages import AIMessage
                 new_msg = AIMessage(
                     content=resp_conv, 
@@ -246,6 +260,7 @@ REGLAS:
                 return {"messages": [new_msg], "next_node": "END"}
                 
             print(f"[Supervisor] Delegando tarea (o sub-tarea pendiente) a: {next_step}")
+            status_bus.publish_status(f"🔀 Delegando al agente **{next_step}**...")
             instruccion = tc["args"].get("instruccion", "").strip()
             if instruccion:
                 content = f"[Instrucción del Supervisor para {next_step}]: {instruccion}"
@@ -301,7 +316,11 @@ def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, cust
             episodic_context=episodic_context,
             procedural_context=procedural_context if procedural_context else "Aún no tienes herramientas."
         )
-        formatted_prompt += "\n\nATENCIÓN: Eres un Sub-Agente Trabajador. NUNCA intentes usar la herramienta 'Route' y NO intentes delegar por tu cuenta a otros agentes. Si una tarea excede tus herramientas, simplemente HAZ TU PARTE, responde con un texto explicando qué hiciste y escribe qué le toca hacer al SIGUIENTE agente (ej. 'Ya leí el archivo, ahora el assistant debe enviarlo'). El Supervisor te leerá y hará la derivación automáticamente. \nCRÍTICO: Si intentas usar una herramienta y falla reiteradamente o te devuelve error, NO te quedes pegado en un bucle infinito reintentando. Detente de inmediato, reporta el fallo y el motivo de forma amigable al usuario en texto plano, y termina tu turno."
+        formatted_prompt += """\n\nATENCIÓN - REGLAS PARA SUB-AGENTES TRABAJADORES:
+1. NUNCA intentes usar la herramienta 'Route'. El Supervisor se encarga del routing.
+2. Si tu system prompt te indica que eres el agente FINAL para la consulta: da una respuesta completa y directa al usuario. NO escribas frases como "el siguiente agente debe...", "ahora el assistant debe...", ni nada similar. TÚ eres la respuesta.
+3. Solo si la tarea requiere una habilidad que realmente NO tienes (diferente tipo de integración, otra API, etc.), entonces explica brevemente qué hiciste y qué quedaría pendiente. El Supervisor lo tomará.
+4. CRÍTICO: Si intentas usar una herramienta y falla reiteradamente, NO te quedes en un bucle infinito. Detente, reporta el fallo amigablemente y termina tu turno."""
         system_msg = SystemMessage(content=formatted_prompt)
         
         messages = state["messages"]
@@ -316,7 +335,14 @@ def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, cust
         clean_messages = _sanitize_messages_for_gemini(clean_messages)
         
         print(f">> LLM Razonando en contexto Worker (historial: {len(clean_messages)} msjs)...")
+        if agent_name:
+            status_bus.publish_status(f"⚙️ Agente **{agent_name}** procesando...")
         response = await llm_with_tools.ainvoke([system_msg] + clean_messages)
+        # Notificar si va a llamar herramientas
+        if hasattr(response, "tool_calls") and response.tool_calls:
+            for tc in response.tool_calls:
+                tool_name = tc.get("name", "herramienta") if isinstance(tc, dict) else getattr(tc, "name", "herramienta")
+                status_bus.publish_status(f"🔧 Usando herramienta: **{tool_name}**")
         return {"messages": [response]}
         
     return agent_node
@@ -371,6 +397,7 @@ class SelfExtendingAgent:
             usar_herramienta_local, 
             escribir_archivo_en_proyecto,
             eliminar_archivo_en_proyecto,
+            instalar_dependencia_python,
             memory_utils.administrar_memoria_episodica, 
             memory_utils.administrar_memoria_procedimental,
             buscar_en_internet, 
@@ -391,7 +418,9 @@ class SelfExtendingAgent:
             listar_espacios_chat,
             leer_mensajes_chat,
             enviar_mensaje_chat,
-            buscar_chat_directo
+            buscar_chat_directo,
+            leer_google_doc,
+            buscar_archivos_drive
         ])
         
         if tools:
@@ -524,7 +553,8 @@ class SelfExtendingAgent:
         print(f"\\nUsuario: {user_input}")
         
         # Provide config for short-term memory continuity
-        config = {"configurable": {"thread_id": thread_id}}
+        # recursion_limit evita bucles infinitos: máx 12 saltos supervisor↔worker
+        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 100}
         
         # State will be appended to the thread automatically
         async for output in self.graph.astream({"messages": [HumanMessage(content=user_input)]}, config=config, stream_mode="updates"):
@@ -567,71 +597,255 @@ class SelfExtendingAgent:
         self._check_and_reload_graph()
             
         print(f"\\n[API] Recibido: {user_input}")
-        config = {"configurable": {"thread_id": thread_id}}
+        # recursion_limit evita bucles infinitos: máx 12 saltos supervisor↔worker
+        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 100}
         final_answer = ""
         usage_record = {}
-        async for output in self.graph.astream({"messages": [HumanMessage(content=user_input)]}, config=config, stream_mode="updates"):
-            for node_name, node_state in output.items():
-                if "messages" in node_state:
-                    # En algunos casos (ej: Supervisor) el estado tiene múltiples mensajes,
-                    # así que aseguramos revisar todos los mensajes para no perder el AIMessage
-                    msgs_to_check = node_state["messages"] if isinstance(node_state["messages"], list) else [node_state["messages"]]
-                    
-                    latest_message = msgs_to_check[-1]
-                    
-                    # Trackear cada paso individual que tenga tokens
-                    for msg in msgs_to_check:
-                        if hasattr(msg, "usage_metadata") and msg.usage_metadata:
-                            i_toks = msg.usage_metadata.get("input_tokens", 0)
-                            o_toks = msg.usage_metadata.get("output_tokens", 0)
-                            if i_toks > 0 or o_toks > 0:
-                                mod_name = "Desconocido"
-                                if hasattr(msg, "response_metadata") and msg.response_metadata:
-                                    mod_name = msg.response_metadata.get("model_name", "Desconocido")
-                                    
-                                try:
-                                    from utils.token_tracker import log_token_usage
-                                    usage_record = log_token_usage(
-                                        user_input=f"[{node_name}] {user_input[:50]}...",
-                                        model=mod_name,
-                                        input_tokens=i_toks,
-                                        output_tokens=o_toks,
-                                        thread_id=thread_id
-                                    )
-                                except Exception as e:
-                                    print(f"[API] Error trackeando tokens de {node_name}: {e}")
+        try:
+            async for output in self.graph.astream({"messages": [HumanMessage(content=user_input)]}, config=config, stream_mode="updates"):
+                for node_name, node_state in output.items():
+                    if "messages" in node_state:
+                        # En algunos casos (ej: Supervisor) el estado tiene múltiples mensajes,
+                        # así que aseguramos revisar todos los mensajes para no perder el AIMessage
+                        msgs_to_check = node_state["messages"] if isinstance(node_state["messages"], list) else [node_state["messages"]]
+                        
+                        latest_message = msgs_to_check[-1]
+                        
+                        # Trackear cada paso individual que tenga tokens
+                        for msg in msgs_to_check:
+                            if hasattr(msg, "usage_metadata") and msg.usage_metadata:
+                                i_toks = msg.usage_metadata.get("input_tokens", 0)
+                                o_toks = msg.usage_metadata.get("output_tokens", 0)
+                                if i_toks > 0 or o_toks > 0:
+                                    mod_name = "Desconocido"
+                                    if hasattr(msg, "response_metadata") and msg.response_metadata:
+                                        mod_name = msg.response_metadata.get("model_name", "Desconocido")
+                                        
+                                    try:
+                                        from utils.token_tracker import log_token_usage
+                                        usage_record = log_token_usage(
+                                            user_input=f"[{node_name}] {user_input[:50]}...",
+                                            model=mod_name,
+                                            input_tokens=i_toks,
+                                            output_tokens=o_toks,
+                                            thread_id=thread_id
+                                        )
+                                    except Exception as e:
+                                        print(f"[API] Error trackeando tokens de {node_name}: {e}")
 
-                    worker_nodes = getattr(self, "_agent_names", ["dev", "assistant", "researcher"])
-                    if node_name in worker_nodes:
-                        if hasattr(latest_message, "tool_calls") and latest_message.tool_calls:
-                            for tc in latest_message.tool_calls:
-                                print(f"\\n[API -> {node_name} decide usar herramienta]: {tc['name']}")
-                        else:
-                            content = latest_message.content
-                            if isinstance(content, list):
-                                text_parts = [c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text"]
-                                text = "".join(text_parts).strip()
-                                if text: 
-                                    final_answer = text
+                        worker_nodes = getattr(self, "_agent_names", ["dev", "assistant", "researcher"])
+                        if node_name in worker_nodes:
+                            if hasattr(latest_message, "tool_calls") and latest_message.tool_calls:
+                                for tc in latest_message.tool_calls:
+                                    print(f"\\n[API -> {node_name} decide usar herramienta]: {tc['name']}")
                             else:
-                                if content:
-                                    final_answer = content
-                    elif node_name == "supervisor":
-                        if not (hasattr(latest_message, "tool_calls") and latest_message.tool_calls):
-                            content = latest_message.content
-                            if isinstance(content, list):
-                                text_parts = [c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text"]
-                                text = "".join(text_parts).strip()
-                                if text:
-                                    final_answer = text
-                            else:
-                                if content:
-                                    final_answer = content
+                                content = latest_message.content
+                                if isinstance(content, list):
+                                    text_parts = [c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text"]
+                                    text = "".join(text_parts).strip()
+                                    if text: 
+                                        final_answer = text
+                                else:
+                                    if content:
+                                        final_answer = content
+                        elif node_name == "supervisor":
+                            if not (hasattr(latest_message, "tool_calls") and latest_message.tool_calls):
+                                content = latest_message.content
+                                if isinstance(content, list):
+                                    text_parts = [c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text"]
+                                    text = "".join(text_parts).strip()
+                                    if text:
+                                        final_answer = final_answer if final_answer else text
+                                else:
+                                    text = str(content).strip() if content else ""
+                                    if text:
+                                        final_answer = final_answer if final_answer else text
+                                        
+        except Exception as e:
+            import traceback
+            import asyncio
+            error_traceback = traceback.format_exc()
+            print(f"\\n[CRITICAL FATAL] Error del Sistema. Inicializando auto-curacion...\\n{str(e)}")
+            
+            # Lanzamos Background Task (Modo Médico) para @dev
+            repair_msg = f"@dev URGENTE FALLO DE RED: El sistema sufrió este crash. Ubica el sub-agente o archivo fallido y usa tus herramientas para reparar el codigo fuente inmediatamente:\\n```python\\n{error_traceback}\\n```"
+            async def auto_repair():
+                print(f"[SEAL TEAM] Dev enviado a reparar en las sombras el error...")
+                heal_config = {"configurable": {"thread_id": f"repair_{thread_id}"}, "recursion_limit": 100}
+                try:
+                    async for _ in self.graph.astream({"messages": [HumanMessage(content=repair_msg)]}, config=heal_config, stream_mode="updates"):
+                        pass
+                    print("[SEAL TEAM] Reparación asíncrona concluida - Dev finalizado.")
+                except Exception as inner_e:
+                    print(f"[REPAIR FATAL SQUAD FAILED] Dev también falló al intentar repararlo: {inner_e}")
+                    
+            asyncio.create_task(auto_repair())
+            
+            final_answer = ("He detectado un error técnico grave al procesar tu solicitud o llamar a mis herramientas internas. "
+                            "Activé un protocolo de auto-reparación y le envié el diagnóstico completo en vivo a mi subagente desarrollador "
+                            "(`dev`) para que inspeccione y parchee el código fuente en segundo plano de manera autónoma.\\n"
+                            "Por favor, intenta la consulta de nuevo en unos momentos.")
 
         if return_usage:
             return final_answer, usage_record
             
         return final_answer
+
+    async def stream_message(self, user_input: str, thread_id: str = "default_session"):
+        """
+        Async generator that streams the agent response as events.
+        Yields dicts with 'type': 'status' | 'token' | 'done' | 'error'
+        - status: intermediate step info (supervisor routing, tool calls)
+        - token: a text chunk of the final response being written
+        - done: final event with full text + usage data
+        - error: something went wrong
+        """
+        if not self.graph:
+            yield {"type": "error", "content": "Agente no inicializado"}
+            return
+
+        self._check_and_reload_graph()
+
+        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 100}
+        worker_nodes = getattr(self, "_agent_names", [])
+        
+        full_response = ""
+        supervisor_fallback = ""   # Respuesta directa del supervisor (sin worker)
+        total_usage = {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost_usd": 0.0,
+            "model": "varios"
+        }
+        last_streaming_node = None  # Nodo cuyo stream de tokens estamos emitiendo
+
+        try:
+            async for event in self.graph.astream_events(
+                {"messages": [HumanMessage(content=user_input)]},
+                config=config,
+                version="v2"
+            ):
+                kind = event.get("event", "")
+                node_name = event.get("metadata", {}).get("langgraph_node", "")
+
+                # ── 1. Stream de tokens del LLM ──────────────────────────────────
+                if kind == "on_chat_model_stream":
+                    # Solo emitir tokens de nodos worker (no supervisor, no tool nodes)
+                    if node_name in worker_nodes:
+                        chunk = event.get("data", {}).get("chunk")
+                        if chunk:
+                            content = chunk.content
+                            # content puede ser str o lista de dicts (Gemini)
+                            if isinstance(content, str) and content:
+                                last_streaming_node = node_name
+                                full_response += content
+                                yield {"type": "token", "content": content, "node": node_name}
+                            elif isinstance(content, list):
+                                for part in content:
+                                    if isinstance(part, dict) and part.get("type") == "text":
+                                        text = part.get("text", "")
+                                        if text:
+                                            last_streaming_node = node_name
+                                            full_response += text
+                                            yield {"type": "token", "content": text, "node": node_name}
+
+                # ── 2. Inicio de un nodo → publicar status ───────────────────────
+                elif kind == "on_chain_start" and node_name:
+                    if node_name in worker_nodes:
+                        msg = f"⚙️ Agente **{node_name}** procesando..."
+                        status_bus.publish_status(msg)
+                        yield {"type": "status", "content": msg}
+                    elif node_name == "supervisor":
+                        msg = "🧠 Supervisor analizando..."
+                        status_bus.publish_status(msg)
+                        yield {"type": "status", "content": msg}
+
+                # ── 3. Fin de un nodo supervisor → capturar respuesta directa ────
+                elif kind == "on_chain_end" and node_name == "supervisor":
+                    # Si el supervisor respondió directamente (sin delegar), capturar su texto
+                    # Esto ocurre cuando el supervisor decide FINISH en el primer paso
+                    output = event.get("data", {}).get("output", {})
+                    if isinstance(output, dict) and "messages" in output:
+                        msgs = output["messages"]
+                        if msgs:
+                            last_msg = msgs[-1]
+                            # Solo si NO es un tool_call (routing call)
+                            has_tc = hasattr(last_msg, "tool_calls") and last_msg.tool_calls
+                            if not has_tc:
+                                raw = last_msg.content if hasattr(last_msg, "content") else ""
+                                if isinstance(raw, list):
+                                    raw = "".join(p.get("text", "") for p in raw if isinstance(p, dict) and p.get("type") == "text")
+                                if raw and isinstance(raw, str):
+                                    supervisor_fallback = raw.strip()
+
+                # ── 4. Fin del LLM call → capturar usage ────────────────────────
+                elif kind == "on_chat_model_end":
+                    response_obj = event.get("data", {}).get("output")
+                    if response_obj and hasattr(response_obj, "usage_metadata") and response_obj.usage_metadata:
+                        i_toks = response_obj.usage_metadata.get("input_tokens", 0)
+                        o_toks = response_obj.usage_metadata.get("output_tokens", 0)
+                        if (i_toks > 0 or o_toks > 0) and node_name:
+                            mod_name = "Desconocido"
+                            if hasattr(response_obj, "response_metadata"):
+                                mod_name = response_obj.response_metadata.get("model_name", "Desconocido")
+                            try:
+                                from utils.token_tracker import log_token_usage
+                                usage_record = log_token_usage(
+                                    user_input=f"[{node_name}] {user_input[:50]}...",
+                                    model=mod_name,
+                                    input_tokens=i_toks,
+                                    output_tokens=o_toks,
+                                    thread_id=thread_id
+                                )
+                                # Acumular el total de la respuesta para el frontend
+                                total_usage["input_tokens"] += usage_record.get("input_tokens", 0)
+                                total_usage["output_tokens"] += usage_record.get("output_tokens", 0)
+                                total_usage["cost_usd"] += usage_record.get("cost_usd", 0.0)
+                                if mod_name != "Desconocido":
+                                    total_usage["model"] = mod_name
+                                    
+                            except Exception as e:
+                                print(f"[stream] Error trackeando tokens: {e}")
+
+                    # Si el nodo tiene tool_calls, reset full_response para no mezclar
+                    # el "thinking" con la respuesta final
+                    if response_obj and hasattr(response_obj, "tool_calls") and response_obj.tool_calls:
+                        if node_name in worker_nodes:
+                            for tc in response_obj.tool_calls:
+                                tool_name = tc.get("name", "herramienta") if isinstance(tc, dict) else getattr(tc, "name", "herramienta")
+                                msg = f"🔧 Usando herramienta: **{tool_name}**"
+                                status_bus.publish_status(msg)
+                                yield {"type": "status", "content": msg}
+                            # Reset: lo que se escribió no es la respuesta final
+                            full_response = ""
+
+        except Exception as e:
+            import traceback
+            error_traceback = traceback.format_exc()
+            print(f"\n[stream_message CRITICAL] {e}\n{error_traceback}")
+            
+            # Auto-repair en background (igual que process_message)
+            import asyncio as _asyncio
+            repair_msg = f"@dev URGENTE FALLO DE RED: {error_traceback}"
+            async def auto_repair():
+                try:
+                    heal_cfg = {"configurable": {"thread_id": f"repair_{thread_id}"}, "recursion_limit": 50}
+                    async for _ in self.graph.astream({"messages": [HumanMessage(content=repair_msg)]}, config=heal_cfg, stream_mode="updates"):
+                        pass
+                except Exception:
+                    pass
+            _asyncio.create_task(auto_repair())
+            
+            yield {"type": "error", "content": "Ocurrió un error técnico. Activé auto-reparación."}
+            return
+
+        # ── Evento final con texto completo + usage ──────────────────────────────
+        status_bus.publish_status("✅ Tarea completada")
+        final_text = full_response.strip()
+        if not final_text and supervisor_fallback:
+            final_text = supervisor_fallback
+            
+        yield {"type": "done", "content": final_text, "usage": total_usage}
 
     async def cleanup(self):
         """Cleanup connections."""

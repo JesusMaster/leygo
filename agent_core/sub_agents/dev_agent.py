@@ -44,7 +44,8 @@ ELIMINAR SUB-AGENTES: usar eliminar_archivo_en_proyecto con ruta del directorio 
     def get_tools(self, all_available_tools: list) -> List[Callable]:
         names = ["crear_y_ejecutar_herramienta_local", "usar_herramienta_local", 
                  "administrar_memoria_episodica", "administrar_memoria_procedimental", 
-                 "escribir_archivo_en_proyecto", "eliminar_archivo_en_proyecto"]
+                 "escribir_archivo_en_proyecto", "eliminar_archivo_en_proyecto",
+                 "instalar_dependencia_python"]
         excluded_prefixes = ("programar_", "listar_record", "eliminar_")
         dev_tools = [t for t in all_available_tools if getattr(t, "name", None) in names]
         mcp_tools = [t for t in all_available_tools 

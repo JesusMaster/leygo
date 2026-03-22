@@ -280,6 +280,13 @@ def escribir_archivo_en_proyecto(ruta_relativa: str, contenido: str) -> str:
         contenido: Contenido completo del archivo a escribir.
     """
     try:
+        # Validación de seguridad: no permitir sobreescribir subagentes base del sistema
+        agentes_protegidos = ["file_reader", "dev", "assistant", "supervisor"]
+        ruta_check = ruta_relativa.lower().replace("\\\\", "/")
+        for pa in agentes_protegidos:
+            if f"sub_agents/{pa}" in ruta_check or f"{pa}_agent.py" in ruta_check:
+                return f"❌ Permiso denegado: '{pa}' es un subagente protegido del sistema central y no tienes permiso para modificarlo/sobrescribirlo."
+
         # Calculamos la raíz del proyecto (2 niveles arriba de este archivo en agent_core/)
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         full_path = os.path.join(project_root, ruta_relativa)
@@ -307,6 +314,14 @@ def eliminar_archivo_en_proyecto(ruta_relativa: str) -> str:
     """
     try:
         import shutil
+        
+        # Validación de seguridad: no permitir eliminar subagentes base del sistema
+        agentes_protegidos = ["file_reader", "dev", "assistant", "supervisor"]
+        ruta_check = ruta_relativa.lower().replace("\\\\", "/")
+        for pa in agentes_protegidos:
+            if f"sub_agents/{pa}" in ruta_check or f"{pa}_agent.py" in ruta_check:
+                return f"❌ Permiso denegado: '{pa}' es un subagente protegido del sistema central y no tienes permiso para eliminarlo."
+
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         full_path = os.path.join(project_root, ruta_relativa)
         
@@ -324,3 +339,22 @@ def eliminar_archivo_en_proyecto(ruta_relativa: str) -> str:
     except Exception as e:
         return f"❌ Error al eliminar '{ruta_relativa}': {str(e)}"
 
+@tool
+def instalar_dependencia_python(libreria: str) -> str:
+    """
+    Instala una librería/paquete de Python en el entorno actual usando pip.
+    Usa esta herramienta cuando necesites programar o probar código que requiera dependencias de terceros (como pandas, youtube-transcript-api, etc) y obtengas errores de módulo no encontrado (ModuleNotFoundError).
+    Args:
+        libreria: Nombre exacto del paquete a instalar (ej: 'youtube-transcript-api').
+    """
+    try:
+        import sys
+        import subprocess
+        print(f"[AutoCoder] Ejecutando: pip install {libreria}")
+        result = subprocess.run([sys.executable, "-m", "pip", "install", libreria], capture_output=True, text=True)
+        if result.returncode == 0:
+            return f"✅ Dependencia '{libreria}' instalada correctamente.\\n{result.stdout.strip()}"
+        else:
+            return f"❌ Error instalando '{libreria}':\\n{result.stderr.strip()}"
+    except Exception as e:
+        return f"❌ Error fatal instalando '{libreria}': {str(e)}"

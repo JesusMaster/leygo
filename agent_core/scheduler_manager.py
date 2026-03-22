@@ -380,6 +380,12 @@ def crear_recordatorio_solo_texto_para_usuario(mensaje: str, chat_id: str, minut
         
     if run_date < now:
          return f"Error: La fecha calculada {run_date} está en el pasado según la hora actual {now}."
+
+    # DEDUP: Evitar crear recordatorios duplicados si el agente llama la herramienta más de una vez
+    job_name_candidate = mensaje[:50]
+    existing = [j for j in scheduler.get_jobs() if j.name == job_name_candidate]
+    if existing:
+        return f"¡Recordatorio ya programado anteriormente! El mensaje '{mensaje[:30]}...' será enviado en los próximos minutos. No se creó uno duplicado."
          
     # Añadir trabajo asíncrono
     scheduler.add_job(
@@ -387,7 +393,7 @@ def crear_recordatorio_solo_texto_para_usuario(mensaje: str, chat_id: str, minut
         'date',
         run_date=run_date,
         args=[chat_id, mensaje],
-        name=mensaje[:50] # Guardamos un fragmento del mensaje como ID visual
+        name=job_name_candidate
     )
     guardar_estado_jobs()
     
@@ -437,13 +443,19 @@ def agendar_accion_autonoma_agente(instruccion_accion: str, chat_id: str, minuto
         
     if run_date < now:
          return f"Error: La fecha calculada {run_date} está en el pasado según la hora actual {now}."
-         
+
+    # DEDUP: Evitar crear tareas duplicadas si el agente llama la herramienta más de una vez
+    job_name_candidate = f"TAREA ACTIVA AGENTE: {instruccion_accion[:40]}"
+    existing = [j for j in scheduler.get_jobs() if j.name == job_name_candidate]
+    if existing:
+        return f"¡Tarea ya programada anteriormente! La acción '{instruccion_accion[:30]}...' ya está encolada. No se creó un duplicado."
+          
     scheduler.add_job(
         execute_agent_task,
         'date',
         run_date=run_date,
         args=[chat_id, instruccion_accion],
-        name=f"TAREA ACTIVA AGENTE: {instruccion_accion[:40]}"
+        name=job_name_candidate
     )
     guardar_estado_jobs()
     
@@ -478,14 +490,20 @@ def crear_rutina_texto_periodica_para_usuario(prompt_instruccion: str, chat_id: 
         return "Error: Debes proveer al menos intervalo_minutos o hora_del_dia."
         
     if intervalo_minutos:
+        job_name_candidate = f"RUTINA TEXTO: {prompt_instruccion[:30]}"
+        existing = [j for j in scheduler.get_jobs() if j.name == job_name_candidate]
+        if existing:
+            return f"¡Rutina ya existe! '{prompt_instruccion[:30]}...' ya está programada. No se creó un duplicado."
+        first_run = datetime.now(TIMEZONE) + timedelta(minutes=intervalo_minutos)
         scheduler.add_job(
             send_dynamic_telegram_reminder,
             'interval',
             minutes=intervalo_minutos,
+            start_date=first_run,
             args=[chat_id, prompt_instruccion],
-            name=f"RUTINA TEXTO: {prompt_instruccion[:30]}"
+            name=job_name_candidate
         )
-        msg_conf = f"¡Rutina programada! Cada {intervalo_minutos} minutos."
+        msg_conf = f"¡Rutina programada! Cada {intervalo_minutos} minutos (primera ejecución a las {first_run.strftime('%H:%M:%S')})."
     elif hora_del_dia:
         try:
             h, m = hora_del_dia.split(":")
@@ -533,14 +551,20 @@ def agendar_rutina_autonoma_agente(instruccion_accion: str, chat_id: str, interv
         return "Error: Debes proveer al menos intervalo_minutos o hora_del_dia."
         
     if intervalo_minutos:
+        job_name_candidate = f"RUTINA AGENTE: {instruccion_accion[:30]}"
+        existing = [j for j in scheduler.get_jobs() if j.name == job_name_candidate]
+        if existing:
+            return f"¡Rutina de agente ya existe! '{instruccion_accion[:30]}...' ya está programada. No se creó un duplicado."
+        first_run = datetime.now(TIMEZONE) + timedelta(minutes=intervalo_minutos)
         scheduler.add_job(
             execute_agent_task,
             'interval',
             minutes=intervalo_minutos,
+            start_date=first_run,
             args=[chat_id, instruccion_accion],
-            name=f"RUTINA AGENTE: {instruccion_accion[:30]}"
+            name=job_name_candidate
         )
-        msg_conf = f"¡Rutina de Tarea Ejecutora programada excelentemente! Me encenderé automáticamente cada {intervalo_minutos} minutos"
+        msg_conf = f"¡Rutina de Tarea Ejecutora programada excelentemente! Me encenderé automáticamente cada {intervalo_minutos} minutos (primera ejecución a las {first_run.strftime('%H:%M:%S')})"
     elif hora_del_dia:
         try:
             h, m = hora_del_dia.split(":")

@@ -19,7 +19,11 @@ def log_token_usage(user_input: str, model: str, input_tokens: int, output_token
     
     _lower_model = model.lower()
     
-    if "pro" in _lower_model:
+    if "image" in _lower_model:
+        # Precios de Imágenes (ej. gemini-3-pro-image-preview o gemini-3.1-flash-image-preview)
+        precio_in = 2.00
+        precio_out = 120.00
+    elif "pro" in _lower_model:
         # Precios para gemini-3.1-pro-preview (<200k context)
         precio_in = 2.00
         precio_out = 12.00

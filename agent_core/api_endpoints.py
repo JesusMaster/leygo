@@ -1,16 +1,19 @@
-from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Request, HTTPException, UploadFile, File
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 import os
 import sys
+import asyncio
 from dotenv import dotenv_values
 
 # Añadir el path para importar el agente
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from main import discover_sub_agents
 from scheduler_manager import scheduler, MEMORIA_RECORDATORIOS_PATH, guardar_estado_jobs, send_telegram_reminder, send_dynamic_telegram_reminder, execute_agent_task
+import status_bus
 import json
 from datetime import datetime
+import shutil
 
 router = APIRouter(prefix="/api")
 
@@ -125,6 +128,87 @@ async def chat(req: MessageRequest, request: Request):
     response, usage = await agent.process_message(req.message, thread_id=req.thread_id, return_usage=True)
     return {"response": response, "usage": usage}
 
+@router.get("/status/stream")
+async def status_stream(request: Request):
+    """
+    SSE endpoint: emite eventos de estado del agente en tiempo real.
+    El cliente se conecta al enviar un mensaje y recibe actualizaciones
+    hasta que la conexión se cierra.
+    """
+    q = status_bus.subscribe()
+
+    async def event_generator():
+        try:
+            while True:
+                if await request.is_disconnected():
+                    break
+                try:
+                    # Esperar máximo 30 segundos por un nuevo mensaje
+                    message = await asyncio.wait_for(q.get(), timeout=30.0)
+                    # Formato SSE: "data: ...\n\n"
+                    yield f"data: {json.dumps({'status': message})}\n\n"
+                except asyncio.TimeoutError:
+                    # Heartbeat para mantener la conexión viva
+                    yield f"data: {json.dumps({'heartbeat': True})}\n\n"
+        finally:
+            status_bus.unsubscribe(q)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",  # Desactiva buffer en Nginx
+            "Connection": "keep-alive",
+        }
+    )
+
+@router.post("/chat/stream")
+async def chat_stream(req: MessageRequest, request: Request):
+    """
+    SSE endpoint unificado: emite status + tokens de la respuesta en tiempo real.
+    Reemplaza GET /api/status/stream + POST /api/chat para el GUI.
+    
+    Tipos de eventos emitidos:
+      {"type": "status",  "content": "🧠 Supervisor analizando..."}
+      {"type": "token",   "content": "trozo de texto..."}
+      {"type": "done",    "content": "texto completo", "usage": {...}}
+      {"type": "error",   "content": "mensaje de error"}
+    """
+    agent = request.app.state.agent
+    if not agent:
+        async def err_gen():
+            yield f"data: {json.dumps({'type': 'error', 'content': 'Agente no inicializado'})}\n\n"
+        return StreamingResponse(err_gen(), media_type="text/event-stream")
+
+    # Verificar presupuesto mensual
+    from utils.token_tracker import check_budget_exceeded
+    is_exceeded, alert_msg = check_budget_exceeded()
+    if is_exceeded:
+        async def budget_gen():
+            yield f"data: {json.dumps({'type': 'done', 'content': alert_msg, 'usage': {}})}\n\n"
+        return StreamingResponse(budget_gen(), media_type="text/event-stream",
+                                 headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+    async def event_generator():
+        try:
+            async for event in agent.stream_message(req.message, thread_id=req.thread_id):
+                if await request.is_disconnected():
+                    break
+                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive",
+        }
+    )
+
 @router.get("/usage")
 async def get_usage_history():
     """Devuelve el historial de uso de tokens y costos."""
@@ -138,6 +222,22 @@ async def get_usage_history():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error leyendo historial: {e}")
 
+@router.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    """Sube un archivo temporalmente para que el agente pueda leerlo."""
+    try:
+        uploads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        # Limpiar el nombre de archivo básico (reemplazando espacios para no romper rutas locales visualmente en logs)
+        safe_filename = file.filename.replace(" ", "_").replace("/", "-")
+        file_path = os.path.join(uploads_dir, safe_filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        print(f"[Upload] Archivo subido localmente: {file_path}")
+        return {"status": "ok", "filepath": file_path, "filename": file.filename}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/auth/google/status")
 async def google_auth_status():
@@ -209,7 +309,9 @@ async def exchange_google_code(req: GoogleAuthCode):
                 'https://www.googleapis.com/auth/spreadsheets',
                 'https://www.googleapis.com/auth/chat.spaces.readonly',
                 'https://www.googleapis.com/auth/chat.messages.readonly',
-                'https://www.googleapis.com/auth/chat.messages'
+                'https://www.googleapis.com/auth/chat.messages',
+                'https://www.googleapis.com/auth/documents.readonly',
+                'https://www.googleapis.com/auth/drive.readonly'
             ],
             redirect_uri='postmessage'
         )
@@ -304,3 +406,99 @@ async def delete_task(task_id: str):
     except Exception as e:
         # Si no existe APScheduler lanza una excepción
         raise HTTPException(status_code=404, detail=f"No se pudo encontrar o eliminar la tarea: {e}")
+
+# --- MCP MANAGER API ---
+
+import yaml
+MCP_CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mcp_config.yaml")
+
+class McpServerConfig(BaseModel):
+    name: str
+    command: str = "npx"
+    transport: str = "stdio"
+    args: list[str] = []
+    env: dict[str, str] = {}
+
+def load_mcp_config():
+    if not os.path.exists(MCP_CONFIG_PATH):
+        return {"mcp_servers": []}
+    try:
+        with open(MCP_CONFIG_PATH, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+            if "mcp_servers" not in data:
+                data["mcp_servers"] = []
+            return data
+    except yaml.YAMLError:
+        return {"mcp_servers": []}
+
+def save_mcp_config(data):
+    with open(MCP_CONFIG_PATH, "w", encoding="utf-8") as f:
+        yaml.safe_dump(data, f, default_flow_style=False, sort_keys=False)
+
+@router.get("/mcp")
+async def get_mcp_servers():
+    """Devuelve la lista de servidores MCP configurados."""
+    data = load_mcp_config()
+    return data.get("mcp_servers", [])
+
+@router.post("/mcp")
+async def create_mcp_server(server: McpServerConfig, request: Request):
+    """Añade un nuevo servidor MCP al yaml."""
+    data = load_mcp_config()
+    # Evitar duplicados
+    for existing in data.get("mcp_servers", []):
+        if existing["name"] == server.name:
+            raise HTTPException(status_code=400, detail=f"El servidor '{server.name}' ya existe.")
+            
+    data["mcp_servers"].append(server.dict())
+    save_mcp_config(data)
+    
+    # Reload mcp client dynamically on backend
+    agent = request.app.state.agent
+    if agent and hasattr(agent, "mcp_manager"):
+        import asyncio
+        asyncio.create_task(agent.mcp_manager.connect_to_servers())
+    
+    return {"status": "ok", "message": f"Servidor {server.name} agregado exitosamente."}
+
+@router.put("/mcp/{name}")
+async def update_mcp_server(name: str, server: McpServerConfig, request: Request):
+    """Actualiza la configuración de un MCP existente."""
+    data = load_mcp_config()
+    updated = False
+    for i, existing in enumerate(data.get("mcp_servers", [])):
+        if existing["name"] == name:
+            data["mcp_servers"][i] = server.dict()
+            updated = True
+            break
+            
+    if not updated:
+        raise HTTPException(status_code=404, detail="Servidor no encontrado.")
+        
+    save_mcp_config(data)
+    
+    agent = request.app.state.agent
+    if agent and hasattr(agent, "mcp_manager"):
+        import asyncio
+        asyncio.create_task(agent.mcp_manager.connect_to_servers())
+    
+    return {"status": "ok", "message": f"Servidor {name} actualizado."}
+
+@router.delete("/mcp/{name}")
+async def delete_mcp_server(name: str, request: Request):
+    """Elimina permanentemente un servidor MCP del pool."""
+    data = load_mcp_config()
+    initial_length = len(data.get("mcp_servers", []))
+    data["mcp_servers"] = [s for s in data.get("mcp_servers", []) if s["name"] != name]
+    
+    if len(data["mcp_servers"]) == initial_length:
+        raise HTTPException(status_code=404, detail="Servidor no encontrado.")
+        
+    save_mcp_config(data)
+    
+    agent = request.app.state.agent
+    if agent and hasattr(agent, "mcp_manager"):
+        import asyncio
+        asyncio.create_task(agent.mcp_manager.connect_to_servers())
+    
+    return {"status": "ok", "message": f"Servidor {name} eliminado."}

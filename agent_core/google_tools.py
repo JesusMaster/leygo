@@ -307,9 +307,10 @@ def responder_evento_calendario(evento_id: str, respuesta: str) -> str:
         return f"Ocurrió un error al responder la invitación: {error}"
 
 @tool
-def crear_evento_calendario(titulo: str, descripcion: str, fecha_hora_inicio_iso: str, duracion_minutos: int = 60, invitados: list[str] = None) -> str:
+def crear_evento_calendario(titulo: str, descripcion: str, fecha_hora_inicio_iso: str, duracion_minutos: int = 60, invitados: list[str] = None, con_meet: bool = False) -> str:
     """
     Crea un nuevo evento en el Google Calendar primario del usuario y opcionalmente invita a otras personas por email.
+    También puede crear automáticamente una sala de Google Meet para la reunión.
     
     Args:
         titulo: Título o resumen del evento.
@@ -317,14 +318,16 @@ def crear_evento_calendario(titulo: str, descripcion: str, fecha_hora_inicio_iso
         fecha_hora_inicio_iso: La fecha y hora de inicio en formato ISO 8601 (ej: '2026-03-12T10:00:00-03:00').
         duracion_minutos: Duración del evento en minutos.
         invitados: (Opcional) Una lista de strings con los correos electrónicos de los asistentes (ej: ['juan@ejemplo.com', 'pedro@gmail.com']).
+        con_meet: (Opcional) Si es True, genera automáticamente una sala de Google Meet para la reunión.
     Returns:
-        Mensaje de éxito con el enlace al evento generado.
+        Mensaje de éxito con el enlace al evento y, si se solicitó, el link de Google Meet.
     """
     creds = get_google_credentials()
     if not creds:
         return "Error: No se pudo verificar la autorización de Google."
 
     try:
+        import uuid
         service = build('calendar', 'v3', credentials=creds)
         
         start_time = datetime.datetime.fromisoformat(fecha_hora_inicio_iso)
@@ -335,7 +338,7 @@ def crear_evento_calendario(titulo: str, descripcion: str, fecha_hora_inicio_iso
           'description': descripcion,
           'start': {
             'dateTime': start_time.isoformat(),
-            'timeZone': 'UTC', # O la zona horaria extraída, pero ISO ya lo tiene
+            'timeZone': 'UTC',
           },
           'end': {
             'dateTime': end_time.isoformat(),
@@ -346,9 +349,36 @@ def crear_evento_calendario(titulo: str, descripcion: str, fecha_hora_inicio_iso
         if invitados:
             event['attendees'] = [{'email': email.strip()} for email in invitados if email.strip()]
 
-        # sendUpdates='all' envía un correo automático a los invitados
-        event = service.events().insert(calendarId='primary', body=event, sendUpdates='all').execute()
-        return f"Evento creado satisfactoriamente (" + ("con invitados" if invitados else "sin invitados") + f"): {event.get('htmlLink')}"
+        # Agregar Google Meet si se solicitó
+        if con_meet:
+            event['conferenceData'] = {
+                'createRequest': {
+                    'requestId': str(uuid.uuid4()),  # ID único por solicitud
+                    'conferenceSolutionKey': {'type': 'hangoutsMeet'}
+                }
+            }
+
+        # conferenceDataVersion=1 es obligatorio para que Calendar genere el Meet
+        insert_kwargs = {'calendarId': 'primary', 'body': event, 'sendUpdates': 'all'}
+        if con_meet:
+            insert_kwargs['conferenceDataVersion'] = 1
+
+        created_event = service.events().insert(**insert_kwargs).execute()
+        
+        detalle = "con invitados" if invitados else "sin invitados"
+        msg = f"Evento creado satisfactoriamente ({detalle}): {created_event.get('htmlLink')}"
+        
+        # Extraer y devolver el link de Meet si fue generado
+        if con_meet:
+            conf_data = created_event.get('conferenceData', {})
+            entry_points = conf_data.get('entryPoints', [])
+            meet_link = next((ep.get('uri') for ep in entry_points if ep.get('entryPointType') == 'video'), None)
+            if meet_link:
+                msg += f"\n\ud83d� Link de Google Meet: {meet_link}"
+            else:
+                msg += "\n⚠️ Se solicitó Meet pero no se generó el link. Verifica que la cuenta tenga Google Workspace o Gmail con Meet habilitado."
+        
+        return msg
         
     except Exception as error:
         return f"Ocurrió un error al crear el evento: {error}"
@@ -621,3 +651,116 @@ def buscar_chat_directo(email: str) -> str:
                 
     except Exception as error:
         return f"Ocurrió un error general al buscar o crear el chat directo: {error}"
+
+
+# ==========================================================
+# 📄 GOOGLE DRIVE & DOCS TOOLS
+# ==========================================================
+
+@tool
+def leer_google_doc(url_o_id: str) -> str:
+    """
+    Lee y extrae el contenido completo de texto de un Google Doc (Documento de Google).
+    Acepta tanto la URL completa del documento como solo el ID del documento.
+
+    Args:
+        url_o_id: La URL completa del Google Doc (ej: 'https://docs.google.com/document/d/1PqsyZ.../edit')
+                  o directamente el ID del documento (ej: '1PqsyZVise1jBU8B7UPchy-yW4EbKi9-Ssj1wCir_gYo').
+    Returns:
+        El contenido completo del documento en texto plano.
+    """
+    import re as _re
+    creds = get_google_credentials()
+    if not creds:
+        return "Error: No se pudo verificar la autorización de Google. Dile al usuario que revise sus credenciales."
+
+    # Extraer el ID si se pasó una URL completa
+    doc_id = url_o_id.strip()
+    url_match = _re.search(r'/document/d/([a-zA-Z0-9_-]+)', doc_id)
+    if url_match:
+        doc_id = url_match.group(1)
+
+    try:
+        # Usamos Drive API para exportar el Doc como texto plano (más simple y robusto que Docs API)
+        drive_service = build('drive', 'v3', credentials=creds)
+        content = drive_service.files().export(
+            fileId=doc_id,
+            mimeType='text/plain'
+        ).execute()
+
+        texto = content.decode('utf-8') if isinstance(content, bytes) else str(content)
+
+        if not texto.strip():
+            return "El documento está vacío o no tiene contenido de texto."
+
+        # Limitar a ~50k caracteres para no saturar el contexto del LLM
+        if len(texto) > 50000:
+            texto = texto[:50000] + "\n\n...[Documento truncado: demasiado largo para mostrar completo]"
+
+        return f"📄 Contenido del Google Doc (ID: {doc_id}):\n\n{texto}"
+
+    except HttpError as error:
+        if error.resp.status == 404:
+            return f"Error 404: No se encontró el documento con ID '{doc_id}'. Verifica que el ID sea correcto y que tengas acceso."
+        elif error.resp.status == 403:
+            return f"Error 403: No tienes permisos para leer este documento, o la cuenta no está autorizada para acceder a Google Drive."
+        return f"Ocurrió un error de la API al leer el Google Doc: {error}"
+    except Exception as error:
+        return f"Ocurrió un error inesperado al leer el Google Doc: {error}"
+
+
+@tool
+def buscar_archivos_drive(nombre: str, max_resultados: int = 10) -> str:
+    """
+    Busca archivos en Google Drive del usuario por nombre parcial o completo.
+    Útil cuando el usuario no sabe el ID del documento y necesita encontrarlo.
+
+    Args:
+        nombre: Texto o nombre parcial del archivo a buscar (ej: 'contrato', 'informe enero').
+        max_resultados: Máximo de resultados a mostrar (por defecto 10).
+    Returns:
+        Una lista de archivos encontrados con su nombre, tipo e ID.
+    """
+    creds = get_google_credentials()
+    if not creds:
+        return "Error: No se pudo verificar la autorización de Google."
+
+    try:
+        drive_service = build('drive', 'v3', credentials=creds)
+
+        query = f"name contains '{nombre}' and trashed = false"
+        results = drive_service.files().list(
+            q=query,
+            pageSize=max_resultados,
+            fields="files(id, name, mimeType, modifiedTime, webViewLink)"
+        ).execute()
+
+        files = results.get('files', [])
+
+        if not files:
+            return f"No se encontraron archivos con el nombre '{nombre}' en Google Drive."
+
+        tipo_map = {
+            'application/vnd.google-apps.document': '📄 Google Doc',
+            'application/vnd.google-apps.spreadsheet': '📊 Google Sheets',
+            'application/vnd.google-apps.presentation': '📑 Google Slides',
+            'application/vnd.google-apps.folder': '📁 Carpeta',
+            'application/pdf': '📕 PDF',
+        }
+
+        lineas = [f"Archivos encontrados en Google Drive (búsqueda: '{nombre}'):"]
+        for f in files:
+            tipo = tipo_map.get(f.get('mimeType', ''), f.get('mimeType', 'Archivo'))
+            lineas.append(
+                f"- {tipo}: {f['name']}\n"
+                f"  ID: {f['id']}\n"
+                f"  Modificado: {f.get('modifiedTime', 'N/A')}\n"
+                f"  Enlace: {f.get('webViewLink', 'N/A')}"
+            )
+
+        return "\n".join(lineas)
+
+    except HttpError as error:
+        return f"Ocurrió un error al buscar en Google Drive: {error}"
+    except Exception as error:
+        return f"Ocurrió un error inesperado al buscar en Google Drive: {error}"

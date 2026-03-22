@@ -15,7 +15,11 @@ from main import SelfExtendingAgent
 from scheduler_manager import start_scheduler, stop_scheduler
 from utils.audio_utils import transcribir_audio
 from api_endpoints import router as api_router
+from setup_manager import setup_router, check_and_init_setup
 from fastapi.middleware.cors import CORSMiddleware
+
+# Verificar primero si el sistema requiere Setup y crear la llave de activación si aplica
+check_and_init_setup()
 
 agent = SelfExtendingAgent()
 
@@ -27,12 +31,13 @@ env_config = dotenv_values(env_path)
 
 TOKEN = env_config.get("TELEGRAM_TOKEN", "").strip()
 if not TOKEN:
-    print("Error crítico: No se configuró un TELEGRAM_TOKEN en el archivo .env. El bot no puede arrancar.")
-    sys.exit(1)
+    print("\n[!] AVISO: No se configuró un TELEGRAM_TOKEN en el archivo .env.")
+    print("[!] El bot de Telegram no arrancará, pero el servidor GUI continuará en pie para que puedas configurarlo.\n")
+    bot = None
+else:
+    bot = Bot(token=TOKEN)
 
 WEBHOOK_URL = env_config.get("WEBHOOK_URL", "").strip()
-
-bot = Bot(token=TOKEN)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,19 +45,23 @@ async def lifespan(app: FastAPI):
     print("=> Inicializando Cerebro del Agente y Conexiones MCP...")
     await agent.initialize()
     
-    if WEBHOOK_URL:
-        webhook_endpoint = f"{WEBHOOK_URL.rstrip('/')}/webhook"
-        print(f"=> Configurando Webhook en Telegram: {webhook_endpoint}")
-        await bot.set_webhook(url=webhook_endpoint)
+    if bot:
+        if WEBHOOK_URL:
+            webhook_endpoint = f"{WEBHOOK_URL.rstrip('/')}/webhook"
+            print(f"=> Configurando Webhook en Telegram: {webhook_endpoint}")
+            await bot.set_webhook(url=webhook_endpoint)
+        else:
+            print("\\n=======================================================")
+            print("=> ADVERTENCIA: WEBHOOK_URL no está configurado.")
+            print("=> Telegram no sabrá adónde enviar los mensajes.")
+            print("=> Abre tu archivo agent_core/.env y añade la clave WEBHOOK_URL=https://tu-url")
+            print("=======================================================\\n")
+            
+        # Start the async job scheduler and pass the bot instance and agent instance for messaging and tasks
+        start_scheduler(bot_instance=bot, agent_instance=agent)
     else:
-        print("\\n=======================================================")
-        print("=> ADVERTENCIA: WEBHOOK_URL no está configurado.")
-        print("=> Telegram no sabrá adónde enviar los mensajes.")
-        print("=> Abre tu archivo agent_core/.env y añade la clave WEBHOOK_URL=https://tu-url")
-        print("=======================================================\\n")
-        
-    # Start the async job scheduler and pass the bot instance and agent instance for messaging and tasks
-    start_scheduler(bot_instance=bot, agent_instance=agent)
+        print("=> Telegram desactivado. Usa el GUI Onboarding para configurarlo.")
+        start_scheduler(bot_instance=None, agent_instance=agent)
         
     yield
     
@@ -60,10 +69,11 @@ async def lifespan(app: FastAPI):
     print("=> Limpiando conexiones...")
     stop_scheduler()
     await agent.cleanup()
-    try:
-        await bot.delete_webhook()
-    except Exception:
-        pass
+    if bot:
+        try:
+            await bot.delete_webhook()
+        except Exception:
+            pass
 
 app = FastAPI(lifespan=lifespan)
 app.state.agent = agent
@@ -84,6 +94,7 @@ app.add_middleware(
 )
 
 # Montar API para la GUI
+app.include_router(setup_router)
 app.include_router(api_router)
 
 import re

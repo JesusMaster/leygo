@@ -97,6 +97,15 @@ Una de las innovaciones clave es la integración de audio fluida en Telegram:
 * **Causa:** La función `guardar_estado_jobs()` solo se invocaba al crear o eliminar tareas manualmente, nunca después de una ejecución automática de APScheduler.
 * **Solución:** Registro de un **Listener de Eventos APScheduler** (`EVENT_JOB_EXECUTED`) al inicializar el scheduler global. Cada vez que una tarea se ejecuta exitosamente, el listener llama automáticamente a `guardar_estado_jobs()`, manteniendo el JSON siempre sincronizado con el tiempo real de la próxima ejecución.
 
+### N. Bucle Infinito al Crear Tareas Programadas y Ejecución Inmediata
+* **Problema 1 – Ejecución inmediata:** Al crear un job de tipo `interval` sin especificar `start_date`, APScheduler lo ejecutaba inmediatamente al arrancar el scheduler, disparando el recordatorio en el mismo instante de su creación.
+* **Solución 1:** Todos los jobs de tipo `interval` ahora calculan `start_date = datetime.now(TIMEZONE) + timedelta(minutes=intervalo)` antes de llamar a `add_job()`, garantizando que la primera ejecución ocurra después del intervalo completo.
+* **Problema 2 – Bucle infinito al crear tareas:** El agente llamaba la herramienta `crear_recordatorio_solo_texto_para_usuario` (u otras del scheduler) múltiples veces dentro del mismo flujo LangGraph, creando decenas de jobs duplicados y ciclos de LLM interminables que colapsaban el servidor.
+* **Causa raíz:** El Supervisor no reconocía la tarea como completada y seguía re-delegando al assistant, que volvía a llamar la misma herramienta en cada iteración.
+* **Solución 2 – Deduplicación en herramientas:** Antes de cada `scheduler.add_job()`, se consulta `scheduler.get_jobs()` y si ya existe un job con el mismo nombre, se retorna inmediatamente un mensaje de "ya programado" sin crear duplicados.
+* **Solución 3 – `recursion_limit`:** Se añadió `recursion_limit: 12` al config de `graph.astream()` en `process_message()` y `run()`. Esto garantiza que cualquier bucle inesperado se corte después de 12 saltos, en lugar de los 25 permitidos por defecto en LangGraph.
+* **Mínimo de llamadas LLM por tarea con herramienta:** El flujo óptimo es `Supervisor(1) → Worker LLM(1, tool_call) → ToolNode → Worker LLM(2, confirmación) → Supervisor(2, FINISH)` = **4 llamadas LLM mínimas**. Esto es inherente al diseño de LangGraph y no puede reducirse sin rediseñar el grafo a un patrón `interrupt_after`.
+
 
 ## 5. Control de Costos y Uso de Tokens (Token Tracker)
 Para habilitar una visibilidad completa de los gastos de API se introdujo un módulo unificado (`agent_core/utils/token_tracker.py`):
@@ -124,23 +133,107 @@ Se implementó un organizador de tiempo y rutinas totalmente asíncrono utilizan
 * **Respeto al Presupuesto:** Todas las tareas programadas verifican el presupuesto mensual antes de ejecutarse. Si la cuota fue superada, se envía una notificación al usuario y la ejecución se omite sin consumir tokens adicionales.
 * **Sincronización Automática (Event Listener):** Un listener de `EVENT_JOB_EXECUTED` en APScheduler actualiza el archivo JSON automáticamente tras cada ejecución exitosa, manteniendo los tiempos de próxima ejecución (`next_run_time_iso`) siempre al día.
 * **Modelo Liviano para Generación:** Los mensajes de rutinas generativos se producen con `gemini-2.5-flash-lite` (o el valor de `MODEL_SUPERVISOR`), evitando el uso de "reasoning tokens" ocultos que inflan los tokens de salida sin necesidad.
+* **Anti-Duplicados:** Cada herramienta del scheduler verifica mediante `scheduler.get_jobs()` si ya existe un job con el mismo nombre antes de crear uno nuevo. En caso de duplicado, retorna un mensaje confirmando que ya está programado sin volver a encolarlo.
+* **Protección contra Bucles (`recursion_limit`):** El grafo LangGraph tiene un límite de 12 iteraciones (default 25) para cortar cualquier ciclo inesperado antes de consumir tokens excesivos.
 
 ---
 
 ## 7. Estructura de Archivos Clave
-- `agent_core/main.py`: Cerebro orquestador y compilador de grafos.
+- `agent_core/main.py`: Cerebro orquestador y compilador de grafos. Define el pool global de herramientas.
 - `agent_core/mcp_client.py`: Enlace asíncrono robusto con herramientas externas.
 - `agent_core/telegram_bot.py`: Gateway de comunicación con Telegram y webhooks.
 - `agent_core/api_endpoints.py`: Rutas FastAPI para conexión e integración de la Interfaz Web.
 - `agent_core/scheduler_manager.py`: Motor local y asíncrono de recordatorios diarios.
 - `agent_core/utils/token_tracker.py`: Útil universal para imputación de costos LLM.
+- `agent_core/google_tools.py`: Herramientas de Gmail, Google Calendar, Sheets, Chat, Drive y Docs.
+- `agent_core/setup_manager.py`: Lógica de inicialización y onboarding del sistema.
 - `agent_core/sub_agents/dev_agent.py`: Agente de auto-extensión (puede crear otros agentes).
+- `agent_core/sub_agents/file_reader_agent.py`: Agente del sistema para lectura de archivos locales y documentos cloud.
 - `leygo-gui/src/app/`: Estructura principal de la aplicación frontend con Angular.
+
+---
+
+## 8. Gestión de Agentes del Sistema vs. Agentes de Usuario
+Se implementó una distinción clara entre agentes del sistema (protegidos) y agentes creados por el usuario:
+
+### FileReaderAgent como Agente del Sistema
+* **Protección en `auto_coder.py`:** Los agentes del sistema (`file_reader`, `dev`, `assistant`, `supervisor`) están protegidos contra sobreescritura o eliminación por el `AutoCoder` o el `DevAgent`.
+* **Registro frontend:** El array `BASE_AGENTS` en `agents.ts` (Angular) incluye `file_reader`, lo que hace que aparezca en la sección "Agentes del Sistema" de la UI y no tenga botón de eliminar.
+* **Inyección de herramientas cloud:** El `FileReaderAgent` acepta herramientas del pool global mediante `get_tools(all_available_tools)`. Filtra por nombre (`leer_google_doc`, `buscar_archivos_drive`, `leer_hoja_calculo`) para complementar sus capacidades locales con acceso a Google Drive.
+
+### Lección Crítica: El Pool Global de Herramientas
+* **Bug documentado:** Al crear herramientas nuevas en `google_tools.py` e importarlas en `main.py`, no basta con el `import`. Las funciones **deben agregarse explícitamente** al `tools.extend([...])` del método `initialize()` de la clase `LeygoAgent`. De lo contrario, no existen en el pool(`all_available_tools`) que se pasa a los sub-agentes, aunque estén importadas.
+* **Patrón correcto:** `import función` → agregar a `tools.extend([función])` → disponible en `agent.get_tools(all_available_tools)`.
+
+---
+
+## 9. Herramientas de Google Drive y Docs
+Se añadió soporte completo para lectura de documentos cloud en `google_tools.py`:
+
+### `leer_google_doc(url_o_id: str)`
+* Acepta la URL completa (`https://docs.google.com/document/d/ID/...`) o directamente el ID del documento.
+* Extrae el ID automáticamente con regex si se pasa la URL completa.
+* Utiliza la **Drive API** con exportación a `text/plain` (más robusto que la Docs API directa).
+* Trunca a 50.000 caracteres para no saturar el contexto del LLM.
+* Manejo de errores HTTP 404 (doc no encontrado) y 403 (sin permisos).
+
+### `buscar_archivos_drive(nombre: str)`
+* Búsqueda por nombre parcial en Google Drive del usuario (`name contains '...'`).
+* Reconoce tipos: Google Docs 📄, Google Sheets 📊, Google Slides 📑, PDFs 📕, carpetas 📁.
+* Devuelve ID, enlace, tipo MIME y fecha de última modificación.
+
+### Scopes OAuth requeridos (agregados al setup)
+```
+https://www.googleapis.com/auth/documents.readonly
+https://www.googleapis.com/auth/drive.readonly
+```
+Se agregan en `setup_manager.py` (SCOPES) y en `api_endpoints.py` (re-autorización desde Configuration). Si el usuario ya tenía token Google, debe re-autorizar para que los nuevos permisos queden activos.
+
+---
+
+## 10. Mejoras al Setup Wizard (Onboarding)
+
+### Apodo/Nombre de Trato del Usuario
+* **Paso 2:** Se añadió el campo "¿Cómo quieres que te llame la IA?" con prellenado automático del primer nombre registrado en el formulario.
+* **Backend (`PreferencesRequest`):** El modelo Pydantic ahora acepta `preferred_name: str = None`.
+* **`usuario_preferencias.md`:** Si el nombre real difiere del apodo, se almacena la instrucción: _"SIEMPRE debes llamarle o referirte a él/ella exclusivamente como: 'Apodo'"_.
+
+### Selector de Zona Horaria (Paso 3)
+* Reemplaza el campo de texto readonly por un **dropdown custom con buscador integrado**.
+* Pre-selecciona automáticamente la zona horaria detectada por el navegador (`Intl.DateTimeFormat().resolvedOptions().timeZone`).
+* Lista de ~90 zonas horarias IANA organizadas por continente, filtrables en tiempo real.
+* Cierre automático al hacer click fuera del dropdown (`@HostListener('document:click')` + `$event.stopPropagation()` en trigger y panel).
+* **Bug documentado:** Sin `$event.stopPropagation()` en el elemento trigger, el click dispara `toggleTzDropdown()` (abre) y luego el `@HostListener` del documento lo cierra inmediatamente, resultando en un dropdown aparentemente no funcional.
+
+## 11. Streaming en Tiempo Real (Server-Sent Events)
+Se implementó un flujo completo de streaming token por token para brindar retroalimentación instantánea al usuario durante el proceso de pensamiento de la IA, imitando la experiencia de ChatGPT.
+
+### 11.1 Backend: Eventos de LangGraph (`stream_message`)
+* **`astream_events(version="v2")`**: Se reemplazó el consumo básico por un generador asíncrono que inspecciona la ejecución interna del grafo en tiempo real.
+* **Filtros Inteligentes**: El sistema clasifica los eventos y emite un flujo unificado estructurado en 4 tipos (`status`, `token`, `done`, `error`).
+* **Acumulación de Uso Total**: El `token_tracker` ya no solo reporta el costo del último nodo ejecutado, sino que se diseñó un acumulador global (`total_usage`) en el generador que va sumando los tokens y el costo de **todos** los sub-agentes que participan en la tarea, enviando la boleta completa en el evento `done`.
+* **Fix Crítico — Supervisor Directo**: Se detectó que consultas simples ("hola") retornaban vacío porque el Supervisor resolvía sin derivar a un trabajador. Se agregó un *fallback* interceptando el evento `on_chain_end` del nodo `supervisor` para inyectar su texto final en caso de que no haya habido flujo de tokens de los *workers*.
+
+### 11.2 API y Red (`POST /api/chat/stream`)
+* **StreamingResponse**: FastAPI sirve las actualizaciones a través del protocolo nativo SSE (`text/event-stream`). El endpoint desactiva explícitamente el buffer de Nginx (`X-Accel-Buffering: no`) para evitar bloqueos.
+* **Unificación**: Originalmente se intentó usar dos vías (POST para enviar el texto y GET para un `EventSource` pasivo), pero causaba pérdida de sincronía. Se condensó todo en un único conector que recibe el payload inicial y responde manteniendo la conexión abierta.
+
+### 11.3 Frontend: Fetching y Renderizado
+* **Fetch ReadableStream**: Angular abandonó `HttpClient` para esta función a favor de la API web nativa `fetch`, leyendo y decodificando los chunks del flujo de la red (NDJSON/SSE) dinámicamente con `TextDecoder`.
+* **Micro-Interacciones UI**: 
+  1. Se agregó una burbuja preliminar (`statusHistory`) donde salen alertas como *🧠 Supervisor analizando...* o *🔧 Usando herramienta...* (tipo "Thinking" de OpenAI).
+  2. El texto en modo streaming (`streamingText`) cuenta con un cursor simulado de terminal parpadeante (▍).
+* **Fix Crítico — Parseo de Markdown Fraccionado**: Pasar texto a un filtro (Pipe) Markdown (`marked`) mientras está incompleto genera sintaxis rota (ej: un par de asteriscos `**a` que abren y no cierran).
+  * **Solución**: Mientras el evento es `'token'`, el texto se inyecta directamente procesado como String libre, empleando CSS puro (`white-space: pre-wrap;`) para forzar los saltos de línea sin que afecten al HTML general.
+  * Solamente al recibir el evento `'done'`, el texto completo se transfiere al `ChatService` donde finalmente se evalúa por el Pipe de Markdown en todo su esplendor semántico final.
+
+---
 
 ## Próximos Pasos Sugeridos
 * **Agentes de Larga Duración:** Implementar procesos que "duerman" y despierten con eventos externos (webhooks reales).
+* **Re-autorización Google sin Setup completo:** Permitir revocar y volver a autorizar Google Workspace desde la pantalla de Configuration sin tener que reiniciar el setup.
+* **Lectura de Google Slides:** Agregar herramienta `leer_google_slides` similar a `leer_google_doc`.
 * **Consolidación de Identidad:** Refinar la personalidad de Leygo como un asistente omnicanal (Telegram, Chat, CLI).
-* **Multi-modalidad:** Expandir el procesamiento de audio actual a procesamiento de imágenes nativo por sub-agentes.
 * **Alertas Proactivas de Presupuesto:** Enviar notificaciones al usuario cuando el gasto alcance el 80% y 90% del límite mensual configurado.
 * **Límite por Consulta Individual:** Añadir un tope máximo de costo por consulta individual para prevenir operaciones excesivamente costosas.
 * **Endurecimiento del Dev Agent:** Agregar validación automática post-generación (import check) para verificar que los agentes creados dinámicamente son importables antes de guardarlos.
