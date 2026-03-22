@@ -72,12 +72,16 @@ def check_and_init_setup():
             key = secrets.token_urlsafe(32)
             with open(KEY_PATH, "w") as f:
                 f.write(key)
-            print("=====================================================")
-            print("=        SETUP REQUIRED: NEW SYSTEM DETECTED        =")
-            print("=====================================================")
-            print(f" Activation Key: {key}")
-            print(" Provide this key in the GUI to create the Admin.")
-            print("=====================================================\n")
+        else:
+            with open(KEY_PATH, "r") as f:
+                key = f.read().strip()
+                
+        print("=====================================================")
+        print("=        SETUP REQUIRED: NEW SYSTEM DETECTED        =")
+        print("=====================================================")
+        print(f" Activation Key: {key}")
+        print(" Provide this key in the GUI to create the Admin.")
+        print("=====================================================\n")
 
 # --- Pydantic Models for Endpoints ---
 
