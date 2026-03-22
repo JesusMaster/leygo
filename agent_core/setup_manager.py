@@ -1,7 +1,7 @@
 import os
 import json
 import secrets
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from dotenv import set_key
@@ -211,7 +211,7 @@ async def update_env_batch(req: EnvConfigUpdateRequest):
     return {"status": "ok", "message": "Configuración guardada en el backend."}
 
 @setup_router.post("/preferences")
-async def save_preferences(req: PreferencesRequest):
+async def save_preferences(req: PreferencesRequest, request: Request):
     """Guarda las preferencias del usuario (memoria) y marca el setup como completado."""
     apodo_regla = f"\n- Apodo o nombre principal de trato: El usuario indicó que SIEMPRE debes llamarle o referirte a él/ella exclusivamente como: '{req.preferred_name}'" if req.preferred_name else ""
     content = f"# Identidad y Preferencias Maestras\n\n- Nombre real de la cuenta de usuario: {req.user_name}{apodo_regla}\n- Nombre que le diste al agente: {req.agent_name}\n\n## Personalidad y Foco\n{req.agent_personality}\n\n*Nota del sistema: El agente debe internalizar este rol, temperamento y contexto en TODAS las respuestas futuras.*\n"
@@ -229,7 +229,12 @@ async def save_preferences(req: PreferencesRequest):
     status["setup_completed"] = True
     save_status(status)
     
-    return {"status": "ok", "message": "Memorias guardadas. Setup erradicado con éxito."}
+    # Reload Agent dynamically!
+    if hasattr(request.app.state, "agent") and request.app.state.agent is not None:
+        if hasattr(request.app.state.agent, "reload_llm_and_graph"):
+            await request.app.state.agent.reload_llm_and_graph()
+    
+    return {"status": "ok", "message": "Memorias guardadas. Setup erradicado con éxito. Agente en línea."}
 
 class GoogleAuthRequest(BaseModel):
     client_id: str

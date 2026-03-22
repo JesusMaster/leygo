@@ -446,6 +446,33 @@ class SelfExtendingAgent:
                 print(f"=> ERROR: Falló la construcción del grafo: {e}")
                 self.graph = None
 
+    async def reload_llm_and_graph(self):
+        """Refreshes the LLM with new .env keys and rebuilds the LangGraph."""
+        from dotenv import load_dotenv
+        load_dotenv(os.path.join(os.path.dirname(__file__), ".env"), override=True)
+        
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            print("=> Falló la recarga dinámica: GOOGLE_API_KEY sigue vacío.")
+            return
+
+        print("=> Recargando LLM y reconstruyendo Grafo...")
+        try:
+            # Re-inicializar LLM
+            self.llm = ChatGoogleGenerativeAI(model="gemini-3-flash-preview", temperature=0)
+            
+            # Re-enlazar herramientas si existen
+            if hasattr(self, "_all_tools") and self._all_tools:
+                self.llm_with_tools = self.llm.bind_tools(self._all_tools)
+                self.graph = self._build_graph(self._all_tools)
+            else:
+                self.llm_with_tools = self.llm
+                self.graph = self._build_graph([])
+                
+            print("=> Agente recargado exitosamente.")
+        except Exception as e:
+            print(f"=> Error durante la recarga dinámica: {e}")
+
     def _get_sub_agents_snapshot(self) -> frozenset:
         """Devuelve un snapshot de (nombre, mtime) de los archivos en sub_agents/."""
         sub_agents_dir = os.path.join(os.path.dirname(__file__), "sub_agents")
