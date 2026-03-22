@@ -252,11 +252,29 @@ async def google_auth_status():
     pickle_path = os.path.join(keys_dir, "token.pickle")
     workspace_connected = os.path.exists(pickle_path)
     
+    # Extraer el nombre de usuario de las preferencias si existe
+    user_name = "Administrador"
+    import re
+    prefs_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "memoria", "episodica", "usuario_preferencias.md")
+    if workspace_connected and os.path.exists(prefs_path):
+        try:
+            with open(prefs_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            match = re.search(r"- Nombre real de la cuenta de usuario:\s*(.+)", content)
+            if match:
+                user_name = match.group(1).strip()
+        except:
+            pass
+
     return {
-        "authenticated": False,
-        "message": "Listo para SSO" if client_id else "SSO de Google no configurado aún en el backend.",
+        "authenticated": workspace_connected,
+        "message": "SSO de Google Activo" if workspace_connected else "Listo para SSO",
         "clientId": client_id,
-        "workspaceConnected": workspace_connected
+        "workspaceConnected": workspace_connected,
+        "user": {
+            "name": user_name,
+            "email": "Conectado vía backend (token.pickle)"
+        } if workspace_connected else None
     }
 
 @router.delete("/auth/google/revoke")
