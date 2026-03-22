@@ -16,7 +16,7 @@ export class SetupComponent implements OnInit {
   totalSteps = 5;
   loading = false;
   errorMessage = '';
-  backendBaseUrl = `${window.location.protocol}//${window.location.hostname}:2083`;
+  backendBaseUrl = `${window.location.protocol}//${window.location.hostname}:8443`;
 
   // --- MODELOS DE DATOS ---
   // Paso 1

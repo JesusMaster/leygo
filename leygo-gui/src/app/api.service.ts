@@ -27,7 +27,7 @@ export interface ScheduledTask {
 export class ApiService {
   private http = inject(HttpClient);
   private host = window.location.hostname;
-  private baseUrl = `${window.location.protocol}//${this.host}:2083/api`;
+  private baseUrl = `${window.location.protocol}//${this.host}:8443/api`;
 
   getAgents(): Observable<Agent[]> {
     return this.http.get<Agent[]>(`${this.baseUrl}/agents`);
