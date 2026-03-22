@@ -284,8 +284,10 @@ async def google_callback(code: str, state: str = None):
         return HTMLResponse("<html><body>Error crítico: credentials.json no existe en el backend. Cierra y vuelve a intentar.</body></html>")
     
     try:
-        redirect_uri_base = f"http://localhost:8000/api/setup/google-callback"
-        
+        # Leemos el redirect_uri dinámico que guardamos en credentials.json para que haga match 100% exacto
+        with open(CREDENTIALS_PATH, "r") as f:
+            creds_data = json.load(f)
+            redirect_uri_base = creds_data.get("installed", {}).get("redirect_uris", [""])[0]
         # Recuperamos la firma PKCE temporal
         auth_state_path = os.path.join(KEYS_DIR, "auth_state.json")
         saved_state = state
