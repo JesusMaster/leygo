@@ -289,3 +289,92 @@
   font-weight: 500;
   letter-spacing: 0.05em;
 }
+
+/* ── Status Steps (Live Agent Thinking) ───────────────────────── */
+.status-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.status-step {
+  font-size: 12px;
+  color: #9ca3af;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* El último paso (activo) se resalta */
+.status-step.active {
+  color: var(--accent-primary, #0ea5e9);
+  background: rgba(14, 165, 233, 0.08);
+  border-color: rgba(14, 165, 233, 0.3);
+  font-weight: 600;
+  animation: step-pulse 1.5s ease-in-out infinite;
+}
+
+/* Eliminar estilos de párrafo dentro de status-step (viene del markdown pipe) */
+.status-step p {
+  margin: 0;
+  display: inline;
+}
+
+@keyframes step-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+/* Dots pequeños cuando hay pasos visibles */
+.dots-mini {
+  display: flex;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+.dots-mini span {
+  width: 5px;
+  height: 5px;
+  background-color: var(--accent-primary, #0ea5e9);
+  border-radius: 50%;
+  display: inline-block;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dots-mini span:nth-child(1) { animation-delay: -0.32s; }
+.dots-mini span:nth-child(2) { animation-delay: -0.16s; }
+
+/* ── Streaming text (token-by-token response) ─────────────────── */
+.streaming-text {
+  font-size: 15px;
+  color: #1f2937;
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap; /* Respeta saltos de línea en texto plano durante el stream */
+}
+
+.streaming-text p:last-child {
+  display: inline; /* Para que el cursor quede pegado al texto */
+}
+
+/* Cursor parpadeante tipo terminal */
+.cursor-blink {
+  display: inline-block;
+  color: var(--accent-primary, #0ea5e9);
+  font-weight: 300;
+  animation: blink-cursor 0.8s step-end infinite;
+  vertical-align: bottom;
+  margin-left: 1px;
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}

@@ -2,7 +2,7 @@ import { Component, inject, signal, ElementRef, ViewChild, AfterViewInit, OnDest
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
-import { ChatService, Message } from '../../services/chat.service';
+import { ChatService } from '../../services/chat.service';
 import { MarkdownPipe } from '../../pipes/markdown.pipe';
 
 @Component({
@@ -15,65 +15,64 @@ import { MarkdownPipe } from '../../pipes/markdown.pipe';
 export class ChatComponent implements AfterViewInit, OnDestroy {
   private api = inject(ApiService);
   private chatService = inject(ChatService);
-  
-  // Enlazamos directamente el estado local con el global proporcionado por el servicio
+
   messages = this.chatService.messages;
-  
+
   userInput = signal('');
   isTyping = signal(false);
   selectedFile = signal<{name: string, path: string} | null>(null);
-  
+
+  // Estado en tiempo real
+  statusHistory = signal<string[]>([]);
+  // Texto de respuesta que se va construyendo token a token
+  streamingText = signal<string>('');
+
+  private abortController: AbortController | null = null;
+
   userName = 'Admin';
 
   constructor() {
     const user = localStorage.getItem('leygo_user');
-    if (user) {
-      this.userName = user;
-    }
+    if (user) this.userName = user;
   }
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
   private observer?: MutationObserver;
 
   ngAfterViewInit() {
-    this.observer = new MutationObserver(() => {
-      this.scrollToBottom();
-    });
-    
-    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+    this.observer = new MutationObserver(() => this.scrollToBottom());
+    if (this.scrollContainer?.nativeElement) {
       this.observer.observe(this.scrollContainer.nativeElement, {
-        childList: true,
-        subtree: true,
-        characterData: true
+        childList: true, subtree: true, characterData: true
       });
-      // Set initial scroll
       setTimeout(() => this.scrollToBottom(), 100);
     }
   }
 
   ngOnDestroy() {
-    if (this.observer) {
-      this.observer.disconnect();
-    }
+    this.observer?.disconnect();
+    this.abortController?.abort();
+  }
+
+  /** URL base del backend, auto-detectada */
+  private get backendUrl(): string {
+    return window.location.hostname === 'localhost'
+      ? 'http://localhost:8000'
+      : `${window.location.protocol}//${window.location.hostname}`;
   }
 
   async sendMessage() {
     let text = this.userInput().trim();
     const file = this.selectedFile();
-    
-    // Si hay archivo pero no hay texto, dar un texto por defecto
-    if (!text && file) {
-      text = "Analiza este archivo por favor.";
-    }
-    
+
+    if (!text && file) text = 'Analiza este archivo por favor.';
     if (!text && !file) return;
 
-    // Si hay un archivo adjunto, agregar la nota visible para el LLM
-    const finalPrompt = file 
-      ? `[Archivo adjunto: ${file.path}]\n\n${text}` 
+    const finalPrompt = file
+      ? `[Archivo adjunto: ${file.path}]\n\n${text}`
       : text;
 
-    // Agregar mensaje visual sin el path feo para mejor UI al usuario
+    // Agregar mensaje del usuario
     this.chatService.addMessage({
       text: file ? `📎 **${file.name}**\n\n${text}` : text,
       sender: 'user',
@@ -83,32 +82,113 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
     this.userInput.set('');
     this.selectedFile.set(null);
     this.isTyping.set(true);
+    this.statusHistory.set([]);
+    this.streamingText.set('');
 
-    // Llamada a la API con el texto y la ruta del archivo ya incrustados
-    this.api.sendMessage(finalPrompt).subscribe({
-      next: (res) => {
-        this.chatService.addMessage({
-          text: res.response,
-          sender: 'bot',
-          timestamp: new Date(),
-          tokens: res.usage ? res.usage.input_tokens + res.usage.output_tokens : undefined,
-          cost: res.usage ? res.usage.cost_usd : undefined,
-          model: res.usage ? res.usage.model : undefined
-        });
-        this.isTyping.set(false);
-      },
-      error: (err) => {
-        this.chatService.addMessage({
-          text: 'Error al conectar con Leygo. Revisa el backend al puerto 8000.',
-          sender: 'bot',
-          timestamp: new Date()
-        });
+    // Cancelar cualquier stream anterior
+    this.abortController?.abort();
+    this.abortController = new AbortController();
+
+    try {
+      const response = await fetch(`${this.backendUrl}/api/chat/stream`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: finalPrompt, thread_id: 'gui_session' }),
+        signal: this.abortController.signal
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let finalUsage: any = undefined;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? ''; // última línea puede estar incompleta
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const raw = line.slice(6).trim();
+          if (!raw) continue;
+
+          let event: any;
+          try { event = JSON.parse(raw); } catch { continue; }
+
+          if (event.type === 'status') {
+            // Paso de estado — mostrar en la burbuja thinking
+            this.statusHistory.update(h => [...h.slice(-4), event.content]);
+
+          } else if (event.type === 'token') {
+            // Token de respuesta — acumular en streamingText
+            this.streamingText.update(t => t + event.content);
+
+          } else if (event.type === 'done') {
+            // Respuesta completa — agregar como mensaje del bot
+            finalUsage = event.usage;
+            const finalText = event.content || this.streamingText();
+            this.chatService.addMessage({
+              text: finalText,
+              sender: 'bot',
+              timestamp: new Date(),
+              tokens: finalUsage
+                ? (finalUsage.input_tokens ?? 0) + (finalUsage.output_tokens ?? 0)
+                : undefined,
+              cost: finalUsage?.cost_usd,
+              model: finalUsage?.model
+            });
+            this.streamingText.set('');
+            this.statusHistory.set([]);
+            this.isTyping.set(false);
+
+          } else if (event.type === 'error') {
+            this.chatService.addMessage({
+              text: event.content || 'Error desconocido',
+              sender: 'bot',
+              timestamp: new Date()
+            });
+            this.streamingText.set('');
+            this.statusHistory.set([]);
+            this.isTyping.set(false);
+          }
+        }
+      }
+
+      // Por si acaso el stream terminó sin evento "done"
+      if (this.isTyping()) {
+        const remaining = this.streamingText();
+        if (remaining) {
+          this.chatService.addMessage({
+            text: remaining,
+            sender: 'bot',
+            timestamp: new Date()
+          });
+        }
+        this.streamingText.set('');
+        this.statusHistory.set([]);
         this.isTyping.set(false);
       }
-    });
+
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return; // cancelado intencionalmente
+      this.chatService.addMessage({
+        text: 'Error al conectar con Leygo. Revisa el backend.',
+        sender: 'bot',
+        timestamp: new Date()
+      });
+      this.streamingText.set('');
+      this.statusHistory.set([]);
+      this.isTyping.set(false);
+    }
   }
 
-  // File Upload Handlers
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
     if (file) {
@@ -118,28 +198,20 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
           this.selectedFile.set({ name: res.filename, path: res.filepath });
           this.isTyping.set(false);
         },
-        error: (err) => {
-          console.error("Error subiendo archivo", err);
-          this.isTyping.set(false);
-        }
+        error: () => this.isTyping.set(false)
       });
     }
-    // Limpiar input para permitir seleccionar el mismo archivo de nuevo
     event.target.value = '';
   }
 
-  removeFile() {
-    this.selectedFile.set(null);
-  }
+  removeFile() { this.selectedFile.set(null); }
 
-  // Opcionalmente podemos añadir funcionalidad para limpiar
-  clearChat() {
-    this.chatService.clearChat();
-  }
+  clearChat() { this.chatService.clearChat(); }
 
   private scrollToBottom(): void {
     try {
-      this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
-    } catch(err) { }
+      this.scrollContainer.nativeElement.scrollTop =
+        this.scrollContainer.nativeElement.scrollHeight;
+    } catch { }
   }
 }

@@ -7,7 +7,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
           </div>
         }
-        
+
         <div class="message-bubble shadow-sm">
           <div class="message-content" [innerHTML]="msg.text | markdown"></div>
           <div class="message-meta">
@@ -29,13 +29,34 @@
       </div>
     }
 
+    <!-- Burbuja de thinking/streaming en tiempo real -->
     @if (isTyping()) {
       <div class="message-group bot">
         <div class="avatar icon-avatar">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
         </div>
+
         <div class="message-bubble typing shadow-sm">
-          <div class="dots"><span></span><span></span><span></span></div>
+          <!-- Pasos de estado (supervisor routing, tools) -->
+          @if (statusHistory().length > 0) {
+            <div class="status-steps">
+              @for (step of statusHistory(); track step; let last = $last) {
+                <div class="status-step" [class.active]="last && !streamingText()" [innerHTML]="step | markdown"></div>
+              }
+            </div>
+          }
+
+          <!-- Texto fluyendo token a token (sin markdown durante el stream) -->
+          @if (streamingText()) {
+            <div class="streaming-text">{{ streamingText() }}</div>
+            <span class="cursor-blink">▍</span>
+          } @else if (statusHistory().length === 0) {
+            <!-- Dots iniciales antes de cualquier evento -->
+            <div class="dots"><span></span><span></span><span></span></div>
+          } @else {
+            <!-- Dots mientras espera tokens tras ver pasos -->
+            <div class="dots-mini"><span></span><span></span><span></span></div>
+          }
         </div>
       </div>
     }
@@ -52,9 +73,9 @@
       }
       <button class="action-btn" (click)="fileInput.click()"><i class="ph ph-paperclip"></i></button>
       <input type="file" #fileInput hidden (change)="onFileSelected($event)">
-      <input 
-        type="text" 
-        [(ngModel)]="userInput" 
+      <input
+        type="text"
+        [(ngModel)]="userInput"
         (keyup.enter)="sendMessage()"
         placeholder="Ask leygo AI anything..."
       >
