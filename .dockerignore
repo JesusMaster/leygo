@@ -25,5 +25,9 @@ token.json
 # Datos dinámicos y almacenamiento (se recomienda usar Volúmenes de Docker para esto)
 agent_core/memoria/episodica/*.json
 agent_core/memoria/episodica/recordatorios.json
+agent_core/memoria/usage.db
+agent_core/memoria/usage.db-wal
+agent_core/memoria/usage.db-shm
+agent_core/memoria/*.bak
 sandbox/
 *.log

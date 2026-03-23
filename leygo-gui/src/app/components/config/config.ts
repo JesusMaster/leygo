@@ -220,8 +220,12 @@ export class ConfigComponent implements OnInit {
 
   updateVar(key: string, value: string) {
     if (!value) return;
-    this.api.updateConfig(key, value).subscribe(() => {
-      alert(`Variable ${key} actualizada exitosamente.`);
+    this.api.updateConfig(key, value).subscribe((res: any) => {
+      if (res.reinit) {
+        alert(`✅ Variable ${key} actualizada. El agente se re-inicializó automáticamente con los nuevos valores.`);
+      } else {
+        alert(`Variable ${key} actualizada exitosamente.`);
+      }
       this.loadData();
     });
   }

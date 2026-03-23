@@ -92,11 +92,9 @@ async def get_config():
     return config
 
 @router.post("/config")
-async def update_config(req: ConfigUpdateRequest):
+async def update_config(req: ConfigUpdateRequest, request: Request):
     """Actualiza una variable de entorno en el archivo .env."""
     env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-    # Nota: En un entorno real usaríamos una librería más robusta para editar .env
-    # Por ahora lo haremos de forma simple
     lines = []
     found = False
     if os.path.exists(env_path):
@@ -118,12 +116,27 @@ async def update_config(req: ConfigUpdateRequest):
         with open(env_path, "w") as f:
             f.write(f"{req.key}={req.value}\n")
             
-    # Hot-reload inyectando en las variables de entorno actuales python (al vuelo)
+    # Hot-reload: inyectar en os.environ del proceso Python actual
     from dotenv import load_dotenv
     os.environ[req.key] = req.value
     load_dotenv(env_path, override=True)
+    
+    # Si la variable es crítica para el agente (API keys, modelos), re-inicializar
+    CRITICAL_PREFIXES = ("GOOGLE_API_KEY", "GEMINI_API_KEY", "MODEL_", "TZ")
+    needs_reinit = any(req.key.startswith(p) for p in CRITICAL_PREFIXES)
+    
+    if needs_reinit:
+        agent = request.app.state.agent
+        if agent:
+            try:
+                from langchain_google_genai import ChatGoogleGenerativeAI
+                agent.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.2)
+                await agent.initialize()
+                print(f"  [Hot-Reload] Variable crítica '{req.key}' actualizada. Agente re-inicializado.")
+            except Exception as e:
+                print(f"  [Hot-Reload] Advertencia al re-inicializar agente tras cambio de '{req.key}': {e}")
             
-    return {"status": "ok", "message": f"Variable {req.key} actualizada."}
+    return {"status": "ok", "message": f"Variable {req.key} actualizada.", "reinit": needs_reinit}
 
 @router.post("/chat")
 async def chat(req: MessageRequest, request: Request):
@@ -227,15 +240,11 @@ async def chat_stream(req: MessageRequest, request: Request):
     )
 
 @router.get("/usage")
-async def get_usage_history():
-    """Devuelve el historial de uso de tokens y costos."""
-    history_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "memoria", "usage_history.json")
-    if not os.path.exists(history_path):
-        return []
+async def get_usage_history_endpoint():
+    """Devuelve el historial de uso de tokens y costos desde SQLite."""
     try:
-        with open(history_path, "r", encoding="utf-8") as f:
-            history = json.load(f)
-        return history
+        from utils.token_tracker import get_usage_history
+        return get_usage_history(limit=1000)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error leyendo historial: {e}")
 

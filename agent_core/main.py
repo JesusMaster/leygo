@@ -168,10 +168,10 @@ def make_supervisor_node(llm, sub_agents: List[BaseSubAgent], all_tools: list):
     
     # Usar modelo más liviano para routing (el supervisor solo decide a quién derivar)
     import os
-    supervisor_model_name = os.environ.get("MODEL_SUPERVISOR", "gemini-2.5-flash-lite")
+    supervisor_model_name = os.environ.get("MODEL_SUPERVISOR", "gemini-2.5-flash")
     try:
         from langchain_google_genai import ChatGoogleGenerativeAI
-        supervisor_base_llm = ChatGoogleGenerativeAI(model=supervisor_model_name, temperature=0)
+        supervisor_base_llm = ChatGoogleGenerativeAI(model=supervisor_model_name, temperature=0.2)
         print(f"  [Supervisor] Usando modelo liviano para routing: {supervisor_model_name}")
     except Exception as e:
         print(f"  [Supervisor] Fallo al cargar {supervisor_model_name}, usando modelo por defecto: {e}")
@@ -374,7 +374,7 @@ class SelfExtendingAgent:
             
         # Initialize the LLM
         try:
-            self.llm = ChatGoogleGenerativeAI(model="gemini-3-flash-preview", temperature=0)
+            self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.2)
         except Exception as e:
              self.llm = None
              print(f"Warning: Failed to initialize Gemini LLM. Ensure GOOGLE_API_KEY is set. Error: {e}")
@@ -552,8 +552,8 @@ class SelfExtendingAgent:
         print(f"\\nUsuario: {user_input}")
         
         # Provide config for short-term memory continuity
-        # recursion_limit evita bucles infinitos: máx 12 saltos supervisor↔worker
-        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 100}
+        # recursion_limit evita bucles infinitos: máx ~6 ciclos supervisor↔worker
+        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 25}
         
         # State will be appended to the thread automatically
         async for output in self.graph.astream({"messages": [HumanMessage(content=user_input)]}, config=config, stream_mode="updates"):
@@ -596,8 +596,8 @@ class SelfExtendingAgent:
         self._check_and_reload_graph()
             
         print(f"\\n[API] Recibido: {user_input}")
-        # recursion_limit evita bucles infinitos: máx 12 saltos supervisor↔worker
-        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 100}
+        # recursion_limit evita bucles infinitos: máx ~6 ciclos supervisor↔worker
+        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 25}
         final_answer = ""
         usage_record = {}
         try:
@@ -693,7 +693,7 @@ class SelfExtendingAgent:
 
         self._check_and_reload_graph()
 
-        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 100}
+        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 25}
         worker_nodes = getattr(self, "_agent_names", [])
         
         full_response = ""
