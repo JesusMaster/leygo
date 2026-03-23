@@ -4,9 +4,25 @@ from pydantic import BaseModel
 class BaseSubAgent:
     """
     Interface base que todo sub-agente debe implementar para ser descubierto y orquestado 
-    automáticamente por el Agente Supervisor (main.py).
     """
     
+    def __init__(self):
+        self.load_env()
+        pass
+        
+    def load_env(self):
+        """Carga automáticamente las variables de entorno de un archivo .env en la misma carpeta que el agente."""
+        import inspect
+        import os
+        from dotenv import load_dotenv
+        
+        # Obtener el archivo donde está definida la subclase actual
+        module = inspect.getmodule(self.__class__)
+        if module and hasattr(module, '__file__'):
+            env_path = os.path.join(os.path.dirname(os.path.abspath(module.__file__)), '.env')
+            if os.path.exists(env_path):
+                load_dotenv(env_path, override=True)
+
     @property
     def name(self) -> str:
         """Nombre interno del agente (ej. 'dev', 'fitness')."""

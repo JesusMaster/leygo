@@ -58,10 +58,11 @@ def guardar_estado_jobs():
         elif hasattr(job.trigger, 'fields'):
             job_info["type"] = "cron"
             for f in job.trigger.fields:
-                if f.name == 'hour':
-                    job_info["cron_hour"] = str(f)
-                elif f.name == 'minute':
-                    job_info["cron_minute"] = str(f)
+                if f.name == 'hour': job_info["cron_hour"] = str(f)
+                elif f.name == 'minute': job_info["cron_minute"] = str(f)
+                elif f.name == 'day': job_info["cron_day"] = str(f)
+                elif f.name == 'month': job_info["cron_month"] = str(f)
+                elif f.name == 'day_of_week': job_info["cron_day_of_week"] = str(f)
         else:
             job_info["type"] = "date"
 
@@ -113,6 +114,9 @@ def cargar_estado_jobs():
             elif job_type == "cron":
                 hour = job_info.get("cron_hour", "*")
                 minute = job_info.get("cron_minute", "*")
+                day = job_info.get("cron_day", "*")
+                month = job_info.get("cron_month", "*")
+                day_of_week = job_info.get("cron_day_of_week", "*")
                 
                 # Helper to safely parse strings to int if possible
                 def parse_cron_val(v):
@@ -125,6 +129,9 @@ def cargar_estado_jobs():
                         'cron',
                         hour=parse_cron_val(hour),
                         minute=parse_cron_val(minute),
+                        day=parse_cron_val(day),
+                        month=parse_cron_val(month),
+                        day_of_week=parse_cron_val(day_of_week),
                         args=args,
                         name=name,
                         id=job_id

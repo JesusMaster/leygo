@@ -42,9 +42,14 @@
         <span class="model-badge">{{ agent.model || 'Default' }}</span>
       </div>
       @if (!['assistant', 'dev', 'mcp', 'researcher', 'file_reader'].includes(agent.name)) {
-        <button class="delete-btn" (click)="deleteAgent(agent.name)" title="Eliminar agente">
-          <i class="ph ph-trash"></i>
-        </button>
+        <div class="agent-actions">
+          <button class="edit-btn" (click)="editAgent(agent.name)" title="Editar configuración y entorno">
+            <i class="ph ph-pencil-simple"></i>
+          </button>
+          <button class="delete-btn" (click)="deleteAgent(agent.name)" title="Eliminar agente">
+            <i class="ph ph-trash"></i>
+          </button>
+        </div>
       }
     </div>
     
@@ -64,4 +69,41 @@
     </div>
   </div>
 </ng-template>
+
+<!-- Editar Agente Modal -->
+@if (showEditModal()) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content large-modal glass" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Editar Agente: {{ editingAgentName() }}</h3>
+        <button class="close-btn" (click)="closeEditModal()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <p class="info-text">Edita el código fuente, la memoria (prompt) y las variables de entorno locales de este agente.</p>
+        
+        <div class="form-group">
+          <label>Prompt Master (.md)</label>
+          <textarea [(ngModel)]="agentFiles().md_code" class="code-editor" placeholder="Instrucciones principales..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Código Fuente (.py)</label>
+          <textarea [(ngModel)]="agentFiles().python_code" class="code-editor py-editor" placeholder="Código python del agente..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Variables de Entorno (.env local)</label>
+          <textarea [(ngModel)]="agentFiles().env_code" class="code-editor env-editor" placeholder="API_KEY=value&#10;PORT=8080"></textarea>
+          <small>El agente leerá automáticamente estas variables cuando trabaje.</small>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeEditModal()">Cancelar</button>
+        <button class="btn-primary" (click)="saveAgentFiles()">Guardar y Recargar</button>
+      </div>
+    </div>
+  </div>
+}
 

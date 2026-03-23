@@ -14,10 +14,13 @@ export interface ScheduledTask {
   name: string;
   func_name?: string;
   args: any[];
-  type: 'date' | 'interval' | 'cron';
+  type: 'date' | 'interval' | 'cron' | 'cron_expr';
   interval_minutes?: number;
   cron_hour?: string;
   cron_minute?: string;
+  cron_day?: string;
+  cron_month?: string;
+  cron_day_of_week?: string;
   next_run_time_iso?: string;
 }
 
@@ -35,6 +38,14 @@ export class ApiService {
 
   deleteAgent(name: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/agents/${name}`);
+  }
+
+  getAgentFiles(name: string): Observable<{python_code: string, md_code: string, env_code: string}> {
+    return this.http.get<{python_code: string, md_code: string, env_code: string}>(`${this.baseUrl}/agents/${name}`);
+  }
+
+  updateAgentFiles(name: string, data: {python_code?: string, md_code?: string, env_code?: string}): Observable<any> {
+    return this.http.put(`${this.baseUrl}/agents/${name}`, data);
   }
 
   getConfig(): Observable<any> {

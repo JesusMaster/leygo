@@ -86,6 +86,67 @@ async def delete_agent(agent_name: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error borrando agente: {str(e)}")
 
+class AgentUpdateRequest(BaseModel):
+    python_code: str = None
+    md_code: str = None
+    env_code: str = None
+
+@router.get("/agents/{agent_name}")
+async def get_agent_files(agent_name: str):
+    """Obtiene los archivos fuente de un sub-agente (Python, prompt MD, Variables .env)."""
+    agent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sub_agents", agent_name)
+    if not os.path.exists(agent_dir) or not os.path.isdir(agent_dir):
+        raise HTTPException(status_code=404, detail="El sub-agente no existe")
+        
+    py_path = os.path.join(agent_dir, f"{agent_name}_agent.py")
+    md_path = os.path.join(agent_dir, f"{agent_name}_prompt.md")
+    env_path = os.path.join(agent_dir, ".env")
+    
+    def read_safe(path):
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read()
+        return ""
+        
+    return {
+        "python_code": read_safe(py_path),
+        "md_code": read_safe(md_path),
+        "env_code": read_safe(env_path)
+    }
+
+@router.put("/agents/{agent_name}")
+async def update_agent_files(agent_name: str, req: AgentUpdateRequest):
+    """Actualiza y edita los archivos fuente de un sub-agente directamente."""
+    agent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sub_agents", agent_name)
+    if not os.path.exists(agent_dir) or not os.path.isdir(agent_dir):
+        raise HTTPException(status_code=404, detail="El sub-agente no existe o no es una carpeta.")
+        
+    py_path = os.path.join(agent_dir, f"{agent_name}_agent.py")
+    md_path = os.path.join(agent_dir, f"{agent_name}_prompt.md")
+    env_path = os.path.join(agent_dir, ".env")
+    
+    try:
+        if req.python_code is not None:
+            with open(py_path, "w", encoding="utf-8") as f: f.write(req.python_code)
+        if req.md_code is not None:
+            with open(md_path, "w", encoding="utf-8") as f: f.write(req.md_code)
+        if req.env_code is not None:
+            with open(env_path, "w", encoding="utf-8") as f: f.write(req.env_code)
+            
+        import importlib, sys
+        # Forzar un recargo caliente simple del modulo
+        mod_name = f"agent_core.sub_agents.{agent_name}.{agent_name}_agent"
+        if mod_name in sys.modules:
+            importlib.reload(sys.modules[mod_name])
+            
+        # Refrescar listado local
+        from main import discover_sub_agents
+        discover_sub_agents()
+        
+        return {"status": "success", "message": "Agente editado correctamente."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error editando agente: {e}")
+
 @router.get("/config")
 async def get_config():
     """Devuelve las variables de entorno configuradas directamente."""
@@ -457,8 +518,18 @@ async def create_task(req: TaskCreateRequest):
                 args=[req.chat_id, req.message_or_prompt],
                 name=f"Rutina Dia: {req.message_or_prompt[:30]}"
             )
+        elif req.type == "cron_expr":
+            from apscheduler.triggers.cron import CronTrigger
+            func_to_call = execute_agent_task if req.is_agent_action else send_dynamic_telegram_reminder
+            trigger = CronTrigger.from_crontab(req.value)
+            scheduler.add_job(
+                func_to_call,
+                trigger=trigger,
+                args=[req.chat_id, req.message_or_prompt],
+                name=f"Rutina Avanzada: {req.message_or_prompt[:30]}"
+            )
         else:
-            raise HTTPException(status_code=400, detail="Tipo de tarea inválido. Use 'date', 'interval' o 'cron'.")
+            raise HTTPException(status_code=400, detail="Tipo de tarea inválido. Use 'date', 'interval', 'cron' o 'cron_expr'.")
         
         guardar_estado_jobs()
         return {"status": "ok", "message": "Tarea programada correctamente."}

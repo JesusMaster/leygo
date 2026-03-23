@@ -1,11 +1,12 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ApiService, Agent } from '../../api.service';
 
 @Component({
   selector: 'app-agents',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './agents.html',
   styleUrl: './agents.css'
 })
@@ -30,6 +31,49 @@ export class AgentsComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
+    });
+  }
+
+  // Editor modal state
+  showEditModal = signal(false);
+  editingAgentName = signal('');
+  agentFiles = signal({
+    python_code: '',
+    md_code: '',
+    env_code: ''
+  });
+
+  editAgent(agentName: string) {
+    this.editingAgentName.set(agentName);
+    this.api.getAgentFiles(agentName).subscribe({
+      next: (files) => {
+        this.agentFiles.set(files);
+        this.showEditModal.set(true);
+      },
+      error: (err) => {
+        alert('Error al obtener archivos del agente.');
+      }
+    });
+  }
+
+  closeEditModal() {
+    this.showEditModal.set(false);
+    this.editingAgentName.set('');
+  }
+
+  saveAgentFiles() {
+    const name = this.editingAgentName();
+    const data = this.agentFiles();
+    this.api.updateAgentFiles(name, data).subscribe({
+      next: () => {
+        alert('Agente actualizado correctamente. Recarga en caliente aplicada.');
+        this.closeEditModal();
+        this.loadAgents();
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error guardando archivos del agente.');
+      }
     });
   }
 

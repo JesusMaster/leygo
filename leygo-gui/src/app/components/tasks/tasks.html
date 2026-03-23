@@ -54,8 +54,8 @@
                 @if (task.type === 'interval') {
                   Cada {{ task.interval_minutes }} minutos
                 }
-                @if (task.type === 'cron') {
-                  Todos los días a las {{ task.cron_hour | number:'2.0-0' }}:{{ task.cron_minute | number:'2.0-0' }}
+                @if (task.type === 'cron' || task.type === 'cron_expr') {
+                  A las {{ task.cron_hour }}:{{ task.cron_minute }} (Cron: día {{ task.cron_day || '*' }}, mes {{ task.cron_month || '*' }})
                 }
                 @if (task.next_run_time_iso) {
                   • Próxima ejecución: {{ task.next_run_time_iso | date:'medium' }}
@@ -107,15 +107,16 @@
                 <option value="date">Una vez (Fecha)</option>
                 <option value="interval">Recurrente (Minutos)</option>
                 <option value="cron">Diaria (Hora exacta)</option>
+                <option value="cron_expr">Avanzado (Expresión Cron)</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label>{{ newTask.type === 'date' ? 'Fecha y Hora (ISO)' : (newTask.type === 'cron' ? 'Hora Diaria (HH:MM)' : 'Intervalo (Minutos)') }}</label>
+              <label>{{ newTask.type === 'date' ? 'Fecha y Hora (ISO)' : (newTask.type === 'cron' ? 'Hora Diaria (HH:MM)' : (newTask.type === 'cron_expr' ? 'Expresión Cron (Ej: 0 10-18 * * *)' : 'Intervalo (Minutos)')) }}</label>
               <input 
-                [type]="newTask.type === 'date' ? 'datetime-local' : (newTask.type === 'cron' ? 'time' : 'number')" 
+                [type]="newTask.type === 'date' ? 'datetime-local' : (newTask.type === 'cron' ? 'time' : (newTask.type === 'cron_expr' ? 'text' : 'number'))" 
                 [(ngModel)]="newTask.value" 
-                [placeholder]="newTask.type === 'interval' ? 'Ej: 30' : ''"
+                [placeholder]="newTask.type === 'interval' ? 'Ej: 30' : (newTask.type === 'cron_expr' ? '0 10-18 * * *' : '')"
               >
             </div>
           </div>
