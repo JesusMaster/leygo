@@ -276,9 +276,22 @@ export class SetupComponent implements OnInit {
       next: () => {
         this.setupService.savePreferences(this.userName, this.preferredName, this.agentName, this.agentPersonality).subscribe({
           next: () => {
-            this.loading = false;
-            this.cdr.detectChanges();
-            window.location.href = '/chat';
+            // Auto-login silencioso
+            this.setupService.login(this.adminEmail, this.adminPass).subscribe({
+              next: (loginRes) => {
+                localStorage.setItem('leygo_token', loginRes.token);
+                localStorage.setItem('leygo_user', loginRes.username);
+                this.loading = false;
+                this.cdr.detectChanges();
+                this.router.navigate(['/chat']); // Soft navigation
+              },
+              error: () => {
+                // Failsafe
+                this.loading = false;
+                this.cdr.detectChanges();
+                window.location.href = '/login';
+              }
+            });
           },
           error: (err) => {
              this.loading = false;

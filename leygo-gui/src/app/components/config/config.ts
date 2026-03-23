@@ -179,6 +179,29 @@ export class ConfigComponent implements OnInit {
     });
   }
 
+  telegramLoading = false;
+  telegramMsg = '';
+  telegramMsgError = false;
+
+  reloadTelegramBot() {
+    this.telegramLoading = true;
+    this.telegramMsg = '';
+    this.telegramMsgError = false;
+    
+    this.api.reloadTelegram().subscribe({
+      next: (res) => {
+        this.telegramLoading = false;
+        this.telegramMsg = res.message;
+        setTimeout(() => this.telegramMsg = '', 5000);
+      },
+      error: (err) => {
+        this.telegramLoading = false;
+        this.telegramMsgError = true;
+        this.telegramMsg = err.error?.detail || err.message;
+      }
+    });
+  }
+
   updateVar(key: string, value: string) {
     if (!value) return;
     this.api.updateConfig(key, value).subscribe(() => {

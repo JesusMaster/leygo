@@ -256,6 +256,16 @@ async def upload_file(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/config/telegram/reload")
+async def reload_telegram_endpoint():
+    """Fuerza la recarga del webhook de Telegram."""
+    try:
+        from telegram_bot import reload_telegram_bot
+        await reload_telegram_bot()
+        return {"status": "ok", "message": "Se intentó recargar el bot de Telegram. Revisa los logs por posibles errores de DNS."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fallo al recargar: {str(e)}")
+
 @router.get("/auth/google/status")
 async def google_auth_status():
     """Estado conceptual del SSO de Google."""

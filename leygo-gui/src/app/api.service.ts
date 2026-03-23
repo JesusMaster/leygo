@@ -82,4 +82,8 @@ export class ApiService {
   revokeGoogleWorkspace(): Observable<any> {
     return this.http.delete(`${this.baseUrl}/auth/google/revoke`);
   }
+
+  reloadTelegram(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/config/telegram/reload`, {});
+  }
 }

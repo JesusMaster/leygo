@@ -67,6 +67,20 @@
       </div>
     </div>
 
+    <!-- Telegram Card -->
+    <div class="config-card glass highlight" style="border-top: 4px solid #0088cc;">
+      <div class="card-icon" style="color: #0088cc; margin-bottom: 0px;"><i class="ph-fill ph-telegram-logo"></i></div>
+      <h3 style="font-size: 1.35rem; margin-top: -8px; margin-bottom: 4px;">Bot de Telegram</h3>
+      <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Si cambiaste el token, o los servidores de Telegram fallaron en resolver la DNS, presiona este botón para forzar la reconexión.</p>
+      <button class="btn-primary" (click)="reloadTelegramBot()" [disabled]="telegramLoading">
+        <i class="ph ph-arrows-clockwise" [class.spin]="telegramLoading"></i> 
+        {{ telegramLoading ? 'Conectando...' : 'Reconectar Webhook' }}
+      </button>
+      <p *ngIf="telegramMsg" style="margin-top: 10px; font-size: 0.85rem;" [ngStyle]="{'color': telegramMsgError ? '#ef4444' : '#10b981'}">
+        {{ telegramMsg }}
+      </p>
+    </div>
+
     <!-- Env Vars Card -->
     <div class="config-card glass wide" style="padding: 32px;">
       <h3 class="section-main-title"><i class="ph ph-sliders"></i> Variables de Entorno (.env)</h3>
