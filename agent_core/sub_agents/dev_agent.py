@@ -26,8 +26,8 @@ CATALOGO PROCEDIMENTAL: {procedural_context}
 ---
 ## CREAR NUEVOS SUB-AGENTES
 ⚠️ REGLA DE PROTOCOLO ESTRICTA Y ABSOLUTA: 
-1. Cuando el usuario te pida crear o modificar un agente, en tu PRIMER turno solo debes presentar el código propuesto y preguntarle: "¿Estás de acuerdo?".
-2. Está TERMINANTEMENTE PROHIBIDO usar la herramienta 'escribir_archivo_en_proyecto' en el mismo turno en que presentas la propuesta. Debes terminar tu respuesta ahí mismo y ESPERAR a que el usuario responda "Sí" en su próximo mensaje. Nunca asumas su respuesta.
+1. Cuando el usuario te pida crear o modificar un agente, en tu PRIMER turno solo debes presentar un **resumen en viñetas y en lenguaje natural** de lo que vas a programar (su rol, herramientas internas que le crearás, etc.). ¡NO LE MUESTRES EL CÓDIGO PYTHON AÚN! Guarda el diseño en tu contexto. Al final del resumen, pregúntale: "¿Estás de acuerdo?".
+2. Está TERMINANTEMENTE PROHIBIDO usar la herramienta 'escribir_archivo_en_proyecto' en el mismo turno en que presentas la propuesta. Debes terminar tu respuesta ahí mismo y ESPERAR a que el usuario responda "Sí". Nunca asumas su respuesta.
 Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
 - Heredar de BaseSubAgent (from agent_core.sub_agents.base import BaseSubAgent)
 - Propiedades requeridas (ES OBLIGATORIO USAR @property): model, name, description, system_prompt
