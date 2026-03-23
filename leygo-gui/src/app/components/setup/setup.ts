@@ -143,6 +143,19 @@ export class SetupComponent implements OnInit {
       }
       this.cdr.detectChanges();
     });
+
+    window.addEventListener('message', (event) => {
+      if (event.data === 'GOOGLE_AUTH_SUCCESS' && this.currentStep === 4) {
+        this.googleAuthRequested = true;
+        // La vista HTML reaccionará y mostrará "Conectado al Workspace..."
+        this.cdr.detectChanges();
+        
+        setTimeout(() => {
+          this.nextStep(); // avanza automáticamente al 5
+          this.cdr.detectChanges();
+        }, 1500); // Pequeña pausa
+      }
+    });
   }
 
   nextStep() {
