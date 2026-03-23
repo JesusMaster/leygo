@@ -39,21 +39,57 @@ export class AgentsComponent implements OnInit {
   editingAgentName = signal('');
   agentFiles = signal({
     python_code: '',
-    md_code: '',
+    episodic_code: '',
+    procedural_code: '',
+    prefs_code: '',
     env_code: ''
   });
+  
+  envVars = signal<{key: string, value: string}[]>([]);
 
   editAgent(agentName: string) {
     this.editingAgentName.set(agentName);
     this.api.getAgentFiles(agentName).subscribe({
       next: (files) => {
-        this.agentFiles.set(files);
+        this.agentFiles.set({
+          python_code: files.python_code || '',
+          episodic_code: files.episodic_code || '',
+          procedural_code: files.procedural_code || '',
+          prefs_code: files.prefs_code || '',
+          env_code: files.env_code || ''
+        });
+        this.parseEnvCode(files.env_code || '');
         this.showEditModal.set(true);
       },
       error: (err) => {
         alert('Error al obtener archivos del agente.');
       }
     });
+  }
+
+  parseEnvCode(envString: string) {
+    const lines = envString.split('\n');
+    const vars: {key: string, value: string}[] = [];
+    for (const line of lines) {
+      if (line.trim().length === 0 || line.startsWith('#')) continue;
+      const parts = line.split('=');
+      const key = parts[0].trim();
+      const value = parts.slice(1).join('=').trim();
+      if (key) vars.push({ key, value });
+    }
+    this.envVars.set(vars);
+  }
+
+  serializeEnvCode(): string {
+    return this.envVars().map(v => `${v.key}=${v.value}`).join('\n');
+  }
+
+  addEnvVar() {
+    this.envVars.update(vars => [...vars, { key: '', value: '' }]);
+  }
+
+  removeEnvVar(index: number) {
+    this.envVars.update(vars => vars.filter((_, i) => i !== index));
   }
 
   closeEditModal() {
@@ -64,6 +100,8 @@ export class AgentsComponent implements OnInit {
   saveAgentFiles() {
     const name = this.editingAgentName();
     const data = this.agentFiles();
+    data.env_code = this.serializeEnvCode();
+    
     this.api.updateAgentFiles(name, data).subscribe({
       next: () => {
         alert('Agente actualizado correctamente. Recarga en caliente aplicada.');

@@ -30,12 +30,17 @@ CATALOGO PROCEDIMENTAL: {procedural_context}
 2. Está TERMINANTEMENTE PROHIBIDO usar la herramienta 'escribir_archivo_en_proyecto' en el mismo turno en que presentas la propuesta. Debes terminar tu respuesta ahí mismo y ESPERAR a que el usuario responda "Sí". Nunca asumas su respuesta.
 Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
 - Heredar de BaseSubAgent (from agent_core.sub_agents.base import BaseSubAgent)
-- Propiedades requeridas (ES OBLIGATORIO USAR @property): model, name, description, system_prompt
+- Propiedades requeridas (ES OBLIGATORIO USAR @property): model, name, description
 - El metodo get_tools DEBE tener la firma exacta: def get_tools(self, all_available_tools: list = None):
 - model por defecto: "gemini-2.5-flash-lite"
 - name: minusculas, solo a-z ASCII
-- Archivos generados (CSV/JSON) van en: agent_core/sub_agents/<nombre>/files/
-- Para memoria/personalidad usar administrar_memoria_episodica/procedimental, NO modificar .py
+- NO SOBREESCRIBAS system_prompt EN LA CLASE PYTHON. 
+- CUANDO CREES EL AGENTE DEBES OBLIGATORIAMENTE crear TAMBIÉN los siguientes 4 archivos vinculados al agente (usando 'escribir_archivo_en_proyecto' en su misma carpeta: agent_core/sub_agents/<nombre>/):
+  1. memoria_procedimental.md (Su core prompt, manual, e instrucciones maestras)
+  2. memoria_episodica.md (Eventos, conocimiento estático de base)
+  3. usuarios_preferencias.md (Reglas sobre preferencias del usuario)
+  4. .env (Vacío o con keys y puertos placeholders)
+- Archivos de datos extra van en: agent_core/sub_agents/<nombre>/files/
 - Evitar acentos en codigo Python generado
 - Al usar escribir_archivo_en_proyecto, NUNCA escapar comillas con barra invertida
 - Para filtrar herramientas globales usar getattr(t, "name", None), NO t.__name__

@@ -40,11 +40,11 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/agents/${name}`);
   }
 
-  getAgentFiles(name: string): Observable<{python_code: string, md_code: string, env_code: string}> {
-    return this.http.get<{python_code: string, md_code: string, env_code: string}>(`${this.baseUrl}/agents/${name}`);
+  getAgentFiles(name: string): Observable<{python_code: string, episodic_code: string, procedural_code: string, prefs_code: string, env_code: string}> {
+    return this.http.get<{python_code: string, episodic_code: string, procedural_code: string, prefs_code: string, env_code: string}>(`${this.baseUrl}/agents/${name}`);
   }
 
-  updateAgentFiles(name: string, data: {python_code?: string, md_code?: string, env_code?: string}): Observable<any> {
+  updateAgentFiles(name: string, data: {python_code?: string, episodic_code?: string, procedural_code?: string, prefs_code?: string, env_code?: string}): Observable<any> {
     return this.http.put(`${this.baseUrl}/agents/${name}`, data);
   }
 

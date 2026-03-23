@@ -88,18 +88,22 @@ async def delete_agent(agent_name: str):
 
 class AgentUpdateRequest(BaseModel):
     python_code: str = None
-    md_code: str = None
+    episodic_code: str = None
+    procedural_code: str = None
+    prefs_code: str = None
     env_code: str = None
 
 @router.get("/agents/{agent_name}")
 async def get_agent_files(agent_name: str):
-    """Obtiene los archivos fuente de un sub-agente (Python, prompt MD, Variables .env)."""
+    """Obtiene los archivos fuente de un sub-agente (Python, episodic, procedural, prefs, env)."""
     agent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sub_agents", agent_name)
     if not os.path.exists(agent_dir) or not os.path.isdir(agent_dir):
         raise HTTPException(status_code=404, detail="El sub-agente no existe")
         
     py_path = os.path.join(agent_dir, f"{agent_name}_agent.py")
-    md_path = os.path.join(agent_dir, f"{agent_name}_prompt.md")
+    ep_path = os.path.join(agent_dir, "memoria_episodica.md")
+    pr_path = os.path.join(agent_dir, "memoria_procedimental.md")
+    prefs_path = os.path.join(agent_dir, "usuarios_preferencias.md")
     env_path = os.path.join(agent_dir, ".env")
     
     def read_safe(path):
@@ -110,7 +114,9 @@ async def get_agent_files(agent_name: str):
         
     return {
         "python_code": read_safe(py_path),
-        "md_code": read_safe(md_path),
+        "episodic_code": read_safe(ep_path),
+        "procedural_code": read_safe(pr_path),
+        "prefs_code": read_safe(prefs_path),
         "env_code": read_safe(env_path)
     }
 
@@ -122,14 +128,20 @@ async def update_agent_files(agent_name: str, req: AgentUpdateRequest):
         raise HTTPException(status_code=404, detail="El sub-agente no existe o no es una carpeta.")
         
     py_path = os.path.join(agent_dir, f"{agent_name}_agent.py")
-    md_path = os.path.join(agent_dir, f"{agent_name}_prompt.md")
+    ep_path = os.path.join(agent_dir, "memoria_episodica.md")
+    pr_path = os.path.join(agent_dir, "memoria_procedimental.md")
+    prefs_path = os.path.join(agent_dir, "usuarios_preferencias.md")
     env_path = os.path.join(agent_dir, ".env")
     
     try:
         if req.python_code is not None:
             with open(py_path, "w", encoding="utf-8") as f: f.write(req.python_code)
-        if req.md_code is not None:
-            with open(md_path, "w", encoding="utf-8") as f: f.write(req.md_code)
+        if req.episodic_code is not None:
+            with open(ep_path, "w", encoding="utf-8") as f: f.write(req.episodic_code)
+        if req.procedural_code is not None:
+            with open(pr_path, "w", encoding="utf-8") as f: f.write(req.procedural_code)
+        if req.prefs_code is not None:
+            with open(prefs_path, "w", encoding="utf-8") as f: f.write(req.prefs_code)
         if req.env_code is not None:
             with open(env_path, "w", encoding="utf-8") as f: f.write(req.env_code)
             

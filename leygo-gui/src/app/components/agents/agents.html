@@ -80,22 +80,52 @@
       </div>
       
       <div class="modal-body">
-        <p class="info-text">Edita el código fuente, la memoria (prompt) y las variables de entorno locales de este agente.</p>
+        <p class="info-text">Edita el código fuente, la memoria y las variables del entorno locales de este agente.</p>
         
         <div class="form-group">
-          <label>Prompt Master (.md)</label>
-          <textarea [(ngModel)]="agentFiles().md_code" class="code-editor" placeholder="Instrucciones principales..."></textarea>
+          <label>Memoria Procedimental (.md)</label>
+          <textarea [(ngModel)]="agentFiles().procedural_code" class="code-editor" placeholder="Estrategias, reglas de cómo resolver tareas..."></textarea>
+          <small>Guía para el agente sobre el *cómo* debe ejecutar sus funciones.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Memoria Episódica (.md)</label>
+          <textarea [(ngModel)]="agentFiles().episodic_code" class="code-editor" placeholder="Hechos, contexto previo o background..."></textarea>
+          <small>Eventos o contexto estático sobre el que actua (el *qué* sabe).</small>
+        </div>
+
+        <div class="form-group">
+          <label>Preferencias de Usuario (.md)</label>
+          <textarea [(ngModel)]="agentFiles().prefs_code" class="code-editor" placeholder="Reglas personalizadas del humano..."></textarea>
+          <small>Restricciones o preferencias para este agente específico.</small>
         </div>
 
         <div class="form-group">
           <label>Código Fuente (.py)</label>
-          <textarea [(ngModel)]="agentFiles().python_code" class="code-editor py-editor" placeholder="Código python del agente..."></textarea>
+          <div class="python-ide-container">
+            <textarea [(ngModel)]="agentFiles().python_code" class="code-editor py-editor ide-theme" placeholder="Código python del agente..." spellcheck="false"></textarea>
+          </div>
         </div>
 
         <div class="form-group">
           <label>Variables de Entorno (.env local)</label>
-          <textarea [(ngModel)]="agentFiles().env_code" class="code-editor env-editor" placeholder="API_KEY=value&#10;PORT=8080"></textarea>
           <small>El agente leerá automáticamente estas variables cuando trabaje.</small>
+          
+          <div class="env-vars-container">
+            @for (v of envVars(); track $index) {
+              <div class="env-row">
+                <input type="text" [(ngModel)]="v.key" placeholder="CLAVE (ej. API_KEY)" class="env-input key-input">
+                <span class="env-equals">=</span>
+                <input type="text" [(ngModel)]="v.value" placeholder="Valor" class="env-input val-input">
+                <button class="btn-remove-env" (click)="removeEnvVar($index)" title="Eliminar variable">
+                  <i class="ph ph-trash"></i>
+                </button>
+              </div>
+            }
+            <button class="btn-add-env" (click)="addEnvVar()">
+              <i class="ph ph-plus"></i> Añadir Variable
+            </button>
+          </div>
         </div>
       </div>
       

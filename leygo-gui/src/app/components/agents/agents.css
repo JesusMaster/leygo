@@ -305,3 +305,112 @@
 .btn-primary:hover {
   background: var(--accent-hover);
 }
+
+/* IDE Theme for Editor */
+.python-ide-container {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  background: #1e1e1e;
+  padding: 4px;
+}
+
+.ide-theme {
+  background-color: #1e1e1e !important;
+  color: #d4d4d4 !important;
+  border: none !important;
+  border-radius: 4px !important;
+  font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ide-theme:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Env Vars List Styles */
+.env-vars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.env-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+}
+
+.env-input {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: monospace;
+}
+
+.env-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.key-input {
+  flex: 1;
+  max-width: 250px;
+}
+
+.val-input {
+  flex: 2;
+}
+
+.env-equals {
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.btn-remove-env {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-remove-env:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.btn-add-env {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: white;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-env:hover {
+  background: #f8fafc;
+  color: var(--accent-primary);
+  border-color: var(--accent-light);
+}

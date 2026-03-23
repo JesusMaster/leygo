@@ -40,8 +40,47 @@ class BaseSubAgent:
         
     @property
     def system_prompt(self) -> str:
-        """El prompt especializado que dictará el comportamiento de este sub-agente."""
-        raise NotImplementedError
+        """El prompt especializado que dictará el comportamiento de este sub-agente.
+        Por defecto, intenta cargar y combinar 'memoria_episodica.md' y 'memoria_procedimental.md'.
+        """
+        import inspect
+        import os
+        
+        module = inspect.getmodule(self.__class__)
+        if not module or not hasattr(module, '__file__'):
+            return f"Ere el agente {self.name}. Haz tu trabajo lo mejor que puedas."
+            
+        base_dir = os.path.dirname(os.path.abspath(module.__file__))
+        episodic_path = os.path.join(base_dir, "memoria_episodica.md")
+        procedural_path = os.path.join(base_dir, "memoria_procedimental.md")
+        prefs_path = os.path.join(base_dir, "usuarios_preferencias.md")
+        
+        prompt_parts = []
+        
+        if os.path.exists(procedural_path):
+            with open(procedural_path, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+                if content:
+                    prompt_parts.append(f"--- MEMORIA PROCEDIMENTAL (Instrucciones de cómo actuar) ---\n{content}")
+                    
+        if os.path.exists(episodic_path):
+            with open(episodic_path, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+                if content:
+                    prompt_parts.append(f"--- MEMORIA EPISÓDICA (Contexto o Eventos Previos) ---\n{content}")
+
+        if os.path.exists(prefs_path):
+            with open(prefs_path, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+                if content:
+                    prompt_parts.append(f"--- PREFERENCIAS DEL USUARIO ---\n{content}")
+                    
+        if prompt_parts:
+            # Inject identity
+            intro = f"Eres el agente especializado: {self.name}.\nDescripción: {self.description}\n\n"
+            return intro + "\n\n".join(prompt_parts)
+            
+        raise NotImplementedError("Debes sobrescribir system_prompt o proveer archivos de memoria .md")
         
     def get_tools(self, all_available_tools: list) -> List[Callable]:
         """
