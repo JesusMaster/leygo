@@ -174,7 +174,8 @@
 }
 
 .highlight {
-  top: 48px;
+  position: relative;
+  top: 0px;
   height: max-content;
 }
 
