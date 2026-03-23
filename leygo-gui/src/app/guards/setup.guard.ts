@@ -8,8 +8,8 @@ export const setupGuard: CanActivateFn = (route, state) => {
   const setupService = inject(SetupService);
   const router = inject(Router);
 
-  // Excepciones: Si ya estás tratando de ir al setup, te dejo pasar
-  if (state.url === '/setup') {
+  // Excepciones: Si ya estás tratando de ir al setup o login, te dejo pasar
+  if (state.url === '/setup' || state.url === '/login') {
     return true;
   }
 

@@ -43,6 +43,10 @@ export class SetupService {
     return this.http.post<any>(`${this.apiUrl}/login`, { username, password });
   }
 
+  googleLogin(credential: string): Observable<{status: string, token: string, username: string, role: string}> {
+    return this.http.post<any>(`${this.apiUrl}/google-login`, { credential });
+  }
+
   logout() {
     localStorage.removeItem('leygo_token');
     localStorage.removeItem('leygo_user');

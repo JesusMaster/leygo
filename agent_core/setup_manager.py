@@ -103,11 +103,138 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
+class GoogleLoginRequest(BaseModel):
+    credential: str  # Google ID Token (JWT)
+
 # --- Endpoints ---
 
 @setup_router.get("/status")
 async def setup_status():
     return get_status()
+
+@setup_router.post("/google-login")
+async def google_login(req: GoogleLoginRequest):
+    """
+    Autentica un usuario usando Google SSO (ID Token).
+    Verifica el token con Google, y si es válido, genera un JWT local.
+    Auto-registra al usuario si es la primera vez que inicia sesión.
+    """
+    import requests as http_requests
+    
+    # Verificar el token con Google
+    try:
+        # Decodificamos el JWT de Google para extraer info básica
+        import base64
+        parts = req.credential.split(".")
+        if len(parts) != 3:
+            raise HTTPException(status_code=401, detail="Token de Google inválido.")
+        
+        # Decodificar el payload (parte 2 del JWT)
+        payload_b64 = parts[1] + "=" * (4 - len(parts[1]) % 4)  # Padding
+        payload = json.loads(base64.urlsafe_b64decode(payload_b64))
+        
+        email = payload.get("email", "")
+        name = payload.get("name", "")
+        email_verified = payload.get("email_verified", False)
+        
+        if not email or not email_verified:
+            raise HTTPException(status_code=401, detail="El email de Google no está verificado.")
+        
+        # Verificar que el token sea válido consultando el endpoint de Google
+        verify_response = http_requests.get(
+            f"https://oauth2.googleapis.com/tokeninfo?id_token={req.credential}",
+            timeout=10
+        )
+        
+        if verify_response.status_code != 200:
+            raise HTTPException(status_code=401, detail="Token de Google rechazado por el servidor de verificación.")
+        
+        verified_data = verify_response.json()
+        
+        # Verificar que el Client ID coincida con el nuestro
+        from dotenv import dotenv_values
+        config = dotenv_values(ENV_PATH)
+        expected_client_id = config.get("GOOGLE_CLIENT_ID", "")
+        
+        if expected_client_id and verified_data.get("aud") != expected_client_id:
+            raise HTTPException(status_code=401, detail="El token no corresponde a esta aplicación.")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Error verificando token de Google: {str(e)}")
+    
+    users = []
+    if os.path.exists(USERS_PATH):
+        with open(USERS_PATH, "r") as f:
+            content = f.read().strip()
+            if content:
+                users = json.loads(content)
+    
+    user_exists = any(u["username"] == email for u in users)
+    
+    # 2. Evaluar si el usuario actual coincide con el dueño de token.pickle
+    owner_email = None
+    if os.path.exists(TOKEN_PATH):
+        import pickle
+        try:
+            with open(TOKEN_PATH, 'rb') as f:
+                creds = pickle.load(f)
+            
+            from google.auth.transport.requests import Request
+            # Refrescar si expiró
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+                with open(TOKEN_PATH, 'wb') as t:
+                    pickle.dump(creds, t)
+            
+            # Consultar profile info
+            if creds and creds.valid:
+                res = http_requests.get("https://www.googleapis.com/oauth2/v2/userinfo", 
+                                        headers={"Authorization": f"Bearer {creds.token}"}, 
+                                        timeout=5)
+                if res.status_code == 200:
+                    owner_email = res.json().get("email")
+        except Exception as e:
+            print(f"Error comprobando owner de token.pickle para el login protegido: {e}")
+            
+    is_owner = (owner_email and email.lower() == owner_email.lower())
+    is_first_user = (len(users) == 0)
+    
+    # REGLA ESTRICTA:
+    # Solo puede iniciar sesión el usuario si:
+    # 1. Ya estaba registrado en users.json
+    # 2. Es el dueño exacto de la cuenta vinculada en el token.pickle de Google
+    # 3. Es el absoluto PRIMER usuario en la historia del sistema (para inicializar el admin)
+    
+    if not (user_exists or is_owner or is_first_user):
+        raise HTTPException(status_code=403, detail="Acceso denegado. Esta cuenta no coincide con el Administrador registrado ni con las credenciales del servidor.")
+    
+    # 3. Si no existe pero pasó la validación, lo registramos automáticamente (ej. is_owner o is_first_user)
+    if not user_exists:
+        users.append({
+            "username": email,
+            "password": "",  # Sin password (SSO only)
+            "role": "admin",
+            "auth_method": "google_sso",
+            "display_name": name
+        })
+        with open(USERS_PATH, "w") as f:
+            json.dump(users, f, indent=4)
+        
+        # Marcar setup como completado si es el primer usuario
+        status = get_status()
+        if not status.get("admin_created"):
+            status["admin_created"] = True
+            status["setup_completed"] = True
+            save_status(status)
+    
+    # Generar JWT local
+    expire = datetime.utcnow() + timedelta(days=7)
+    token_data = {"sub": email, "role": "admin", "name": name, "exp": expire}
+    token = jwt.encode(token_data, JWT_SECRET, algorithm="HS256")
+    
+    return {"status": "ok", "token": token, "username": email, "role": "admin"}
 
 @setup_router.post("/validate-key")
 async def validate_key(req: ValidateKeyRequest):
