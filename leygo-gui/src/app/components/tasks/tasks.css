@@ -106,6 +106,86 @@
   background-color: #fee2e2;
 }
 
+.task-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-edit {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.btn-edit:hover {
+  background-color: #dbeafe;
+}
+
+.task-instruction {
+  margin-bottom: 8px;
+}
+
+.instruction-text {
+  font-size: 12px;
+  color: #4b5563;
+  background: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-style: italic;
+  display: inline-block;
+  line-height: 1.4;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.edit-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #3b82f6;
+  border-radius: 8px;
+  font-size: 12px;
+  resize: vertical;
+  font-family: inherit;
+  margin-bottom: 8px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-actions .btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.edit-actions .btn-save {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.edit-actions .btn-cancel {
+  background: white;
+  border: 1px solid #d1d5db;
+  color: #4b5563;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 .empty-state {
   text-align: center;
   padding: 80px 40px;

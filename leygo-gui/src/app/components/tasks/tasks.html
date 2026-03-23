@@ -37,6 +37,19 @@
                 </span>
               </div>
               <h3>{{ task.name }}</h3>
+              
+              <div class="task-instruction">
+                @if (editingTaskId() === task.id) {
+                  <textarea [(ngModel)]="editingTaskValue" class="edit-textarea" rows="2"></textarea>
+                  <div class="edit-actions">
+                    <button class="btn-cancel" (click)="cancelEditing()">Cancelar</button>
+                    <button class="btn-save" (click)="saveTaskEdit(task.id)">Guardar</button>
+                  </div>
+                } @else {
+                  <p class="instruction-text">{{ task.args && task.args.length > 1 ? task.args[1] : 'Sin instrucción' }}</p>
+                }
+              </div>
+
               <p class="task-meta">
                 @if (task.type === 'interval') {
                   Cada {{ task.interval_minutes }} minutos
@@ -50,7 +63,12 @@
               </p>
             </div>
             <div class="task-actions">
-              <button class="btn-delete" (click)="deleteTask(task.id)">
+              @if (editingTaskId() !== task.id) {
+                <button class="btn-edit" (click)="startEditing(task)" title="Editar Instrucción">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                </button>
+              }
+              <button class="btn-delete" (click)="deleteTask(task.id)" title="Eliminar Tarea">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
               </button>
             </div>

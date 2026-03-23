@@ -75,6 +75,10 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/tasks/${taskId}`);
   }
 
+  updateTask(taskId: string, message_or_prompt: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/tasks/${taskId}`, { message_or_prompt });
+  }
+
   exchangeGoogleCode(code: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/google/exchange`, { code });
   }

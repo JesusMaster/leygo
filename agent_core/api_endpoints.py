@@ -32,6 +32,9 @@ class TaskCreateRequest(BaseModel):
     chat_id: str = "default_session"
     is_agent_action: bool = False
 
+class TaskUpdateRequest(BaseModel):
+    message_or_prompt: str
+
 @router.get("/agents")
 async def get_agents():
     """Devuelve la lista de agentes y sus herramientas."""
@@ -472,6 +475,38 @@ async def delete_task(task_id: str):
     except Exception as e:
         # Si no existe APScheduler lanza una excepción
         raise HTTPException(status_code=404, detail=f"No se pudo encontrar o eliminar la tarea: {e}")
+
+@router.put("/tasks/{task_id}")
+async def update_task_instruction(task_id: str, req: TaskUpdateRequest):
+    """Actualiza la instrucción (argumento) de una tarea programada y su nombre."""
+    try:
+        job = scheduler.get_job(task_id)
+        if not job:
+            raise HTTPException(status_code=404, detail="Tarea no encontrada")
+        
+        old_args = list(job.args)
+        if len(old_args) >= 2:
+            old_args[1] = req.message_or_prompt
+            
+            # Reflejar parte del texto en el nombre también
+            is_agent = job.func.__name__ == 'execute_agent_task'
+            prefix = "Rutina"
+            if job.trigger.__class__.__name__ == 'CronTrigger':
+                prefix = "Rutina Dia"
+            if not is_agent:
+                prefix = "Aviso"
+            
+            new_name = req.message_or_prompt[:50] if type(job.trigger).__name__ == 'DateTrigger' else f"{prefix}: {req.message_or_prompt[:30]}"
+            
+            scheduler.modify_job(task_id, args=tuple(old_args), name=new_name)
+            guardar_estado_jobs()
+            return {"status": "ok", "message": "Tarea actualizada correctamente."}
+        else:
+            raise HTTPException(status_code=400, detail="El formato de la tarea no es compatible para la edición.")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error actualizando tarea: {e}")
 
 # --- MCP MANAGER API ---
 

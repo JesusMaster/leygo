@@ -47,6 +47,31 @@ export class TasksComponent implements OnInit {
     }
   }
 
+  editingTaskId = signal<string | null>(null);
+  editingTaskValue = signal<string>('');
+
+  startEditing(task: ScheduledTask) {
+    this.editingTaskId.set(task.id);
+    this.editingTaskValue.set(task.args[1] || ''); // args[1] is the message_or_prompt
+  }
+
+  cancelEditing() {
+    this.editingTaskId.set(null);
+    this.editingTaskValue.set('');
+  }
+
+  saveTaskEdit(taskId: string) {
+    const newVal = this.editingTaskValue();
+    if (!newVal.trim()) return;
+    
+    this.api.updateTask(taskId, newVal).subscribe({
+      next: () => {
+        this.cancelEditing();
+        this.loadTasks();
+      }
+    });
+  }
+
   addTask() {
     if (!this.newTask.message_or_prompt || !this.newTask.value) return;
 
