@@ -1,6 +1,7 @@
 mcp_servers:
   - name: "mcp-remote"
     command: "npx"
-    args: ["mcp-remote"]
-    env: {}
+    args: ["-y", "mcp-remote@latest", "https://yourMCPurl/sse", "--header", "Autorization:${YOUR_TOKEN}"]
+    env: 
+      YOUR_TOKEN: "yourToken"
     

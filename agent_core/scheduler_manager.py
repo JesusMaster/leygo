@@ -219,7 +219,7 @@ async def send_dynamic_telegram_reminder(chat_id: str, prompt_instruccion: str):
 
     # Autogenerate text with Gemini
     try:
-        model_name = os.getenv("MODEL_SUPERVISOR", "gemini-2.5-flash-lite")
+        model_name = os.getenv("MODEL_TASK", "gemini-2.5-flash-lite")
         mini_llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.7)
         response = await mini_llm.ainvoke(
             [HumanMessage(content=f"Genera un mensaje corto directo y amigable cumpliendo esta instrucción: '{prompt_instruccion}'. No repitas lo mismo de siempre, sé creativo. IMPORTANTE: Devuelve ÚNICAMENTE el mensaje, sin saludos iniciales, sin afirmaciones previas como 'Claro, aquí tienes', ni texto conversacional extra.")]

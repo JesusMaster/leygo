@@ -492,7 +492,7 @@ async def create_mcp_server(server: McpServerConfig, request: Request):
     agent = request.app.state.agent
     if agent and hasattr(agent, "mcp_manager"):
         import asyncio
-        asyncio.create_task(agent.mcp_manager.connect_to_servers())
+        asyncio.create_task(agent.mcp_manager.connect_all())
     
     return {"status": "ok", "message": f"Servidor {server.name} agregado exitosamente."}
 
@@ -515,7 +515,7 @@ async def update_mcp_server(name: str, server: McpServerConfig, request: Request
     agent = request.app.state.agent
     if agent and hasattr(agent, "mcp_manager"):
         import asyncio
-        asyncio.create_task(agent.mcp_manager.connect_to_servers())
+        asyncio.create_task(agent.mcp_manager.connect_all())
     
     return {"status": "ok", "message": f"Servidor {name} actualizado."}
 
@@ -534,6 +534,6 @@ async def delete_mcp_server(name: str, request: Request):
     agent = request.app.state.agent
     if agent and hasattr(agent, "mcp_manager"):
         import asyncio
-        asyncio.create_task(agent.mcp_manager.connect_to_servers())
+        asyncio.create_task(agent.mcp_manager.connect_all())
     
     return {"status": "ok", "message": f"Servidor {name} eliminado."}
