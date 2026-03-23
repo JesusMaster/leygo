@@ -214,9 +214,8 @@ Tu trabajo es analizar la petición del usuario, leer SIEMPRE TODO EL HISTORIAL 
 REGLAS ESTRICTAS PARA EVITAR BUCLES:
 1. DELEGACIÓN INICIAL: Delega tareas al sub-agente correcto según sus herramientas (ej. 'assistant' para agendar/emails, 'mcp' para repositorios/datos, 'youtube' para videos).
 2. VERIFICA EL ÚLTIMO MENSAJE: Si el último AIMessage de un sub-agente en el historial indica que YA ATENDIÓ la solicitud del usuario (ej. dice "Ok, agendado", "Acá está el resumen", "Te lo recordaré", etc.), entonces **LA TAREA HA FINALIZADO**.
-3. FINISH (¡MUY IMPORTANTE!): SI LA TAREA FUE COMPLETADA por el agente previo, **DEBES usar `next_node`='FINISH'** obligatoriamente y DEJAR EL CAMPO `respuesta_conversacional` VACÍO. 
-4. NUNCA DELEGUES LA MISMA TAREA 2 VECES SEGUIDAS AL MISMO AGENTE si este acaba de responder. Si lo haces, crearás un bucle infinito y romperás el sistema.
-5. SÓLO usa el campo `respuesta_conversacional` si TÚ directamente vas a responder algo sencillo (saludos informales) y el 'next_node' es 'FINISH'.
+3. FINISH (¡MUY IMPORTANTE!): SI LA TAREA FUE COMPLETADA por el agente previo o requiere tu respuesta final al usuario, DEBES usar `next_node`='FINISH' y proporcionar siempre un resumen o la respuesta completa al usuario en el campo `respuesta_conversacional`. NO lo dejes vacío si el agente worker ya respondió; en ese caso, repite o resume su logro. 
+4. NUNCA DELEGUES LA MISMA TAREA 2 VECES SEGUIDAS al mismo agente si este acaba de responder algo sustancial.
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
@@ -719,23 +718,10 @@ class SelfExtendingAgent:
                 # ── 1. Stream de tokens del LLM ──────────────────────────────────
                 if kind == "on_chat_model_stream":
                     # Solo emitir tokens de nodos worker (no supervisor, no tool nodes)
-                    if node_name in worker_nodes:
-                        chunk = event.get("data", {}).get("chunk")
-                        if chunk:
-                            content = chunk.content
-                            # content puede ser str o lista de dicts (Gemini)
-                            if isinstance(content, str) and content:
-                                last_streaming_node = node_name
-                                full_response += content
-                                yield {"type": "token", "content": content, "node": node_name}
-                            elif isinstance(content, list):
-                                for part in content:
-                                    if isinstance(part, dict) and part.get("type") == "text":
-                                        text = part.get("text", "")
-                                        if text:
-                                            last_streaming_node = node_name
-                                            full_response += text
-                                            yield {"type": "token", "content": text, "node": node_name}
+                            # No emitimos tokens de workers en tiempo real (según solicitud usuario)
+                            # para que solo se vea el resultado final cuando el flujo termine.
+                            # full_response += text    <- No lo sumamos para evitar duplicados en 'done'
+                            pass
 
                 # ── 2. Inicio de un nodo → publicar status ───────────────────────
                 elif kind == "on_chain_start" and node_name:
@@ -765,6 +751,15 @@ class SelfExtendingAgent:
                                     raw = "".join(p.get("text", "") for p in raw if isinstance(p, dict) and p.get("type") == "text")
                                 if raw and isinstance(raw, str):
                                     supervisor_fallback = raw.strip()
+
+                    # Caso especial: Capturar 'respuesta_conversacional' de la herramienta 'Route'
+                    from langchain_core.messages import AIMessage
+                    if isinstance(output, AIMessage) and output.tool_calls:
+                        for tc in output.tool_calls:
+                            if tc.get("name") == "Route":
+                                args = tc.get("args", {})
+                                if args.get("next_node", "").lower() in ("finish", "end"):
+                                    supervisor_fallback = args.get("respuesta_conversacional", "").strip()
 
                 # ── 4. Fin del LLM call → capturar usage ────────────────────────
                 elif kind == "on_chat_model_end":
