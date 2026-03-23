@@ -22,6 +22,13 @@ class MCPClientManager:
         self._stop_events: List[asyncio.Event] = []
         self._tools_cache: dict = {}
 
+    async def reload_all(self, new_config: dict = None):
+        """Closes all connections and reconnects using the new configuration."""
+        if new_config is not None:
+            self.config = new_config
+        await self.close()
+        await self.connect_all()
+
     async def connect_all(self):
         servers = self.config.get("mcp_servers", [])
         if not servers:
