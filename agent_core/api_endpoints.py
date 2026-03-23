@@ -538,7 +538,8 @@ async def create_mcp_server(server: McpServerConfig, request: Request):
     if agent and hasattr(agent, "mcp_manager"):
         import asyncio
         async def reinit():
-            await agent.mcp_manager.reload_all(new_config=data)
+            agent.mcp_manager.config = data
+            await agent.mcp_manager.close()
             await agent.initialize()
         asyncio.create_task(reinit())
     
@@ -564,7 +565,8 @@ async def update_mcp_server(name: str, server: McpServerConfig, request: Request
     if agent and hasattr(agent, "mcp_manager"):
         import asyncio
         async def reinit():
-            await agent.mcp_manager.reload_all(new_config=data)
+            agent.mcp_manager.config = data
+            await agent.mcp_manager.close()
             await agent.initialize()
         asyncio.create_task(reinit())
     
@@ -586,7 +588,8 @@ async def delete_mcp_server(name: str, request: Request):
     if agent and hasattr(agent, "mcp_manager"):
         import asyncio
         async def reinit():
-            await agent.mcp_manager.reload_all(new_config=data)
+            agent.mcp_manager.config = data
+            await agent.mcp_manager.close()
             await agent.initialize()
         asyncio.create_task(reinit())
     
