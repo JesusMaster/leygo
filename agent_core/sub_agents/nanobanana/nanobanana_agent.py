@@ -16,10 +16,6 @@ class NanobananaAgent(BaseSubAgent):
         return "Agente especializado en generar imágenes a partir de ideas o prompts usando el modelo gemini-3-pro-image-preview."
 
     @property
-    def system_prompt(self) -> str:
-        return "Eres Nanobanana, un experto en crear prompts visuales y generar imágenes. Recibes ideas del usuario, las optimizas y usas tu herramienta para generar la imagen. IMPORTANTE: La herramienta ahora devuelve una URL pública de la imagen. SIEMPRE muéstrala al usuario usando formato Markdown para imágenes: ![Descripción](URL_PUBLICA) para que la interfaz la renderice correctamente."
-
-    @property
     def model(self) -> str:
         return "gemini-3-pro-image-preview"
 

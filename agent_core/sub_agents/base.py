@@ -51,9 +51,9 @@ class BaseSubAgent:
             return f"Ere el agente {self.name}. Haz tu trabajo lo mejor que puedas."
             
         base_dir = os.path.dirname(os.path.abspath(module.__file__))
-        episodic_path = os.path.join(base_dir, "memoria_episodica.md")
-        procedural_path = os.path.join(base_dir, "memoria_procedimental.md")
-        prefs_path = os.path.join(base_dir, "usuarios_preferencias.md")
+        episodic_path = os.path.join(base_dir, "memoria", "memoria_episodica.md")
+        procedural_path = os.path.join(base_dir, "memoria", "memoria_procedimental.md")
+        prefs_path = os.path.join(base_dir, "memoria", "usuarios_preferencias.md")
         
         prompt_parts = []
         

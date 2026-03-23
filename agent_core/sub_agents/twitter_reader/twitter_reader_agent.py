@@ -15,10 +15,6 @@ class TwitterReaderAgent(BaseSubAgent):
     def model(self):
         return "gemini-2.5-flash-lite"
 
-    @property
-    def system_prompt(self):
-        return "Eres un agente especializado en extraer y resumir informacion de Twitter (X). Utiliza tu herramienta para leer el contenido de los tweets a partir de su URL o ID. Presenta la informacion de forma clara, incluyendo el autor, la fecha y el contenido del tweet."
-
     def get_tools(self, all_available_tools: list = None):
         def leer_tweet_gratis(url_o_id: str) -> str:
             """

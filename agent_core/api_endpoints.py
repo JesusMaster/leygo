@@ -101,9 +101,10 @@ async def get_agent_files(agent_name: str):
         raise HTTPException(status_code=404, detail="El sub-agente no existe")
         
     py_path = os.path.join(agent_dir, f"{agent_name}_agent.py")
-    ep_path = os.path.join(agent_dir, "memoria_episodica.md")
-    pr_path = os.path.join(agent_dir, "memoria_procedimental.md")
-    prefs_path = os.path.join(agent_dir, "usuarios_preferencias.md")
+    mem_dir = os.path.join(agent_dir, "memoria")
+    ep_path = os.path.join(mem_dir, "memoria_episodica.md")
+    pr_path = os.path.join(mem_dir, "memoria_procedimental.md")
+    prefs_path = os.path.join(mem_dir, "usuarios_preferencias.md")
     env_path = os.path.join(agent_dir, ".env")
     
     def read_safe(path):
@@ -128,12 +129,14 @@ async def update_agent_files(agent_name: str, req: AgentUpdateRequest):
         raise HTTPException(status_code=404, detail="El sub-agente no existe o no es una carpeta.")
         
     py_path = os.path.join(agent_dir, f"{agent_name}_agent.py")
-    ep_path = os.path.join(agent_dir, "memoria_episodica.md")
-    pr_path = os.path.join(agent_dir, "memoria_procedimental.md")
-    prefs_path = os.path.join(agent_dir, "usuarios_preferencias.md")
+    mem_dir = os.path.join(agent_dir, "memoria")
+    ep_path = os.path.join(mem_dir, "memoria_episodica.md")
+    pr_path = os.path.join(mem_dir, "memoria_procedimental.md")
+    prefs_path = os.path.join(mem_dir, "usuarios_preferencias.md")
     env_path = os.path.join(agent_dir, ".env")
     
     try:
+        os.makedirs(mem_dir, exist_ok=True)
         if req.python_code is not None:
             with open(py_path, "w", encoding="utf-8") as f: f.write(req.python_code)
         if req.episodic_code is not None:

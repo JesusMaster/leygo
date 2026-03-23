@@ -35,11 +35,12 @@ Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
 - model por defecto: "gemini-2.5-flash-lite"
 - name: minusculas, solo a-z ASCII
 - NO SOBREESCRIBAS system_prompt EN LA CLASE PYTHON. 
-- CUANDO CREES EL AGENTE DEBES OBLIGATORIAMENTE crear TAMBIÉN los siguientes 4 archivos vinculados al agente (usando 'escribir_archivo_en_proyecto' en su misma carpeta: agent_core/sub_agents/<nombre>/):
-  1. memoria_procedimental.md (Su core prompt, manual, e instrucciones maestras)
-  2. memoria_episodica.md (Eventos, conocimiento estático de base)
-  3. usuarios_preferencias.md (Reglas sobre preferencias del usuario)
-  4. .env (Vacío o con keys y puertos placeholders)
+- CUANDO CREES EL AGENTE DEBES OBLIGATORIAMENTE crear TAMBIÉN los siguientes 4 archivos vinculados al agente (usando 'escribir_archivo_en_proyecto').
+  NOTA: Las memorias van DENTRO de la subcarpeta especial `memoria/` de ese agente:
+  1. agent_core/sub_agents/<nombre>/memoria/memoria_procedimental.md (Su core prompt e instrucciones maestras)
+  2. agent_core/sub_agents/<nombre>/memoria/memoria_episodica.md (Eventos, conocimiento estático)
+  3. agent_core/sub_agents/<nombre>/memoria/usuarios_preferencias.md (Reglas sobre el usuario)
+  4. agent_core/sub_agents/<nombre>/.env (Vacío o con keys placeholders. Va en la raíz del agente, NO en memoria)
 - Archivos de datos extra van en: agent_core/sub_agents/<nombre>/files/
 - Evitar acentos en codigo Python generado
 - Al usar escribir_archivo_en_proyecto, NUNCA escapar comillas con barra invertida
