@@ -343,7 +343,13 @@ async def google_callback(code: str, state: str = None):
                     <p style="color:#6b7280;"><b>token.pickle</b> fue generado a baja profundidad en el servidor.</p>
                     <p style="margin-top:20px;">Puedes cerrar esta pestaña o la ventana emergente tranquilamente y continuar el Setup.</p>
                     <button onclick="window.close()" style="margin-top:20px; padding:10px 20px; background:#6366f1; color:white; border:none; border-radius:6px; cursor:pointer;">Cerrar Ventana</button>
-                    <script>setTimeout(()=>window.close(), 4000);</script>
+                    <script>
+                        // Comunicar la autorizacion exitosa a la ventana principal de Setup (paso 4)
+                        if (window.opener && !window.opener.closed) {
+                            window.opener.postMessage('GOOGLE_AUTH_SUCCESS', '*');
+                        }
+                        setTimeout(()=>window.close(), 2000);
+                    </script>
                 </div>
             </body>
         </html>
