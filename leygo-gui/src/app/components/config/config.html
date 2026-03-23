@@ -75,6 +75,18 @@
         <div class="card-icon" style="color: #0088cc; margin-bottom: 0px;"><i class="ph-fill ph-telegram-logo"></i></div>
         <h3 style="font-size: 1.35rem; margin-top: -8px; margin-bottom: 4px;">Bot de Telegram</h3>
         <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Si cambiaste el token, o los servidores de Telegram fallaron en resolver la DNS, presiona este botón para forzar la reconexión.</p>
+
+        <div style="margin-bottom: 15px;">
+           <span *ngIf="telegramConnected" class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
+             Conectado
+           </span>
+           <span *ngIf="!telegramConnected" class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
+             Desconectado
+           </span>
+        </div>
+
         <button class="btn-primary" (click)="reloadTelegramBot()" [disabled]="telegramLoading">
           <i class="ph ph-arrows-clockwise" [class.spin]="telegramLoading"></i> 
           {{ telegramLoading ? 'Conectando...' : 'Reconectar Webhook' }}

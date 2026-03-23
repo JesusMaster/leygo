@@ -113,11 +113,15 @@ async def reload_telegram_bot():
             # Actualizamos también el scheduler para que el bot pueda enviar recordatorios
             from agent_core.scheduler_manager import update_scheduler_bot
             update_scheduler_bot(bot)
+            return "ok"
             
         else:
             bot = None
+            return "No token provided"
     except Exception as e:
-        print(f"\\n⚠️  No se pudo recargar el bot de Telegram al Vuelo: {e}")
+        err_msg = str(e)
+        print(f"\\n⚠️  No se pudo recargar el bot de Telegram al Vuelo: {err_msg}")
+        return err_msg
 
 app = FastAPI(lifespan=lifespan)
 app.state.agent = agent

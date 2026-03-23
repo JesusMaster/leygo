@@ -86,4 +86,8 @@ export class ApiService {
   reloadTelegram(): Observable<any> {
     return this.http.post(`${this.baseUrl}/config/telegram/reload`, {});
   }
+
+  getTelegramStatus(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/config/telegram/status`);
+  }
 }

@@ -261,10 +261,22 @@ async def reload_telegram_endpoint():
     """Fuerza la recarga del webhook de Telegram."""
     try:
         from telegram_bot import reload_telegram_bot
-        await reload_telegram_bot()
-        return {"status": "ok", "message": "Se intentó recargar el bot de Telegram. Revisa los logs por posibles errores de DNS."}
+        res = await reload_telegram_bot()
+        if res != "ok":
+            raise HTTPException(status_code=500, detail=f"Fallo al conectar con Telegram: {res}")
+        return {"status": "ok", "message": "¡Webhook de Telegram reconectado y verificado con éxito!"}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fallo al recargar: {str(e)}")
+
+@router.get("/config/telegram/status")
+async def get_telegram_status():
+    """Retorna si el bot de telegram está actualmente inicializado en backend."""
+    from telegram_bot import bot
+    if bot:
+        return {"connected": True}
+    return {"connected": False}
 
 @router.get("/auth/google/status")
 async def google_auth_status():

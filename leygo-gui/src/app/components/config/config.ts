@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
@@ -14,6 +14,7 @@ declare var google: any;
 })
 export class ConfigComponent implements OnInit {
   private api = inject(ApiService);
+  private cdr = inject(ChangeDetectorRef);
   
   config = signal<any>({});
   authStatus = signal<any>({ authenticated: false });
@@ -182,22 +183,37 @@ export class ConfigComponent implements OnInit {
   telegramLoading = false;
   telegramMsg = '';
   telegramMsgError = false;
+  telegramConnected = false;
+
+  checkTelegramStatus() {
+    this.api.getTelegramStatus().subscribe({
+      next: (res) => {
+        this.telegramConnected = res.connected;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   reloadTelegramBot() {
     this.telegramLoading = true;
     this.telegramMsg = '';
     this.telegramMsgError = false;
+    this.cdr.detectChanges();
     
     this.api.reloadTelegram().subscribe({
       next: (res) => {
         this.telegramLoading = false;
         this.telegramMsg = res.message;
-        setTimeout(() => this.telegramMsg = '', 5000);
+        this.telegramConnected = true;
+        this.cdr.detectChanges();
+        setTimeout(() => { this.telegramMsg = ''; this.cdr.detectChanges(); }, 5000);
       },
       error: (err) => {
         this.telegramLoading = false;
         this.telegramMsgError = true;
+        this.telegramConnected = false;
         this.telegramMsg = err.error?.detail || err.message;
+        this.cdr.detectChanges();
       }
     });
   }
