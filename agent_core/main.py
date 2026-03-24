@@ -169,13 +169,22 @@ def make_supervisor_node(llm, sub_agents: List[BaseSubAgent], all_tools: list):
     # Usar modelo más liviano para routing (el supervisor solo decide a quién derivar)
     import os
     supervisor_model_name = os.environ.get("MODEL_SUPERVISOR", "gemini-2.5-flash")
+    
+    supervisor_base_llm = None
     try:
         from langchain_google_genai import ChatGoogleGenerativeAI
-        supervisor_base_llm = ChatGoogleGenerativeAI(model=supervisor_model_name, temperature=0.2)
-        print(f"  [Supervisor] Usando modelo liviano para routing: {supervisor_model_name}")
+        api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+        if api_key:
+            supervisor_base_llm = ChatGoogleGenerativeAI(model=supervisor_model_name, temperature=0.2)
+            print(f"  [Supervisor] Usando modelo liviano para routing: {supervisor_model_name}")
     except Exception as e:
-        print(f"  [Supervisor] Fallo al cargar {supervisor_model_name}, usando modelo por defecto: {e}")
+        print(f"  [Supervisor] Fallo al cargar {supervisor_model_name}: {e}")
+    
+    if not supervisor_base_llm:
         supervisor_base_llm = llm
+        
+    if not supervisor_base_llm:
+        raise RuntimeError("No se pudo inicializar el modelo de lenguaje (LLM) para el Supervisor (Routing).")
     
     supervisor_llm = supervisor_base_llm.bind_tools([RouteModel], tool_choice="any")
     
@@ -289,6 +298,9 @@ def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, cust
         except Exception as e:
             print(f"  [Discovery] Fallo al cargar modelo {custom_model} para {agent_name}. Usando default. {e}")
             
+    if not llm:
+        raise RuntimeError(f"El LLM para el agente '{agent_name}' no pudo ser inicializado. Verifica las llaves API.")
+
     if tools:
         llm_with_tools = llm.bind_tools(tools)
     else:
@@ -384,6 +396,20 @@ class SelfExtendingAgent:
 
     async def initialize(self):
         """Asynchronously connect to MCP servers and build the graph."""
+        # Recargar .env para capturar llaves recién puestas en el Setup
+        load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"), override=True)
+        
+        # Re-inicializar LLM si estaba en None (común tras primer setup fallido por falta de llaves)
+        if not self.llm:
+            try:
+                from langchain_google_genai import ChatGoogleGenerativeAI
+                api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+                if api_key:
+                    self.llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2)
+                    print("=> LLM principal inicializado correctamente tras el Setup.")
+            except Exception as e:
+                print(f"=> Falló intento de inicializar LLM tras el Setup: {e}")
+
         print("=> Inicializando conexiones MCP...")
         await self.mcp_manager.connect_all()
         
