@@ -162,6 +162,72 @@ async def update_agent_files(agent_name: str, req: AgentUpdateRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error editando agente: {e}")
 
+class AgentFileNode(BaseModel):
+    path: str
+    content: str
+
+class AgentTreeUpdateRequest(BaseModel):
+    files: list[AgentFileNode]
+    deleted_paths: list[str] = []
+
+@router.get("/agents/{agent_name}/tree")
+async def get_agent_tree(agent_name: str):
+    """Retorna un arbol plano con todos los archivos de un agente y su contenido."""
+    agent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sub_agents", agent_name)
+    if not os.path.exists(agent_dir) or not os.path.isdir(agent_dir):
+        raise HTTPException(status_code=404, detail="El sub-agente no existe")
+        
+    result = []
+    for root, dirs, files in os.walk(agent_dir):
+        for file in files:
+            if file == ".DS_Store" or file.endswith(".pyc") or "__pycache__" in root: continue
+            file_path = os.path.join(root, file)
+            rel_path = os.path.relpath(file_path, agent_dir)
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                result.append({"path": rel_path, "content": content})
+            except Exception:
+                pass # Skip binary or unreadable files
+    return result
+
+@router.put("/agents/{agent_name}/tree")
+async def update_agent_tree(agent_name: str, req: AgentTreeUpdateRequest):
+    """Guarda (o elimina) múltiples archivos de un agente usando su ruta relativa."""
+    agent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sub_agents", agent_name)
+    if not os.path.exists(agent_dir) or not os.path.isdir(agent_dir):
+        raise HTTPException(status_code=404, detail="El sub-agente no existe")
+        
+    try:
+        # 1. Eliminar archivos solicitados
+        for dpath in req.deleted_paths:
+            full_path = os.path.abspath(os.path.join(agent_dir, dpath))
+            if full_path.startswith(os.path.abspath(agent_dir)) and os.path.exists(full_path):
+                os.remove(full_path)
+        
+        # 2. Guardar/sobreescribir archivos nuevos o modificados
+        for fnode in req.files:
+            full_path = os.path.abspath(os.path.join(agent_dir, fnode.path))
+            # Seguridad: evitar path traversal fuera del directorio del agente
+            if not full_path.startswith(os.path.abspath(agent_dir)):
+                continue
+            
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+            with open(full_path, "w", encoding="utf-8") as f:
+                f.write(fnode.content)
+                
+        # 3. Reload simple de módulos si hubieron cambios
+        import importlib, sys
+        mod_name = f"agent_core.sub_agents.{agent_name}.{agent_name}_agent"
+        if mod_name in sys.modules:
+            importlib.reload(sys.modules[mod_name])
+            
+        from main import discover_sub_agents
+        discover_sub_agents()
+        return {"status": "success", "message": "Archivos actualizados correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/config")
 async def get_config():
     """Devuelve las variables de entorno configuradas directamente."""

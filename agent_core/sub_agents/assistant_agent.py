@@ -4,10 +4,6 @@ from .base import BaseSubAgent
 
 class AssistantAgent(BaseSubAgent):
     @property
-    def model(self) -> str:
-        return os.environ.get("MODEL_ASSISTANT")
-
-    @property
     def name(self) -> str:
         return "assistant"
         
@@ -23,6 +19,8 @@ La fecha actual es: {current_time_iso}. Tu `thread_id` (para schedulers) es: {th
 ⚠️ REGLA CRÍTICA sobre chat_id: Cuando uses herramientas de schedulers/recordatorios, el parámetro `chat_id` DEBE ser EXACTAMENTE el valor de `thread_id` mostrado arriba (es un ID numérico de Telegram). NUNCA uses el nombre del usuario (ej. "Jesus") como chat_id. Si el thread_id es "default_session", usa "default_session" tal cual.
 
 Manejas la agenda, los emails y las rutinas guardadas del usuario. Tienes acceso completo a usar Schedulers locales o interactuar con las APIs de Google.
+
+⚠️ REGLA ANTI-ALUCINACIÓN: NUNCA confirmes que has creado un recordatorio, agendado un evento o enviado un correo a menos que hayas utilizado la HERRAMIENTA ("tool") correspondiente con éxito y recibido confirmación. Si el usuario te pide enviarlo por una plataforma donde no tienes permisos (como enviar chat a "TI" cuando falla la API de chat), DEBES informarle que no puedes completarlo por falta de permisos en vez de decir "ya lo envié".
 
 MEMORIA EPISÓDICA DEL USUARIO:
 {episodic_context}

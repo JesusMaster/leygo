@@ -1,0 +1,82 @@
+<div class="editor-page">
+  <div class="header">
+    <div class="header-left">
+      <button class="btn-back" (click)="goBack()"><i class="ph ph-arrow-left"></i> Volver</button>
+      <h2>Agente: <span class="highlight">{{ agentName() }}</span></h2>
+    </div>
+    <div class="header-right">
+      <button class="btn-primary" (click)="saveAll()" [disabled]="saving() || loading()">
+        <i class="ph" [ngClass]="saving() ? 'ph-spinner' : 'ph-floppy-disk'"></i> 
+        {{ saving() ? 'Guardando...' : 'Guardar y Recargar' }}
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loader-container">
+      <div class="loader"></div>
+    </div>
+  } @else {
+    <div class="ide-container glass">
+      
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h3>Archivos</h3>
+          <button class="btn-icon" (click)="createNewFile()" title="Nuevo archivo">
+            <i class="ph ph-file-plus"></i>
+          </button>
+        </div>
+        
+        <ul class="file-tree">
+          @for (file of files(); track file.path) {
+            <li class="file-node" 
+                [class.active]="selectedFile()?.path === file.path" 
+                (click)="selectFile(file)">
+              
+              <div class="file-info">
+                @if (file.path.endsWith('.py')) {
+                  <i class="ph ph-file-code file-icon text-blue"></i>
+                } @else if (file.path.endsWith('.md')) {
+                  <i class="ph ph-file-text file-icon text-green"></i>
+                } @else if (file.path.endsWith('.env')) {
+                  <i class="ph ph-sliders file-icon text-yellow"></i>
+                } @else {
+                  <i class="ph ph-file file-icon text-gray"></i>
+                }
+                <span class="file-path">{{ file.path }}</span>
+              </div>
+
+              <!-- Boton oculto de eliminar excepto hover -->
+              @if (!file.path.endsWith('_agent.py')) {
+                <button class="btn-node-delete" (click)="deleteFile(file); $event.stopPropagation()" title="Eliminar">
+                  <i class="ph ph-trash"></i>
+                </button>
+              }
+            </li>
+          } @empty {
+            <li class="empty-state">No hay archivos.</li>
+          }
+        </ul>
+      </div>
+
+      <!-- MAIN EDITOR -->
+      <div class="main-editor">
+        @if (selectedFile(); as file) {
+          <div class="editor-header">
+            <span class="active-file">{{ file.path }}</span>
+          </div>
+          <div class="monaco-wrapper">
+            <ngx-monaco-editor [options]="editorOptions()" [(ngModel)]="file.content"></ngx-monaco-editor>
+          </div>
+        } @else {
+          <div class="no-file-selected">
+            <i class="ph ph-code"></i>
+            <p>Selecciona un archivo del panel izquierdo para editar.</p>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+</div>

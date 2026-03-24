@@ -213,9 +213,9 @@ Tu trabajo es analizar la petición del usuario, leer SIEMPRE TODO EL HISTORIAL 
 {agent_rules}
 REGLAS ESTRICTAS PARA EVITAR BUCLES:
 1. DELEGACIÓN INICIAL: Delega tareas al sub-agente correcto según sus herramientas (ej. 'assistant' para agendar/emails, 'mcp' para repositorios/datos, 'youtube' para videos).
-2. VERIFICA EL ÚLTIMO MENSAJE: Si el último AIMessage de un sub-agente en el historial indica que YA ATENDIÓ la solicitud del usuario (ej. dice "Ok, agendado", "Acá está el resumen", "Te lo recordaré", etc.), entonces **LA TAREA HA FINALIZADO**.
-3. FINISH (¡MUY IMPORTANTE!): SI LA TAREA FUE COMPLETADA por el agente previo o requiere tu respuesta final al usuario, DEBES usar `next_node`='FINISH' y proporcionar siempre un resumen o la respuesta completa al usuario en el campo `respuesta_conversacional`. NO lo dejes vacío si el agente worker ya respondió; en ese caso, repite o resume su logro. 
-4. NUNCA DELEGUES LA MISMA TAREA 2 VECES SEGUIDAS al mismo agente si este acaba de responder algo sustancial.
+2. VERIFICA EL ÚLTIMO MENSAJE: Si el último AIMessage de un sub-agente en el historial indica que YA ATENDIÓ la solicitud del usuario (ej. dice "Ok, agendado", "Acá está el resumen", "Te lo recordaré", etc.), o SI EN EL ÚLTIMO MENSAJE EL AGENTE TE PIDE ALGO AL USUARIO (ej. "Dime la URL", "Qué video quieres?"), entonces **DEBES RESPONDERLE AL USUARIO**, es decir, `next_node`='FINISH'. NO se lo devuelvas al agente.
+3. FINISH (¡MUY IMPORTANTE!): SI LA TAREA FUE COMPLETADA por el agente previo o si el agente hizo una pregunta al usuario, DEBES usar `next_node`='FINISH' y proporcionar la respuesta completa o la pregunta al usuario en el campo `respuesta_conversacional`.
+4. NUNCA DELEGUES LA MISMA TAREA 2 VECES SEGUIDAS al mismo agente. Si el agente acaba de responder en el último mensaje, DEBES usar 'FINISH' (o llamar a otro distinto si hace falta). ¡Ruta de vuelta al usuario para evitar bucles infinitos!
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
@@ -309,12 +309,11 @@ def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, cust
         episodic_context = memory_utils.load_all_episodic_context(agent_name=agent_name)
         procedural_context = memory_utils.load_procedural_documentation(agent_name=agent_name)
         
-        formatted_prompt = system_prompt_text.format(
-            current_time_iso=current_time_iso,
-            thread_id=thread_id,
-            episodic_context=episodic_context,
-            procedural_context=procedural_context if procedural_context else "Aún no tienes herramientas."
-        )
+        formatted_prompt = system_prompt_text \
+            .replace("{current_time_iso}", current_time_iso) \
+            .replace("{thread_id}", thread_id) \
+            .replace("{episodic_context}", episodic_context) \
+            .replace("{procedural_context}", procedural_context if procedural_context else "Aún no tienes herramientas.")
         formatted_prompt += """\n\nATENCIÓN - REGLAS PARA SUB-AGENTES TRABAJADORES:
 1. NUNCA intentes usar la herramienta 'Route'. El Supervisor se encarga del routing.
 2. Si tu system prompt te indica que eres el agente FINAL para la consulta: da una respuesta completa y directa al usuario. NO escribas frases como "el siguiente agente debe...", "ahora el assistant debe...", ni nada similar. TÚ eres la respuesta.

@@ -90,7 +90,7 @@ h1, h2, h3, h4 {
 
 
 /* Base expands for all route components */
-app-chat, app-agents, app-config, app-tasks, app-usage, app-mcp-settings {
+app-chat, app-agents, app-config, app-tasks, app-usage, app-mcp-settings, app-agent-editor {
   display: flex !important;
   flex: 1 !important;
   width: 100% !important;

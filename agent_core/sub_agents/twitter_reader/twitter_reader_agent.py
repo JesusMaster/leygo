@@ -11,10 +11,6 @@ class TwitterReaderAgent(BaseSubAgent):
     def description(self):
         return "Agente especializado en leer y resumir hilos y tweets de X (Twitter) de forma gratuita usando APIs publicas."
 
-    @property
-    def model(self):
-        return "gemini-2.5-flash-lite"
-
     def get_tools(self, all_available_tools: list = None):
         def leer_tweet_gratis(url_o_id: str) -> str:
             """

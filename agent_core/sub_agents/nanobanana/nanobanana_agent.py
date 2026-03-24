@@ -15,10 +15,6 @@ class NanobananaAgent(BaseSubAgent):
     def description(self) -> str:
         return "Agente especializado en generar imágenes a partir de ideas o prompts usando el modelo gemini-3-pro-image-preview."
 
-    @property
-    def model(self) -> str:
-        return "gemini-3-pro-image-preview"
-
     def get_tools(self, all_available_tools: list = None) -> list:
         def generar_imagen_nanobanana(prompt: str) -> str:
             '''

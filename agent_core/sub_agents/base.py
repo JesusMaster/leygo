@@ -30,7 +30,35 @@ class BaseSubAgent:
         
     @property
     def model(self) -> str:
-        """(Opcional) Modelo específico LLM a usar para este agente (ej. 'gemini-2.5-flash'). Si retorna None, usa el default."""
+        """Obtiene el modelo del agente. Prioridad:
+        1. MODEL_OVERRIDE en el .env local del agente
+        2. MODEL en el .env local del agente
+        3. Variable de entorno global MODEL_{NAME.upper()} (ej. MODEL_DEV)
+        4. None (usa el default del sistema)
+        """
+        import inspect
+        import os
+        from dotenv import dotenv_values
+        
+        module = inspect.getmodule(self.__class__)
+        if module and hasattr(module, '__file__'):
+            env_path = os.path.join(os.path.dirname(os.path.abspath(module.__file__)), '.env')
+            if os.path.exists(env_path):
+                config = dotenv_values(env_path)
+                if config.get("MODEL_OVERRIDE"):
+                    return config["MODEL_OVERRIDE"]
+                if config.get("MODEL"):
+                    return config["MODEL"]
+        
+        # Fallback: variable global tipo MODEL_DEV, MODEL_ASSISTANT, etc.
+        try:
+            agent_name = self.name.upper().replace("-", "_")
+            val = os.environ.get(f"MODEL_{agent_name}")
+            if val:
+                return val
+        except NotImplementedError:
+            pass
+        
         return None
         
     @property
@@ -61,13 +89,13 @@ class BaseSubAgent:
             with open(procedural_path, "r", encoding="utf-8") as f:
                 content = f.read().strip()
                 if content:
-                    prompt_parts.append(f"--- MEMORIA PROCEDIMENTAL (Instrucciones de cómo actuar) ---\n{content}")
+                    prompt_parts.append(f"--- MEMORIA PROCEDIMENTAL ---\n{content}")
                     
         if os.path.exists(episodic_path):
             with open(episodic_path, "r", encoding="utf-8") as f:
                 content = f.read().strip()
                 if content:
-                    prompt_parts.append(f"--- MEMORIA EPISÓDICA (Contexto o Eventos Previos) ---\n{content}")
+                    prompt_parts.append(f"--- MEMORIA EPISÓDICA ---\n{content}")
 
         if os.path.exists(prefs_path):
             with open(prefs_path, "r", encoding="utf-8") as f:

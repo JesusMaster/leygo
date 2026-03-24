@@ -24,6 +24,16 @@ export interface ScheduledTask {
   next_run_time_iso?: string;
 }
 
+export interface AgentFileNode {
+  path: string;
+  content: string;
+}
+
+export interface AgentTreeUpdateRequest {
+  files: AgentFileNode[];
+  deleted_paths?: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -46,6 +56,14 @@ export class ApiService {
 
   updateAgentFiles(name: string, data: {python_code?: string, episodic_code?: string, procedural_code?: string, prefs_code?: string, env_code?: string}): Observable<any> {
     return this.http.put(`${this.baseUrl}/agents/${name}`, data);
+  }
+
+  getAgentTree(name: string): Observable<AgentFileNode[]> {
+    return this.http.get<AgentFileNode[]>(`${this.baseUrl}/agents/${name}/tree`);
+  }
+
+  updateAgentTree(name: string, data: AgentTreeUpdateRequest): Observable<any> {
+    return this.http.put(`${this.baseUrl}/agents/${name}/tree`, data);
   }
 
   getConfig(): Observable<any> {

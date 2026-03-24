@@ -4,10 +4,6 @@ from .base import BaseSubAgent
 
 class DevAgent(BaseSubAgent):
     @property
-    def model(self) -> str:
-        return os.environ.get("MODEL_DEV")
-
-    @property
     def name(self) -> str:
         return "dev"
         
@@ -30,9 +26,8 @@ CATALOGO PROCEDIMENTAL: {procedural_context}
 2. Está TERMINANTEMENTE PROHIBIDO usar la herramienta 'escribir_archivo_en_proyecto' en el mismo turno en que presentas la propuesta. Debes terminar tu respuesta ahí mismo y ESPERAR a que el usuario responda "Sí". Nunca asumas su respuesta.
 Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
 - Heredar de BaseSubAgent (from agent_core.sub_agents.base import BaseSubAgent)
-- Propiedades requeridas (ES OBLIGATORIO USAR @property): model, name, description
+- Propiedades requeridas (ES OBLIGATORIO USAR @property): name, description. NO SOBREESCRIBAS `model`.
 - El metodo get_tools DEBE tener la firma exacta: def get_tools(self, all_available_tools: list = None):
-- model por defecto: "gemini-2.5-flash-lite"
 - name: minusculas, solo a-z ASCII
 - NO SOBREESCRIBAS system_prompt EN LA CLASE PYTHON. 
 - CUANDO CREES EL AGENTE DEBES OBLIGATORIAMENTE crear TAMBIÉN los siguientes 4 archivos vinculados al agente (usando 'escribir_archivo_en_proyecto').
@@ -40,12 +35,13 @@ Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
   1. agent_core/sub_agents/<nombre>/memoria/memoria_procedimental.md (Su core prompt e instrucciones maestras)
   2. agent_core/sub_agents/<nombre>/memoria/memoria_episodica.md (Eventos, conocimiento estático)
   3. agent_core/sub_agents/<nombre>/memoria/usuarios_preferencias.md (Reglas sobre el usuario)
-  4. agent_core/sub_agents/<nombre>/.env (Vacío o con keys placeholders. Va en la raíz del agente, NO en memoria)
+  4. agent_core/sub_agents/<nombre>/.env (OBLIGATORIO Escribir el modelo por defecto aquí: `MODEL=gemini-2.5-flash-lite` u otro modelo. Va en la raíz del agente, NO en memoria)
 - Archivos de datos extra van en: agent_core/sub_agents/<nombre>/files/
 - Evitar acentos en codigo Python generado
 - Al usar escribir_archivo_en_proyecto, NUNCA escapar comillas con barra invertida
 - Para filtrar herramientas globales usar getattr(t, "name", None), NO t.__name__
 - Hot-reload activo, no necesita reinicio
+- OBLIGATORIO: NUNCA importes de `langchain.tools` (generará un ModuleNotFoundError). IMPORTA SIEMPRE de `langchain_core.tools` tanto para `@tool` como para `StructuredTool`.
 
 ELIMINAR SUB-AGENTES: usar eliminar_archivo_en_proyecto con ruta del directorio completo.
 '''

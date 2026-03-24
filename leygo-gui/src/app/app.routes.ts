@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { ChatComponent } from './components/chat/chat';
 import { AgentsComponent } from './components/agents/agents';
+import { AgentEditorComponent } from './components/agent-editor/agent-editor';
 import { ConfigComponent } from './components/config/config';
 import { TasksComponent } from './components/tasks/tasks';
 import { UsageComponent } from './components/usage/usage';
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: '', redirectTo: 'chat', pathMatch: 'full' },
   { path: 'chat', component: ChatComponent, canActivate: [setupGuard, authGuard] },
   { path: 'agents', component: AgentsComponent, canActivate: [setupGuard, authGuard] },
+  { path: 'editor/:agentName', component: AgentEditorComponent, canActivate: [setupGuard, authGuard] },
   { path: 'tasks', component: TasksComponent, canActivate: [setupGuard, authGuard] },
   { path: 'config', component: ConfigComponent, canActivate: [setupGuard, authGuard] },
   { path: 'mcp-settings', component: McpSettingsComponent, canActivate: [setupGuard, authGuard] },

@@ -19,6 +19,8 @@
     "@angular/router": "^21.2.0",
     "@types/marked": "^5.0.2",
     "marked": "^17.0.4",
+    "monaco-editor": "^0.55.1",
+    "ngx-monaco-editor-v2": "^21.1.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

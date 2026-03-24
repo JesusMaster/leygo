@@ -13,10 +13,6 @@ class ChartAgent(BaseSubAgent):
     def description(self) -> str:
         return "Especialista en visualizacion de datos. Transforma conjuntos de datos crudos en graficos atractivos usando QuickChart."
 
-    @property
-    def model(self) -> str:
-        return "gemini-2.5-flash-lite"
-
     def generar_url_grafico(self, tipo_grafico: str, etiquetas: list[str], valores: list[float], titulo: str = "") -> str:
         """
         Genera una URL directa a un grafico de QuickChart.
