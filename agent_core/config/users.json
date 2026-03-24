@@ -1,7 +1,1 @@
-[
-    {
-        "username": "jleiva@dcanje.com",
-        "password": "$argon2id$v=19$m=65536,t=3,p=4$JH0ocyWm4iWBmclSXss+mg$6wTrD9hNyLGHr9U+gwLTI+UFLM5z5QejK9Sm4Xj1uVY",
-        "role": "admin"
-    }
-]
+[]
