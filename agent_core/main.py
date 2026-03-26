@@ -228,17 +228,45 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
-        # Para el Supervisor: filtrar mensajes de herramientas (ToolMessage y AIMessage con solo tool_calls)
-        # El Supervisor solo necesita ver texto humano/AI para decidir el routing, no payloads JSON de tools
+        # Para el Supervisor: filtrar mensajes de herramientas para reducir tokens,
+        # PERO respetando la regla de Gemini: un AIMessage con tool_calls DEBE ir
+        # inmediatamente seguido de sus ToolMessages. Si se rompe ese orden, la API
+        # devuelve 400 "function call turn comes immediately after a user turn".
+        #
+        # Estrategia: construir pares (AIMessage con tool_calls + sus ToolMessages).
+        # Si el par está completo → descartamos ambos (el supervisor no necesita los payloads).
+        # Si el AIMessage con tool_calls queda huérfano (sin ToolMessage siguiente) → lo descartamos también.
+        # Si el AIMessage tiene AMBOS content+tool_calls → lo incluimos solo con el content, sin tool_calls.
+        
         lightweight_messages = []
-        for m in clean_messages:
-            # Saltar ToolMessages (respuestas de herramientas con JSON pesado)
+        i = 0
+        while i < len(clean_messages):
+            m = clean_messages[i]
+            
             if isinstance(m, ToolMessage):
+                # ToolMessage huérfano (su AIMessage ya fue descartado) — omitir
+                i += 1
                 continue
-            # Saltar AIMessages que solo tienen tool_calls sin texto útil
-            if hasattr(m, 'tool_calls') and m.tool_calls and not (m.content and str(m.content).strip()):
+            
+            has_tool_calls = hasattr(m, 'tool_calls') and m.tool_calls
+            has_content = m.content and str(m.content).strip()
+            
+            if has_tool_calls:
+                # Consumir todos los ToolMessages consecutivos que siguen
+                j = i + 1
+                while j < len(clean_messages) and isinstance(clean_messages[j], ToolMessage):
+                    j += 1
+                # Ahora [i+1 .. j-1] son los ToolMessages del par
+                # En todos los casos descartamos el par completo (el supervisor no necesita los payloads)
+                # PERO si el AIMessage también tiene content de texto, lo preservamos sin tool_calls
+                if has_content:
+                    from langchain_core.messages import AIMessage as _AIMessage
+                    lightweight_messages.append(_AIMessage(content=m.content))
+                i = j  # saltar el AIMessage y todos sus ToolMessages
                 continue
+            
             lightweight_messages.append(m)
+            i += 1
         
         # Truncar a los últimos N mensajes para evitar explotar tokens
         if len(lightweight_messages) > MAX_CONTEXT_MESSAGES:
