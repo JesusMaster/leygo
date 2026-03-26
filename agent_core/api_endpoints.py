@@ -122,7 +122,7 @@ async def get_agent_files(agent_name: str):
     }
 
 @router.put("/agents/{agent_name}")
-async def update_agent_files(agent_name: str, req: AgentUpdateRequest):
+async def update_agent_files(agent_name: str, req: AgentUpdateRequest, request: Request):
     """Actualiza y edita los archivos fuente de un sub-agente directamente."""
     agent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sub_agents", agent_name)
     if not os.path.exists(agent_dir) or not os.path.isdir(agent_dir):
@@ -148,15 +148,15 @@ async def update_agent_files(agent_name: str, req: AgentUpdateRequest):
         if req.env_code is not None:
             with open(env_path, "w", encoding="utf-8") as f: f.write(req.env_code)
             
-        import importlib, sys
+        import sys
         # Forzar descarga del modulo para que el reload tome el codigo nuevo
         mod_name = f"agent_core.sub_agents.{agent_name}.{agent_name}_agent"
         if mod_name in sys.modules:
             del sys.modules[mod_name]
 
-        # Disparar hot-reload del grafo via el agente global
+        # Disparar hot-reload del grafo via la instancia global del agente
         try:
-            from main import agent as _global_agent
+            _global_agent = request.app.state.agent
             _global_agent._sub_agents_snapshot = frozenset()  # Invalidar snapshot
             _global_agent._check_and_reload_graph()
         except Exception as reload_err:
@@ -196,7 +196,7 @@ async def get_agent_tree(agent_name: str):
     return result
 
 @router.put("/agents/{agent_name}/tree")
-async def update_agent_tree(agent_name: str, req: AgentTreeUpdateRequest):
+async def update_agent_tree(agent_name: str, req: AgentTreeUpdateRequest, request: Request):
     """Guarda (o elimina) múltiples archivos de un agente usando su ruta relativa."""
     agent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sub_agents", agent_name)
     if not os.path.exists(agent_dir) or not os.path.isdir(agent_dir):
@@ -212,23 +212,21 @@ async def update_agent_tree(agent_name: str, req: AgentTreeUpdateRequest):
         # 2. Guardar/sobreescribir archivos nuevos o modificados
         for fnode in req.files:
             full_path = os.path.abspath(os.path.join(agent_dir, fnode.path))
-            # Seguridad: evitar path traversal fuera del directorio del agente
             if not full_path.startswith(os.path.abspath(agent_dir)):
                 continue
-            
             os.makedirs(os.path.dirname(full_path), exist_ok=True)
             with open(full_path, "w", encoding="utf-8") as f:
                 f.write(fnode.content)
-                
+
         import sys
         # Forzar descarga del modulo para que el reload tome el codigo nuevo
         mod_name = f"agent_core.sub_agents.{agent_name}.{agent_name}_agent"
         if mod_name in sys.modules:
             del sys.modules[mod_name]
 
-        # Disparar hot-reload del grafo via el agente global
+        # Disparar hot-reload del grafo via la instancia global del agente
         try:
-            from main import agent as _global_agent
+            _global_agent = request.app.state.agent
             _global_agent._sub_agents_snapshot = frozenset()  # Invalidar snapshot
             _global_agent._check_and_reload_graph()
         except Exception as reload_err:
