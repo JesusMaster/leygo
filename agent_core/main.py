@@ -411,6 +411,8 @@ class SelfExtendingAgent:
                 print(f"=> Falló intento de inicializar LLM tras el Setup: {e}")
 
         print("=> Inicializando conexiones MCP...")
+        # Limpiar conexiones previas para evitar duplicidad de sesiones (común tras Setup)
+        await self.mcp_manager.close()
         await self.mcp_manager.connect_all()
         
         tools = await self.mcp_manager.get_all_tools()
@@ -446,6 +448,16 @@ class SelfExtendingAgent:
             leer_google_doc,
             buscar_archivos_drive
         ])
+        
+        # Eliminar duplicados para evitar error de Gemini 400 'Duplicate function declaration'
+        seen_names = set()
+        unique_tools = []
+        for t in tools:
+            name = getattr(t, "name", getattr(t, "__name__", str(t)))
+            if name not in seen_names:
+                unique_tools.append(t)
+                seen_names.add(name)
+        tools = unique_tools
         
         if tools:
             print(f"=> Se configuraron {len(tools)} herramientas (MCP + Fallback locales).")
@@ -521,6 +533,17 @@ class SelfExtendingAgent:
         # 4. Inyectar dinámicamente cada Sub-Agente como nodos y enlazar
         for agent in sub_agents:
             agent_tools = agent.get_tools(tools)
+            
+            # Asegurar unicidad de herramientas para este agente antes de hacer el bind al LLM
+            if agent_tools:
+                seen_sub = set()
+                unique_sub = []
+                for t in agent_tools:
+                    name = getattr(t, "name", getattr(t, "__name__", str(t)))
+                    if name not in seen_sub:
+                        unique_sub.append(t)
+                        seen_sub.add(name)
+                agent_tools = unique_sub
             prompt_text = agent.system_prompt
             
             node_name = agent.name
