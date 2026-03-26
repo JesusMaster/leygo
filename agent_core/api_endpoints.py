@@ -149,16 +149,20 @@ async def update_agent_files(agent_name: str, req: AgentUpdateRequest):
             with open(env_path, "w", encoding="utf-8") as f: f.write(req.env_code)
             
         import importlib, sys
-        # Forzar un recargo caliente simple del modulo
+        # Forzar descarga del modulo para que el reload tome el codigo nuevo
         mod_name = f"agent_core.sub_agents.{agent_name}.{agent_name}_agent"
         if mod_name in sys.modules:
-            importlib.reload(sys.modules[mod_name])
-            
-        # Refrescar listado local
-        from main import discover_sub_agents
-        discover_sub_agents()
-        
-        return {"status": "success", "message": "Agente editado correctamente."}
+            del sys.modules[mod_name]
+
+        # Disparar hot-reload del grafo via el agente global
+        try:
+            from main import agent as _global_agent
+            _global_agent._sub_agents_snapshot = frozenset()  # Invalidar snapshot
+            _global_agent._check_and_reload_graph()
+        except Exception as reload_err:
+            print(f"[hot-reload] Advertencia: {reload_err}")
+
+        return {"status": "success", "message": "Agente editado y grafo recargado."}  
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error editando agente: {e}")
 
@@ -216,15 +220,21 @@ async def update_agent_tree(agent_name: str, req: AgentTreeUpdateRequest):
             with open(full_path, "w", encoding="utf-8") as f:
                 f.write(fnode.content)
                 
-        # 3. Reload simple de módulos si hubieron cambios
-        import importlib, sys
+        import sys
+        # Forzar descarga del modulo para que el reload tome el codigo nuevo
         mod_name = f"agent_core.sub_agents.{agent_name}.{agent_name}_agent"
         if mod_name in sys.modules:
-            importlib.reload(sys.modules[mod_name])
-            
-        from main import discover_sub_agents
-        discover_sub_agents()
-        return {"status": "success", "message": "Archivos actualizados correctamente"}
+            del sys.modules[mod_name]
+
+        # Disparar hot-reload del grafo via el agente global
+        try:
+            from main import agent as _global_agent
+            _global_agent._sub_agents_snapshot = frozenset()  # Invalidar snapshot
+            _global_agent._check_and_reload_graph()
+        except Exception as reload_err:
+            print(f"[hot-reload] Advertencia: {reload_err}")
+
+        return {"status": "success", "message": "Archivos actualizados y grafo recargado."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

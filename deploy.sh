@@ -46,6 +46,60 @@ restore_path() {
     fi
 }
 
+# Respalda .env, memoria/ y el .py principal de TODOS los sub-agentes en carpeta.
+# Detecta automáticamente cualquier agente creado en runtime, sin necesidad de
+# listarlo manualmente aquí.
+backup_all_sub_agents() {
+    local sub_agents_dir="$REPO_DIR/agent_core/sub_agents"
+    local count=0
+    for agent_dir in "$sub_agents_dir"/*/; do
+        [ -d "$agent_dir" ] || continue
+        local agent_name
+        agent_name="$(basename "$agent_dir")"
+        # Ignorar __pycache__ y similares
+        [[ "$agent_name" == __* ]] && continue
+
+        local backed=0
+        # .env del agente
+        if [ -f "$agent_dir/.env" ]; then
+            backup_path "agent_core/sub_agents/$agent_name/.env"
+            backed=1
+        fi
+        # Carpeta de memoria completa
+        if [ -d "$agent_dir/memoria" ]; then
+            backup_path "agent_core/sub_agents/$agent_name/memoria"
+            backed=1
+        fi
+        # Archivo Python principal (preserva agentes creados en runtime que no están en git)
+        local py_file="$agent_dir/${agent_name}_agent.py"
+        if [ -f "$py_file" ]; then
+            backup_path "agent_core/sub_agents/$agent_name/${agent_name}_agent.py"
+            backed=1
+        fi
+        [ $backed -eq 1 ] && ((count++)) || true
+    done
+    log "  $count sub-agente(s) en carpeta respaldado(s)."
+}
+
+# Restaura .env, memoria/ y .py de TODOS los sub-agentes que estén en el backup.
+restore_all_sub_agents() {
+    local backup_sub="$BACKUP_DIR/agent_core/sub_agents"
+    [ -d "$backup_sub" ] || return 0
+    local count=0
+    for agent_dir in "$backup_sub"/*/; do
+        [ -d "$agent_dir" ] || continue
+        local agent_name
+        agent_name="$(basename "$agent_dir")"
+        [[ "$agent_name" == __* ]] && continue
+
+        restore_path "agent_core/sub_agents/$agent_name/.env" 2>/dev/null || true
+        restore_path "agent_core/sub_agents/$agent_name/memoria" 2>/dev/null || true
+        restore_path "agent_core/sub_agents/$agent_name/${agent_name}_agent.py" 2>/dev/null || true
+        ((count++)) || true
+    done
+    log "  $count sub-agente(s) en carpeta restaurado(s)."
+}
+
 cd "$REPO_DIR"
 log "=== Iniciando deploy en: $REPO_DIR ==="
 mkdir -p "$BACKUP_DIR"
@@ -56,13 +110,8 @@ backup_path "agent_core/config"
 backup_path "agent_core/keys"
 backup_path "agent_core/memoria"
 backup_path "agent_core/.env"
-backup_path "agent_core/sub_agents/nami/.env"
-backup_path "agent_core/sub_agents/nami/memoria"
-backup_path "agent_core/sub_agents/chart/.env"
-backup_path "agent_core/sub_agents/twitter_reader/.env"
-backup_path "agent_core/sub_agents/nanobanana/.env"
-backup_path "agent_core/sub_agents/youtube_analyzer/.env"
-backup_path "agent_core/sub_agents/youtube_analyzer/memoria"
+# Auto-descubre y respalda TODOS los sub-agentes en carpeta
+backup_all_sub_agents
 
 # ─── 2. Git stash ────────────────────────────────────────────────────────────
 log "Guardando cambios locales sin commitear ..."
@@ -79,13 +128,8 @@ restore_path "agent_core/config"
 restore_path "agent_core/keys"
 restore_path "agent_core/memoria"
 restore_path "agent_core/.env"
-restore_path "agent_core/sub_agents/nami/.env"
-restore_path "agent_core/sub_agents/nami/memoria"
-restore_path "agent_core/sub_agents/chart/.env"
-restore_path "agent_core/sub_agents/twitter_reader/.env"
-restore_path "agent_core/sub_agents/nanobanana/.env"
-restore_path "agent_core/sub_agents/youtube_analyzer/.env"
-restore_path "agent_core/sub_agents/youtube_analyzer/memoria"
+# Restaura automáticamente todos los sub-agentes respaldados
+restore_all_sub_agents
 
 # ─── 5. Rebuild Docker ───────────────────────────────────────────────────────
 if [ "$1" != "--no-build" ]; then

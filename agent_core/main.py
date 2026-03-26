@@ -502,23 +502,20 @@ class SelfExtendingAgent:
         self.graph = self._build_graph(tools)
 
     def _get_sub_agents_snapshot(self) -> frozenset:
-        """Devuelve un snapshot de (nombre, mtime) de los archivos en sub_agents/."""
+        """Devuelve un snapshot de (ruta_relativa, mtime) de TODOS los archivos
+        en sub_agents/ (incluyendo memorias, .env, etc.) para detectar cualquier cambio."""
         sub_agents_dir = os.path.join(os.path.dirname(__file__), "sub_agents")
         result = set()
         try:
-            for fname in os.listdir(sub_agents_dir):
-                if fname in ("__init__.py", "base.py", "__pycache__", ".DS_Store"):
-                    continue
-                item_path = os.path.join(sub_agents_dir, fname)
-                
-                # Formato A:
-                if os.path.isfile(item_path) and fname.endswith(".py"):
-                    result.add((fname, os.path.getmtime(item_path)))
-                # Formato B:
-                elif os.path.isdir(item_path):
-                    expected_file = os.path.join(item_path, f"{fname}_agent.py")
-                    if os.path.isfile(expected_file):
-                        result.add((f"{fname}/{fname}_agent.py", os.path.getmtime(expected_file)))
+            for root, dirs, files in os.walk(sub_agents_dir):
+                # Ignorar __pycache__
+                dirs[:] = [d for d in dirs if d != "__pycache__"]
+                for fname in files:
+                    if fname in (".DS_Store",) or fname.endswith(".pyc"):
+                        continue
+                    fpath = os.path.join(root, fname)
+                    rel = os.path.relpath(fpath, sub_agents_dir)
+                    result.add((rel, os.path.getmtime(fpath)))
         except Exception:
             pass
         return frozenset(result)
