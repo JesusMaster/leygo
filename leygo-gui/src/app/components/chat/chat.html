@@ -73,12 +73,14 @@
       }
       <button class="action-btn" (click)="fileInput.click()"><i class="ph ph-paperclip"></i></button>
       <input type="file" #fileInput hidden (change)="onFileSelected($event)">
-      <input
-        type="text"
+      <textarea
+        #messageInput
         [(ngModel)]="userInput"
-        (keyup.enter)="sendMessage()"
+        (input)="onInput($event)"
+        (keydown)="onKeyDown($event)"
         placeholder="Ask leygo AI anything..."
-      >
+        rows="1"
+      ></textarea>
       <div class="input-actions">
         <button class="clear-btn" (click)="clearChat()" title="Limpiar historial de chat">
           <i class="ph ph-broom"></i>

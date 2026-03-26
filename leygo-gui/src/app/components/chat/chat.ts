@@ -28,6 +28,7 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
   streamingText = signal<string>('');
 
   private abortController: AbortController | null = null;
+  @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
 
   userName = 'Admin';
 
@@ -100,6 +101,11 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
     this.isTyping.set(true);
     this.statusHistory.set([]);
     this.streamingText.set('');
+    
+    // Reset textarea height
+    if (this.messageInput) {
+      this.messageInput.nativeElement.style.height = 'auto';
+    }
 
     // Cancelar cualquier stream anterior
     this.abortController?.abort();
@@ -223,6 +229,28 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
   removeFile() { this.selectedFile.set(null); }
 
   clearChat() { this.chatService.clearChat(); }
+
+  onInput(event: Event) {
+    const target = event.target as HTMLTextAreaElement;
+    this.adjustHeight(target);
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage();
+    }
+  }
+
+  private adjustHeight(target: HTMLTextAreaElement) {
+    target.style.height = 'auto';
+    // Max 12 lines. Line height is approx 24px (1.5 * 16px). 
+    // We can also let the CSS max-height handle it, but setting it here is safer.
+    const maxHeight = 12 * 24; 
+    const newHeight = Math.min(target.scrollHeight, maxHeight);
+    target.style.height = `${newHeight}px`;
+    target.style.overflowY = target.scrollHeight > maxHeight ? 'auto' : 'hidden';
+  }
 
   private scrollToBottom(): void {
     try {
