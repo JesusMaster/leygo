@@ -1,4 +1,4 @@
-import { Component, inject, signal, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, ElementRef, ViewChild, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
@@ -12,7 +12,7 @@ import { MarkdownPipe } from '../../pipes/markdown.pipe';
   templateUrl: './chat.html',
   styleUrl: './chat.css'
 })
-export class ChatComponent implements AfterViewInit, OnDestroy {
+export class ChatComponent implements AfterViewInit, OnDestroy, OnInit {
   private api = inject(ApiService);
   private chatService = inject(ChatService);
 
@@ -30,11 +30,24 @@ export class ChatComponent implements AfterViewInit, OnDestroy {
   private abortController: AbortController | null = null;
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
 
+  supervisorModel = signal('gemini'); // Se rellena en ngOnInit
+
   userName = 'Admin';
 
   constructor() {
     const user = localStorage.getItem('leygo_user');
     if (user) this.userName = user;
+  }
+
+  ngOnInit() {
+    this.api.getConfig().subscribe({
+      next: (config: any) => {
+        const model = config['MODEL_SUPERVISOR'] || config['MODEL'] || 'gemini-2.5-flash';
+        // Mostrar versión corta y legible del modelo
+        this.supervisorModel.set(model.replace('models/', ''));
+      },
+      error: () => {} // silencioso si falla
+    });
   }
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
