@@ -64,13 +64,6 @@
 
   <div class="input-container">
     <div class="floating-input shadow-md">
-      @if (selectedFile()) {
-        <div class="file-badge">
-          <i class="ph ph-file-text"></i>
-          <span>{{ selectedFile()?.name }}</span>
-          <button (click)="removeFile()"><i class="ph ph-x"></i></button>
-        </div>
-      }
       <textarea
         #messageInput
         [(ngModel)]="userInput"
@@ -99,12 +92,19 @@
           <i class="ph ph-paperclip"></i>
           <span>Adjuntar</span>
         </button>
-        <button class="tool-btn danger" (click)="clearChat()" title="Limpiar historial">
-          <i class="ph ph-broom"></i>
-          <span>Limpiar</span>
-        </button>
+        @if (selectedFile()) {
+          <div class="file-chip">
+            <i class="ph ph-file-text"></i>
+            <span>{{ selectedFile()?.name }}</span>
+            <button (click)="removeFile()" title="Quitar archivo"><i class="ph ph-x"></i></button>
+          </div>
+        }
       </div>
       <div class="toolbar-right">
+        <button class="tool-btn danger" (click)="clearChat()" title="Limpiar historial">
+          <i class="ph ph-broom"></i>
+          <span>Limpiar Chat</span>
+        </button>
         <span class="model-badge">{{ supervisorModel() }}</span>
         <span class="char-count">{{ userInput().length }} / 2000</span>
       </div>

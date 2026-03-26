@@ -352,6 +352,54 @@
   color: #9ca3af;
 }
 
+/* File chip shown in toolbar after attaching a file */
+.file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 10px;
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-primary, #0ea5e9);
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.file-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.file-chip i {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.file-chip button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: var(--accent-primary, #0ea5e9);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  font-size: 12px;
+}
+
+.file-chip button:hover {
+  opacity: 1;
+}
+
 .disclaimer {
   font-size: 10px;
   color: #9ca3af;
