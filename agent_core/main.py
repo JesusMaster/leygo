@@ -175,7 +175,12 @@ def make_supervisor_node(llm, sub_agents: List[BaseSubAgent], all_tools: list):
         from langchain_google_genai import ChatGoogleGenerativeAI
         api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
         if api_key:
-            supervisor_base_llm = ChatGoogleGenerativeAI(model=supervisor_model_name, temperature=0.2)
+            # El supervisor solo necesita producir una decision de routing, no texto largo
+            supervisor_base_llm = ChatGoogleGenerativeAI(
+                model=supervisor_model_name,
+                temperature=0.2,
+                max_output_tokens=8192
+            )
             print(f"  [Supervisor] Usando modelo liviano para routing: {supervisor_model_name}")
     except Exception as e:
         print(f"  [Supervisor] Fallo al cargar {supervisor_model_name}: {e}")
@@ -321,7 +326,12 @@ def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, cust
     if custom_model:
         try:
             from langchain_google_genai import ChatGoogleGenerativeAI
-            llm = ChatGoogleGenerativeAI(model=custom_model, temperature=0)
+            # Los agentes necesitan espacio para generar respuestas largas (analisis, codigo, etc.)
+            llm = ChatGoogleGenerativeAI(
+                model=custom_model,
+                temperature=0,
+                max_output_tokens=16384
+            )
             print(f"  [Discovery] Agente '{agent_name}' inicializado con modelo personalizado: {custom_model}")
         except Exception as e:
             print(f"  [Discovery] Fallo al cargar modelo {custom_model} para {agent_name}. Usando default. {e}")
@@ -545,70 +555,75 @@ class SelfExtendingAgent:
         for agent in sub_agents:
             if hasattr(agent, "set_tools"):
                 agent.set_tools(tools)
-                
-        agent_names = [a.name for a in sub_agents]
-        print(f"=> Sub-Agentes descubiertos dinámicamente: {agent_names}")
         
         # 2. Iniciar Grafo Principal
         workflow = StateGraph(AgentState)
         
-        # 3. Añadir el Supervisor (ahora instanciado y dotado con la lista de agentes)
-        workflow.add_node("supervisor", make_supervisor_node(self.llm, sub_agents, tools))
-        
-        # 4. Inyectar dinámicamente cada Sub-Agente como nodos y enlazar
+        # 3. Intentar añadir cada sub-agente como nodo.
+        # Los agentes que fallen (error de import, schema inválido, etc.) se omiten
+        # para evitar KeyError en el routing del supervisor.
+        successful_agents = []
         for agent in sub_agents:
-            agent_tools = agent.get_tools(tools)
-            
-            # Asegurar unicidad de herramientas para este agente antes de hacer el bind al LLM
-            if agent_tools:
-                seen_sub = set()
-                unique_sub = []
-                for t in agent_tools:
-                    name = getattr(t, "name", getattr(t, "__name__", str(t)))
-                    if name not in seen_sub:
-                        unique_sub.append(t)
-                        seen_sub.add(name)
-                agent_tools = unique_sub
-            prompt_text = agent.system_prompt
-            
             node_name = agent.name
-            tools_node_name = f"{node_name}_tools"
-            
-            # Intentar obtener custom model del agente si existe y no es nulo
-            agent_model = getattr(agent, "model", None)
-            
-            # Crear y añadir nodo inteligente
-            workflow.add_node(
-                node_name, 
-                make_agent_node(
-                    self.llm, 
-                    agent_tools, 
-                    prompt_text, 
-                    agent_name=node_name, 
-                    custom_model=agent_model
+            try:
+                agent_tools = agent.get_tools(tools)
+                
+                # Asegurar unicidad de herramientas
+                if agent_tools:
+                    seen_sub = set()
+                    unique_sub = []
+                    for t in agent_tools:
+                        t_name = getattr(t, "name", getattr(t, "__name__", str(t)))
+                        if t_name not in seen_sub:
+                            unique_sub.append(t)
+                            seen_sub.add(t_name)
+                    agent_tools = unique_sub
+                    
+                prompt_text = agent.system_prompt
+                tools_node_name = f"{node_name}_tools"
+                agent_model = getattr(agent, "model", None)
+                
+                workflow.add_node(
+                    node_name,
+                    make_agent_node(
+                        self.llm,
+                        agent_tools,
+                        prompt_text,
+                        agent_name=node_name,
+                        custom_model=agent_model
+                    )
                 )
-            )
-            
-            # Crear y añadir su nodo de herramientas (solo si usa herramientas)
-            if agent_tools:
-                workflow.add_node(tools_node_name, ToolNode(agent_tools))
-                workflow.add_conditional_edges(
-                    node_name, 
-                    create_worker_condition(tools_node_name),
-                    {tools_node_name: tools_node_name, "supervisor": "supervisor"}
-                )
-                workflow.add_edge(tools_node_name, node_name)
-            else:
-                workflow.add_edge(node_name, "supervisor")
+                
+                if agent_tools:
+                    workflow.add_node(tools_node_name, ToolNode(agent_tools))
+                    workflow.add_conditional_edges(
+                        node_name,
+                        create_worker_condition(tools_node_name),
+                        {tools_node_name: tools_node_name, "supervisor": "supervisor"}
+                    )
+                    workflow.add_edge(tools_node_name, node_name)
+                else:
+                    workflow.add_edge(node_name, "supervisor")
+                
+                successful_agents.append(agent)
+            except Exception as e:
+                print(f"  [build_graph] ⚠️  Agente '{node_name}' omitido del grafo: {e}")
 
-        # 5. Enlaces (Edges) de control
+        agent_names = [a.name for a in successful_agents]
+        print(f"=> Sub-Agentes cargados en el grafo: {agent_names}")
+        
+        # 4. Añadir el Supervisor con SOLO los agentes cargados exitosamente
+        # Esto garantiza que sus opciones de routing coincidan exactamente con los nodos del grafo
+        workflow.add_node("supervisor", make_supervisor_node(self.llm, successful_agents, tools))
+
+        # 5. Enlaces de control
         routing_map = {n: n for n in agent_names}
         routing_map["END"] = END
         
         workflow.add_conditional_edges("supervisor", supervisor_condition, routing_map)
         workflow.add_edge(START, "supervisor")
         
-        # 6. Guardar nombres para filtros dinámicos en run() y process_message()
+        # 6. Guardar nombres para filtros dinámicos
         self._agent_names = agent_names
         self._tools_nodes = [f"{n}_tools" for n in agent_names]
         

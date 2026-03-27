@@ -54,7 +54,23 @@ Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
 - Propiedades requeridas (ES OBLIGATORIO USAR @property): name, description. NO SOBREESCRIBAS `model`.
 - El metodo get_tools DEBE tener la firma exacta: def get_tools(self, all_available_tools: list = None):
 - name: minusculas, solo a-z ASCII
-- NO SOBREESCRIBAS system_prompt EN LA CLASE PYTHON. 
+- NO SOBREESCRIBAS system_prompt EN LA CLASE PYTHON.
+- CARGA DE .env OBLIGATORIA: Todo agente que use variables de entorno (credenciales, URLs, tokens)
+  DEBE cargar su propio .env al inicio del modulo. Sin esto, las herramientas no pueden leer sus variables.
+  Incluye SIEMPRE estas lineas al principio del archivo, despues de los imports:
+  ```python
+  from pathlib import Path
+  from dotenv import load_dotenv
+
+  _agent_dir = Path(__file__).parent
+  load_dotenv(_agent_dir / ".env", override=False)
+  ```
+  Y en get_tools() agrega un segundo load con override=True para capturar cambios en caliente:
+  ```python
+  def get_tools(self, all_available_tools: list = None):
+      load_dotenv(_agent_dir / ".env", override=True)
+      return [mi_herramienta]
+  ```
 - CUANDO CREES EL AGENTE DEBES OBLIGATORIAMENTE crear TAMBIÉN los siguientes 4 archivos vinculados al agente (usando 'escribir_archivo_en_proyecto').
   NOTA: Las memorias van DENTRO de la subcarpeta especial `memoria/` de ese agente:
   1. agent_core/sub_agents/<nombre>/memoria/memoria_procedimental.md (Su core prompt e instrucciones maestras)
