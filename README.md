@@ -4,69 +4,149 @@ Un asistente de Inteligencia Artificial personal, autónomo y **auto-extensible*
 
 ---
 
-## ✨ Características Principales
+## 🏗️ Arquitectura del Sistema Multi-Agente
 
-### 🧠 Arquitectura Multi-Agente Jerárquica (LangGraph)
-*   **Supervisor Central:** Orquestador inteligente que evalúa el historial completo y delega tareas a sub-agentes especializados mediante la herramienta estructurada `Route`. Soporta *Zero-Shot Handoff* entre agentes para tareas multipaso complejas.
-*   **Auto-Discovery & Hot-Reload:** El sistema detecta nuevos sub-agentes en la carpeta `sub_agents/` y recompila el grafo de LangGraph dinámicamente sin reiniciar el contenedor.
-*   **Gestión Estricta de Alucinaciones:** Restricciones sistémicas a nivel `bind_tools` (`tool_choice="any"`) previniendo loops infinitos y forzando delegaciones limpias.
+Inspirado en ecosistemas cognitivos, Leygo utiliza **LangGraph** para orquestar un esquema de delegación basado en grafos. El Supervisor actúa como enrutador inteligente y deriva el trabajo semánticamente.
 
-### ⏰ Ejecución Autónoma y Schedulers (APScheduler)
-*   **Recordatorios y Rutinas:** Capacidad de agendar recordatorios simples por texto o rutinas dinámicas generativas (cron, intervalos o fechas específicas).
-*   **Acciones de Agente en Diferido:** El usuario puede pedirle a Leygo agendar *comportamientos de agente* para el futuro (ej. *"revisa un archivo en 10 minutos y envíalo por correo"*). APScheduler gatilla la inyección de contexto en la hora exacta respetando la zona horaria local (`America/Santiago`).
-*   **Persistencia Tolerante a Fallos:** Schedulers guardados y recuperados en almacenamiento episódico de formato JSON.
+```mermaid
+flowchart TD
+    User((Usuario))
+    
+    subgraph Interfaces de Entrada
+        Voz[Telegram Audio/Texto]
+        GUI[Angular Web UI]
+    end
+    
+    subgraph Orquestador LangGraph
+        Supervisor{🧠 Supervisor Central}
+    end
+    
+    subgraph Pool de Sub-Agentes
+        Dev[💻 Dev Agent]
+        Assistant[📅 Assistant Agent]
+        MCP[🔗 MCP Agent]
+        Loopy[🌉 Loopybridge Agent]
+        Others[...Otros Agentes]
+    end
+    
+    subgraph Recursos y Ejecución
+        Memoria[(Memoria Episódica/Procedimental)]
+        Tools[Herramientas Nativas]
+        Server[MCP Servers & APIs]
+        Sched[⏰ APScheduler]
+    end
+    
+    User <-->|Comandos| Voz
+    User <-->|SSE Streaming| GUI
+    
+    Voz --> Supervisor
+    GUI --> Supervisor
+    
+    Supervisor <-->|Contexto| Memoria
+    
+    Supervisor --->|Delegación Zero-Shot| Dev
+    Supervisor --->|Delegación Zero-Shot| Assistant
+    Supervisor --->|Delegación Zero-Shot| MCP
+    Supervisor --->|Delegación Zero-Shot| Loopy
+    Supervisor --->|Delegación Zero-Shot| Others
+    
+    Dev <--> Tools
+    Assistant <--> Tools
+    MCP <--> Server
+    Loopy <--> Server
+    
+    Supervisor -.->|Programa Tareas| Sched
+    Sched -.->|Despierta Agentes| Supervisor
+```
 
-### 🔌 Integración con Google Workspace
-*   **Gmail, Calendar, Sheets y Chat:** El `Assistant Agent` posee gestión íntegra de correos, invitaciones, calendarios y envío automáticos de reportes a espacios de Google Chat.
+### 🔄 Flujo de Resolución de Tareas
 
-### 💾 Sistema de Memoria Segmentada
-*   **Memoria Episódica:** Contextos conversacionales (memoria a corto plazo) y preferencias crónicas del usuario inyectados como base.
-*   **Memoria Procedimental:** Catálogo histórico de lecciones técnicas, errores solucionados, herramientas y guías operativas.
+A continuación se detalla cómo el sistema resuelve un _prompt_ delegándolo asíncronamente:
 
-### 💻 Auto-Coder & Auto-Extension
-*   El **Dev Agent** tiene la capacidad de crear, probar localmente (`auto_coder.py`) y desplegar permanentemente nuevas herramientas o sub-agentes en Python dentro del propio ecosistema de Leygo.
-
-### 🔗 Soporte MCP (Model Context Protocol)
-*   **MCP Agent:** Conectividad robusta con repositorios locales, bases de datos (Postgres), y APIs de Slack o GitHub usando configuración dinámica YAML o Node.js.
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant GUI as Telegram / Web UI
+    participant Supervisor as 🧠 Supervisor
+    participant Worker as 🤖 Sub-Agente Especialista
+    participant Tool as 🛠️ Herramienta / MCP
+    
+    Usuario->>+GUI: Envía prompt (Texto o Nota de Voz)
+    GUI->>+Supervisor: Envía Payload + Historial
+    
+    Supervisor-->>GUI: Emite status (SSE): "🧠 Analizando..."
+    Supervisor->>Supervisor: Evalúa capacidades de todos los agentes
+    Supervisor->>+Worker: Route(Tarea técnica específica)
+    
+    Worker-->>GUI: Emite status (SSE): "🤖 Procesando con [Agente]..."
+    Worker->>+Tool: Ejecuta función estructurada
+    Tool-->>-Worker: Retorna JSON/Texto con resultados
+    Worker->>Worker: Sintetiza resultado
+    Worker-->>-Supervisor: Retorna respuesta de Worker
+    
+    Supervisor-->>GUI: Emite status (SSE): "✨ Finalizando repuesta..."
+    Supervisor-->>-GUI: FINISH (Genera Streaming de Tokens)
+    GUI-->>-Usuario: Muestra Markdown formateado
+```
 
 ---
 
-## 🚀 Arquitectura del Proyecto
+## ✨ Características Principales
+
+### 🧠 Supervisor y Hot-Reload (LangGraph)
+*   **Supervisor Central:** Orquestador inteligente que evalúa el historial completo y delega tareas a sub-agentes mediante la herramienta estructurada `Route`. 
+*   **Auto-Discovery & Hot-Reload:** El sistema detecta nuevos sub-agentes en la carpeta `sub_agents/` creados por el AutoCoder y recompila el grafo dinámicamente sin reiniciar el bot.
+*   **Anti-Alucinaciones:** Restricciones sistémicas a nivel `bind_tools` previniendo loops infinitos y forzando delegaciones seguras.
+
+### ⏰ Ejecución Autónoma en Diferido (APScheduler)
+*   **Rutinas Dinámicas:** Capacidad de agendar recordatorios o rutinas lógicas generativas (cron, intervalos o fechas).
+*   **Acciones de Agente Programadas:** El usuario puede pedir agendar _"revisa un archivo en 10 minutos y mándalo por email"_. El orquestador despierta en background e inyecta la tarea sin interacción manual, respetando estrictamente zonas horarias (`Timezone-Aware`).
+
+### 🔌 Model Context Protocol (MCP) y Puentes
+*   **MCP Agent:** Conectividad robusta con repositorios, bases de datos (Postgres), APIs (Slack, GitHub) inyectadas dinámicamente vía especificación JSON-RPC de Anthropic.
+*   **Loopybridge Agent:** Interconexión remota en tiempo real mediante tokens *Bearer* con ecosistemas de agentes externos (ej. Loopy Thinking).
+
+### 💾 Sistema de Memoria Segmentada y Aislada
+*   **Memoria Episódica:** Contextos conversacionales a largo plazo y preferencias crónicas del usuario inyectados como base.
+*   **Memoria Procedimental:** Catálogo histórico de lecciones técnicas, errores solucionados, herramientas y guías operativas. El Supervisor inyecta solo la sub-carpeta de memoria del agente activado, previniendo sobredilución del contexto.
+
+### 💻 Auto-Coder & Editor Web IDE
+*   El **Dev Agent** tiene la capacidad de crear, probar localmente y desplegar permanentemente nuevas herramientas y sub-agentes.
+*   **Leygo GUI (Angular 17+):** Una interfaz web robusta con editor de código IDE full-screen integrado. Permite gestionar variables locales (`.env`) por agente, sobreescribir sus instrucciones en línea y visualizar el historial de costos (Budget Limiter) detallado mediante métricas interactivas.
+
+---
+
+## 🚀 Estructura de Proyecto
 
 ```text
 self-agent/
 ├── agent_core/
 │   ├── main.py                 # Orquestador: Supervisor LangGraph y Routing
-│   ├── scheduler_manager.py    # Motor de APScheduler para tareas futuras
-│   ├── mcp_client.py           # Cliente Model Context Protocol
-│   ├── memory_utils.py         # Memoria Episódica y Procedimental
-│   ├── auto_coder.py           # Sandbox de ejecución y auto-programación
-│   ├── telegram_bot.py         # Recepción y webhook de Telegram
-│   ├── api_endpoints.py        # API REST para el Frontend (FastAPI)
-│   └── sub_agents/             # 🧠 Sub-Agentes Independientes
-│       ├── base.py             # Interfaces Base
-│       ├── dev/                # Dev Agent (Ingeniero de Software)
-│       ├── assistant/          # Assistant Agent (Agenda y Google Workspace)
-│       ├── mcp/                # Mcp Agent (Bases de datos y Repositorios)
-│       └── researcher/         # Researcher Agent (Búsqueda Web Pública)
-├── agent_core/memoria/         # 📁 JSONs y MDs de Estado del Agente
-├── leygo-gui/                  # 💻 Frontend Web en Angular/Node
-└── docker-compose.yml          # Despliegue en contenedores integrados
+│   ├── scheduler_manager.py    # Motor asíncrono avanzado de recordatorios
+│   ├── api_endpoints.py        # API REST FastAPI + Server-Sent Events (SSE)
+│   ├── sub_agents/             # 🧠 Sub-Agentes Independientes (Escalables)
+│   ├── memoria/                # 📁 Almacenamiento JSON/MD y Costos Históricos
+│   └── keys/                   # Autenticaciones de Google OAuth2 (token.pickle)
+├── leygo-gui/                  # 💻 Frontend App en Angular/Node
+├── docker-compose.yml          # Topología general
+└── deploy.sh                   # Script seguro de actualización y backup en caliente
 ```
 
 ---
 
 ## ⚙️ Instalación y Despliegue (Docker)
 
-La arquitectura de Leygo funciona eficientemente dentro de un entorno vectorizado en Docker para evitar colisiones de dependencias entre el Frontend GUI y los procesos Python en background.
+La arquitectura de Leygo funciona eficientemente dentro de un entorno vectorizado en Docker para evitar colisiones de dependencias entre el Frontend GUI y los procesos interactivos de Python.
 
-1.  **Clonar repositorio y preparar variables de entorno:**
-    Crea un archivo `.env` en `agent_core/.env`:
+1.  **Clonar repositorio y preparar variables de entorno principales:**
+    Crea un archivo `.env` base en `agent_core/.env`:
     ```env
     GOOGLE_API_KEY="tu_api_key_gemini"
     TELEGRAM_TOKEN="tu_token_bot"
     TELEGRAM_CHAT_ID="tu_id_numerico_principal"
-    MODEL_SUPERVISOR="gemini-2.5-pro"
+    MODEL_SUPERVISOR="gemini-2.5-flash"
+    MONTHLY_BUDGET_USD="5.0"
     ```
 
 2.  **Construir e iniciar contenedores:**
@@ -74,8 +154,8 @@ La arquitectura de Leygo funciona eficientemente dentro de un entorno vectorizad
     docker-compose up -d --build
     ```
 
-3.  **Monitoreo del Agente:**
-    Puedes seguir la orquestación (y ver cómo se transfieren tareas entre Supervisor y sub-agentes) examinando los logs de FastAPI:
+3.  **Monitoreo del Agente y Logs de Flujo:**
+    Sigue el proceso de inicialización, handshake MCP y delegaciones LangGraph en crudo:
     ```bash
     docker logs -f leygo-bot
     ```
