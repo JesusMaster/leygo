@@ -1,51 +1,74 @@
 import os
 import sys
 import asyncio
+import inspect
+import importlib
+import logging
+import warnings
+import traceback
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from typing import Annotated, TypedDict, Literal, List
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage, AIMessage
-from langchain_core.runnables.config import RunnableConfig
-from pydantic import BaseModel, Field
-from langgraph.graph import StateGraph, START, END
-from langgraph.graph.message import add_messages
-from langgraph.prebuilt import ToolNode, tools_condition
-from langgraph.checkpoint.memory import MemorySaver
+
+# Agrega la ruta base para permitir imports relativos y desde raiz
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from pydantic import BaseModel, Field, create_model
 from dotenv import load_dotenv
 
 # Load ENV before everything
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
-# Import local modules
+# Langchain / Langgraph imports
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage, AIMessage
+from langchain_core.runnables.config import RunnableConfig
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode, tools_condition
+from langgraph.checkpoint.memory import MemorySaver
+
+# Local modules
+import status_bus
 import memory_utils
 from mcp_client import MCPClientManager
+from utils.token_tracker import log_token_usage
+from agent_core.sub_agents.base import BaseSubAgent
+
+# Local tools imports
 from auto_coder import crear_y_ejecutar_herramienta_local, usar_herramienta_local, escribir_archivo_en_proyecto, eliminar_archivo_en_proyecto, instalar_dependencia_python
 from web_tools import buscar_en_internet
 from scheduler_manager import crear_recordatorio_solo_texto_para_usuario, listar_tareas_programadas, start_scheduler, stop_scheduler, crear_rutina_texto_periodica_para_usuario, eliminar_tarea_programada, agendar_accion_autonoma_agente, agendar_rutina_autonoma_agente
 from google_tools import leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo, leer_google_doc, buscar_archivos_drive
+
 MAX_CONTEXT_MESSAGES = 15
-MAX_MESSAGE_CHARS = 20000 # ~5000 tokens por mensaje individual como máximo
+MAX_MESSAGE_CHARS = 20000  # ~5000 tokens por mensaje individual como maximo
 
-import status_bus
-
-import logging
-import warnings
 logging.getLogger("langchain_core.utils.json_schema").setLevel(logging.ERROR)
 logging.getLogger("langchain_google_genai._function_utils").setLevel(logging.ERROR)
 warnings.filterwarnings('ignore', category=UserWarning, message='.*is not supported in schema.*')
 
+def get_llm_instance(model_name: str = "gemini-2.5-flash", temperature: float = 0.2, max_tokens: int = 8192):
+    """Instancia centralizada para cargar el modelo de Lenguaje y validar llaves."""
+    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("Falta configurar GOOGLE_API_KEY o GEMINI_API_KEY en el entorno.")
+    
+    return ChatGoogleGenerativeAI(
+        model=model_name,
+        temperature=temperature,
+        max_output_tokens=max_tokens
+    )
+
+def get_fallback_local_tools() -> list:
+    """Retorna la lista de todas las herramientas locales estaticas."""
+    return [
+        crear_y_ejecutar_herramienta_local, usar_herramienta_local, escribir_archivo_en_proyecto, eliminar_archivo_en_proyecto, instalar_dependencia_python, memory_utils.administrar_memoria_episodica, memory_utils.administrar_memoria_procedimental, buscar_en_internet, crear_recordatorio_solo_texto_para_usuario, agendar_accion_autonoma_agente, listar_tareas_programadas, crear_rutina_texto_periodica_para_usuario, agendar_rutina_autonoma_agente, eliminar_tarea_programada, leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo, leer_google_doc, buscar_archivos_drive
+    ]
+
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
     next_node: str
-
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-import pkgutil
-import inspect
-import importlib
-from pydantic import create_model
-from agent_core.sub_agents.base import BaseSubAgent
 
 def discover_sub_agents() -> List[BaseSubAgent]:
     """Descubre y devuelve instancias de todos los sub-agentes en la carpeta sub_agents/.
@@ -163,53 +186,40 @@ def _sanitize_messages_for_gemini(messages):
     
     return sanitized
 
-def make_supervisor_node(llm, sub_agents: List[BaseSubAgent], all_tools: list):
-    RouteModel = get_dynamic_route_model(sub_agents, all_tools)
-    
-    # Usar modelo más liviano para routing (el supervisor solo decide a quién derivar)
-    import os
-    supervisor_model_name = os.environ.get("MODEL_SUPERVISOR", "gemini-2.5-flash")
-    
-    supervisor_base_llm = None
-    try:
-        from langchain_google_genai import ChatGoogleGenerativeAI
-        api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-        if api_key:
-            # El supervisor solo necesita producir una decision de routing, no texto largo
-            supervisor_base_llm = ChatGoogleGenerativeAI(
-                model=supervisor_model_name,
+class SupervisorNode:
+    def __init__(self, llm, sub_agents: List[BaseSubAgent], all_tools: list):
+        self.sub_agents = sub_agents
+        self.all_tools = all_tools
+        self.route_model = get_dynamic_route_model(sub_agents, all_tools)
+        
+        supervisor_model_name = os.environ.get("MODEL_SUPERVISOR", "gemini-2.5-flash")
+        try:
+            self.supervisor_base_llm = get_llm_instance(
+                model_name=supervisor_model_name,
                 temperature=0.2,
-                max_output_tokens=8192
+                max_tokens=8192
             )
             print(f"  [Supervisor] Usando modelo liviano para routing: {supervisor_model_name}")
-    except Exception as e:
-        print(f"  [Supervisor] Fallo al cargar {supervisor_model_name}: {e}")
-    
-    if not supervisor_base_llm:
-        supervisor_base_llm = llm
-        
-    if not supervisor_base_llm:
-        raise RuntimeError("No se pudo inicializar el modelo de lenguaje (LLM) para el Supervisor (Routing).")
-    
-    supervisor_llm = supervisor_base_llm.bind_tools([RouteModel], tool_choice="any")
-    
-    async def supervisor_node(state: AgentState, config: RunnableConfig):
+        except Exception as e:
+            print(f"  [Supervisor] Fallo al cargar {supervisor_model_name}: {e}")
+            self.supervisor_base_llm = llm
+            
+        if not self.supervisor_base_llm:
+            raise RuntimeError("No se pudo inicializar el modelo de lenguaje (LLM) para el Supervisor (Routing).")
+            
+        self.supervisor_llm = self.supervisor_base_llm.bind_tools([self.route_model], tool_choice="any")
+
+    async def __call__(self, state: AgentState, config: RunnableConfig):
         messages = state["messages"]
 
-        from datetime import datetime
-        import os
-        from zoneinfo import ZoneInfo
-        
         tz_str = os.getenv("TZ", "America/Santiago")
         current_time_iso = datetime.now(ZoneInfo(tz_str)).isoformat()
-        
         episodic_context = memory_utils.load_all_episodic_context(agent_name="supervisor")
         
-        # Generar las reglas del prompt dinámicamente mapeadas incluyendo sus herramientas
         agent_desc_lines = []
-        for a in sub_agents:
+        for a in self.sub_agents:
             try:
-                agent_tools = [getattr(t, "name", getattr(t, "__name__", str(t))) for t in a.get_tools(all_tools)]
+                agent_tools = [getattr(t, "name", getattr(t, "__name__", str(t))) for t in a.get_tools(self.all_tools)]
                 tools_str = f" [Herramientas que domina: {', '.join(agent_tools)}]" if agent_tools else ""
             except Exception:
                 tools_str = ""
@@ -233,23 +243,12 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
-        # Para el Supervisor: filtrar mensajes de herramientas para reducir tokens,
-        # PERO respetando la regla de Gemini: un AIMessage con tool_calls DEBE ir
-        # inmediatamente seguido de sus ToolMessages. Si se rompe ese orden, la API
-        # devuelve 400 "function call turn comes immediately after a user turn".
-        #
-        # Estrategia: construir pares (AIMessage con tool_calls + sus ToolMessages).
-        # Si el par está completo → descartamos ambos (el supervisor no necesita los payloads).
-        # Si el AIMessage con tool_calls queda huérfano (sin ToolMessage siguiente) → lo descartamos también.
-        # Si el AIMessage tiene AMBOS content+tool_calls → lo incluimos solo con el content, sin tool_calls.
-        
         lightweight_messages = []
         i = 0
         while i < len(clean_messages):
             m = clean_messages[i]
             
             if isinstance(m, ToolMessage):
-                # ToolMessage huérfano (su AIMessage ya fue descartado) — omitir
                 i += 1
                 continue
             
@@ -257,29 +256,23 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
             has_content = m.content and str(m.content).strip()
             
             if has_tool_calls:
-                # Consumir todos los ToolMessages consecutivos que siguen
                 j = i + 1
                 while j < len(clean_messages) and isinstance(clean_messages[j], ToolMessage):
                     j += 1
-                # Ahora [i+1 .. j-1] son los ToolMessages del par
-                # En todos los casos descartamos el par completo (el supervisor no necesita los payloads)
-                # PERO si el AIMessage también tiene content de texto, lo preservamos sin tool_calls
                 if has_content:
-                    from langchain_core.messages import AIMessage as _AIMessage
-                    lightweight_messages.append(_AIMessage(content=m.content))
-                i = j  # saltar el AIMessage y todos sus ToolMessages
+                    lightweight_messages.append(AIMessage(content=m.content))
+                i = j
                 continue
             
             lightweight_messages.append(m)
             i += 1
         
-        # Truncar a los últimos N mensajes para evitar explotar tokens
         if len(lightweight_messages) > MAX_CONTEXT_MESSAGES:
             lightweight_messages = lightweight_messages[-MAX_CONTEXT_MESSAGES:]
         
         print(f">> Supervisor evaluando (historial: {len(lightweight_messages)} msjs, filtrados de {len(clean_messages)})...")
         status_bus.publish_status("🧠 Supervisor analizando la solicitud...")
-        response = await supervisor_llm.ainvoke([system_prompt] + lightweight_messages)
+        response = await self.supervisor_llm.ainvoke([system_prompt] + lightweight_messages)
         
         next_step = "FINISH"
         if hasattr(response, "tool_calls") and response.tool_calls:
@@ -292,7 +285,6 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
             if next_step in ("finish", "end"):
                 print(f"[Supervisor] El flujo general está completo según el Supervisor. Terminando (END).")
                 status_bus.publish_status("✅ Tarea completada")
-                from langchain_core.messages import AIMessage
                 new_msg = AIMessage(
                     content=resp_conv, 
                     usage_metadata=getattr(response, "usage_metadata", {}), 
@@ -308,63 +300,54 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
             else:
                 content = f"[Instrucción del Supervisor para {next_step}]: Por favor, atiende la solicitud del usuario de acuerdo a tu rol usando tu contexto."
             
-            from langchain_core.messages import HumanMessage
             instruction_msg = HumanMessage(content=content, name="Supervisor")
-            
-            # ATENCIÓN: Solo devolvemos la instrucción fingida como HumanMessage. NO devolvemos
-            # el 'response' original (AIMessage con tool_calls) para evitar corromper la alternancia 
-            # Human/AI de la API de Gemini (INVALID_ARGUMENT).
             return {"messages": [instruction_msg], "next_node": next_step}
             
         print("[Supervisor] Respondiendo directamente o asumiendo END sin herramienta.")
         return {"messages": [response], "next_node": "END"}
 
-    return supervisor_node
-
-def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, custom_model: str = None):
-    # Si el agente especifica un modelo a usar, instanciamos uno nuevo conservando temperature=0
-    if custom_model:
-        try:
-            from langchain_google_genai import ChatGoogleGenerativeAI
-            # Los agentes necesitan espacio para generar respuestas largas (analisis, codigo, etc.)
-            llm = ChatGoogleGenerativeAI(
-                model=custom_model,
-                temperature=0,
-                max_output_tokens=16384
-            )
-            print(f"  [Discovery] Agente '{agent_name}' inicializado con modelo personalizado: {custom_model}")
-        except Exception as e:
-            print(f"  [Discovery] Fallo al cargar modelo {custom_model} para {agent_name}. Usando default. {e}")
-            
-    if not llm:
-        raise RuntimeError(f"El LLM para el agente '{agent_name}' no pudo ser inicializado. Verifica las llaves API.")
-
-    if tools:
-        llm_with_tools = llm.bind_tools(tools)
-    else:
-        llm_with_tools = llm
+class WorkerNode:
+    def __init__(self, llm, tools, system_prompt_text, agent_name: str = None, custom_model: str = None):
+        self.agent_name = agent_name
+        self.system_prompt_text = system_prompt_text
         
-    async def agent_node(state: AgentState, config: RunnableConfig):
+        if custom_model:
+            try:
+                self.llm = get_llm_instance(
+                    model_name=custom_model,
+                    temperature=0.0,
+                    max_tokens=16384
+                )
+                print(f"  [Discovery] Agente '{agent_name}' inicializado con modelo personalizado: {custom_model}")
+            except Exception as e:
+                print(f"  [Discovery] Fallo al cargar modelo {custom_model} para {agent_name}. Usando default. {e}")
+                self.llm = llm
+        else:
+            self.llm = llm
+            
+        if not self.llm:
+            raise RuntimeError(f"El LLM para el agente '{agent_name}' no pudo ser inicializado. Verifica las llaves API.")
+
+        if tools:
+            self.llm_with_tools = self.llm.bind_tools(tools)
+        else:
+            self.llm_with_tools = self.llm
+
+    async def __call__(self, state: AgentState, config: RunnableConfig):
         thread_id = "default_session"
         if config and "configurable" in config:
             thread_id = config["configurable"].get("thread_id", "default_session")
             
-        from datetime import datetime
-        import os
-        from zoneinfo import ZoneInfo
-        
         tz_str = os.getenv("TZ", "America/Santiago")
         current_time_iso = datetime.now(ZoneInfo(tz_str)).isoformat()
         
-        episodic_context = memory_utils.load_all_episodic_context(agent_name=agent_name)
-        procedural_context = memory_utils.load_procedural_documentation(agent_name=agent_name)
+        episodic_context = memory_utils.load_all_episodic_context(agent_name=self.agent_name)
+        procedural_context = memory_utils.load_procedural_documentation(agent_name=self.agent_name)
         
-        formatted_prompt = system_prompt_text \
-            .replace("{current_time_iso}", current_time_iso) \
-            .replace("{thread_id}", thread_id) \
-            .replace("{episodic_context}", episodic_context) \
-            .replace("{procedural_context}", procedural_context if procedural_context else "Aún no tienes herramientas.")
-        formatted_prompt += """\n\nATENCIÓN - REGLAS PARA SUB-AGENTES TRABAJADORES:
+        formatted_prompt = self.system_prompt_text             .replace("{current_time_iso}", current_time_iso)             .replace("{thread_id}", thread_id)             .replace("{episodic_context}", episodic_context)             .replace("{procedural_context}", procedural_context if procedural_context else "Aún no tienes herramientas.")
+        formatted_prompt += """
+
+ATENCIÓN - REGLAS PARA SUB-AGENTES TRABAJADORES:
 1. NUNCA intentes usar la herramienta 'Route'. El Supervisor se encarga del routing.
 2. Si tu system prompt te indica que eres el agente FINAL para la consulta: da una respuesta completa y directa al usuario. NO escribas frases como "el siguiente agente debe...", "ahora el assistant debe...", ni nada similar. TÚ eres la respuesta.
 3. Solo si la tarea requiere una habilidad que realmente NO tienes (diferente tipo de integración, otra API, etc.), entonces explica brevemente qué hiciste y qué quedaría pendiente. El Supervisor lo tomará.
@@ -374,26 +357,21 @@ def make_agent_node(llm, tools, system_prompt_text, agent_name: str = None, cust
         messages = state["messages"]
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
-        # Truncar a los últimos N mensajes para evitar explotar tokens
         if len(clean_messages) > MAX_CONTEXT_MESSAGES:
             clean_messages = clean_messages[-MAX_CONTEXT_MESSAGES:]
         
-        # Sanitizar: asegurar que la secuencia de mensajes sea válida para Gemini
-        # (no dejar ToolMessages huérfanos ni AIMessages con tool_calls sin respuesta)
         clean_messages = _sanitize_messages_for_gemini(clean_messages)
         
         print(f">> LLM Razonando en contexto Worker (historial: {len(clean_messages)} msjs)...")
-        if agent_name:
-            status_bus.publish_status(f"⚙️ Agente **{agent_name}** procesando...")
-        response = await llm_with_tools.ainvoke([system_msg] + clean_messages)
-        # Notificar si va a llamar herramientas
+        if self.agent_name:
+            status_bus.publish_status(f"⚙️ Agente **{self.agent_name}** procesando...")
+        response = await self.llm_with_tools.ainvoke([system_msg] + clean_messages)
+        
         if hasattr(response, "tool_calls") and response.tool_calls:
             for tc in response.tool_calls:
                 tool_name = tc.get("name", "herramienta") if isinstance(tc, dict) else getattr(tc, "name", "herramienta")
                 status_bus.publish_status(f"🔧 Usando herramienta: **{tool_name}**")
         return {"messages": [response]}
-        
-    return agent_node
 
 def supervisor_condition(state: AgentState):
     next_node = state.get("next_node", "END")
@@ -423,7 +401,7 @@ class SelfExtendingAgent:
             
         # Initialize the LLM
         try:
-            self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.2)
+            self.llm = get_llm_instance(model_name="gemini-2.5-flash", temperature=0.2)
         except Exception as e:
              self.llm = None
              print(f"Warning: Failed to initialize Gemini LLM. Ensure GOOGLE_API_KEY is set. Error: {e}")
@@ -440,11 +418,8 @@ class SelfExtendingAgent:
         # Re-inicializar LLM si estaba en None (común tras primer setup fallido por falta de llaves)
         if not self.llm:
             try:
-                from langchain_google_genai import ChatGoogleGenerativeAI
-                api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-                if api_key:
-                    self.llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2)
-                    print("=> LLM principal inicializado correctamente tras el Setup.")
+                self.llm = get_llm_instance(model_name="gemini-2.0-flash", temperature=0.2)
+                print("=> LLM principal inicializado correctamente tras el Setup.")
             except Exception as e:
                 print(f"=> Falló intento de inicializar LLM tras el Setup: {e}")
 
@@ -456,36 +431,7 @@ class SelfExtendingAgent:
         tools = await self.mcp_manager.get_all_tools()
         
         # Add fallback local tools
-        tools.extend([
-            crear_y_ejecutar_herramienta_local, 
-            usar_herramienta_local, 
-            escribir_archivo_en_proyecto,
-            eliminar_archivo_en_proyecto,
-            instalar_dependencia_python,
-            memory_utils.administrar_memoria_episodica, 
-            memory_utils.administrar_memoria_procedimental,
-            buscar_en_internet, 
-            crear_recordatorio_solo_texto_para_usuario,
-            agendar_accion_autonoma_agente,
-            listar_tareas_programadas,
-            crear_rutina_texto_periodica_para_usuario,
-            agendar_rutina_autonoma_agente,
-            eliminar_tarea_programada,
-            leer_correos_recientes,
-            modificar_etiquetas_correo,
-            enviar_correo,
-            listar_eventos_calendario,
-            responder_evento_calendario,
-            crear_evento_calendario,
-            leer_hoja_calculo,
-            escribir_hoja_calculo,
-            listar_espacios_chat,
-            leer_mensajes_chat,
-            enviar_mensaje_chat,
-            buscar_chat_directo,
-            leer_google_doc,
-            buscar_archivos_drive
-        ])
+        tools.extend(get_fallback_local_tools())
         
         # Eliminar duplicados para evitar error de Gemini 400 'Duplicate function declaration'
         seen_names = set()
@@ -585,7 +531,7 @@ class SelfExtendingAgent:
                 
                 workflow.add_node(
                     node_name,
-                    make_agent_node(
+                    WorkerNode(
                         self.llm,
                         agent_tools,
                         prompt_text,
@@ -614,7 +560,7 @@ class SelfExtendingAgent:
         
         # 4. Añadir el Supervisor con SOLO los agentes cargados exitosamente
         # Esto garantiza que sus opciones de routing coincidan exactamente con los nodos del grafo
-        workflow.add_node("supervisor", make_supervisor_node(self.llm, successful_agents, tools))
+        workflow.add_node("supervisor", SupervisorNode(self.llm, successful_agents, tools))
 
         # 5. Enlaces de control
         routing_map = {n: n for n in agent_names}
@@ -709,7 +655,6 @@ class SelfExtendingAgent:
                                         mod_name = msg.response_metadata.get("model_name", "Desconocido")
                                         
                                     try:
-                                        from utils.token_tracker import log_token_usage
                                         usage_record = log_token_usage(
                                             user_input=f"[{node_name}] {user_input[:50]}...",
                                             model=mod_name,
@@ -749,8 +694,6 @@ class SelfExtendingAgent:
                                         final_answer = final_answer if final_answer else text
                                         
         except Exception as e:
-            import traceback
-            import asyncio
             error_traceback = traceback.format_exc()
             print(f"\\n[CRITICAL FATAL] Error del Sistema. Inicializando auto-curacion...\\n{str(e)}")
             
@@ -841,7 +784,6 @@ class SelfExtendingAgent:
                                     supervisor_fallback = raw.strip()
 
                     # Caso especial: Capturar 'respuesta_conversacional' de la herramienta 'Route'
-                    from langchain_core.messages import AIMessage
                     if isinstance(output, AIMessage) and output.tool_calls:
                         for tc in output.tool_calls:
                             if tc.get("name") == "Route":
@@ -860,7 +802,6 @@ class SelfExtendingAgent:
                             if hasattr(response_obj, "response_metadata"):
                                 mod_name = response_obj.response_metadata.get("model_name", "Desconocido")
                             try:
-                                from utils.token_tracker import log_token_usage
                                 usage_record = log_token_usage(
                                     user_input=f"[{node_name}] {user_input[:50]}...",
                                     model=mod_name,
@@ -891,12 +832,10 @@ class SelfExtendingAgent:
                             full_response = ""
 
         except Exception as e:
-            import traceback
             error_traceback = traceback.format_exc()
             print(f"\n[stream_message CRITICAL] {e}\n{error_traceback}")
             
             # Auto-repair en background (igual que process_message)
-            import asyncio as _asyncio
             repair_msg = f"@dev URGENTE FALLO DE RED: {error_traceback}"
             async def auto_repair():
                 try:
@@ -905,7 +844,7 @@ class SelfExtendingAgent:
                         pass
                 except Exception:
                     pass
-            _asyncio.create_task(auto_repair())
+            asyncio.create_task(auto_repair())
             
             yield {"type": "error", "content": "Ocurrió un error técnico. Activé auto-reparación."}
             return
