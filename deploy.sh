@@ -110,6 +110,7 @@ backup_path "agent_core/config"
 backup_path "agent_core/keys"
 backup_path "agent_core/memoria"
 backup_path "agent_core/.env"
+backup_path "agent_core/mcp_config.yaml"
 # Auto-descubre y respalda TODOS los sub-agentes en carpeta
 backup_all_sub_agents
 
@@ -128,6 +129,7 @@ restore_path "agent_core/config"
 restore_path "agent_core/keys"
 restore_path "agent_core/memoria"
 restore_path "agent_core/.env"
+backup_path "agent_core/mcp_config.yaml"
 # Restaura automáticamente todos los sub-agentes respaldados
 restore_all_sub_agents
 

@@ -184,6 +184,26 @@ def _sanitize_messages_for_gemini(messages):
     if not sanitized or isinstance(sanitized[0], AIMessage):
         sanitized.insert(0, HumanMessage(content="Continúa con la tarea pendiente usando tu contexto y herramientas.", name="WorkerContext"))
     
+    # 3. Eliminar tool_calls huérfanos de AIMessages (previene error 400 de Gemini)
+    cleaned_sequence = []
+    for i, m in enumerate(sanitized):
+        if isinstance(m, AIMessage) and getattr(m, 'tool_calls', None):
+            # Check if there is at least one following ToolMessage
+            has_tool_message_next = False
+            if i + 1 < len(sanitized) and isinstance(sanitized[i+1], ToolMessage):
+                has_tool_message_next = True
+            
+            if not has_tool_message_next:
+                # Strip tool_calls to prevent Gemini API crashing due to unfulfilled function calls
+                m = AIMessage(
+                    content=m.content, 
+                    usage_metadata=getattr(m, "usage_metadata", None),
+                    response_metadata=getattr(m, "response_metadata", None)
+                )
+        cleaned_sequence.append(m)
+        
+    sanitized = cleaned_sequence
+    
     return sanitized
 
 class SupervisorNode:
