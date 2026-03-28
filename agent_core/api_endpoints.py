@@ -52,12 +52,20 @@ async def get_agents():
                 # Intentamos obtener herramientas sin inyectar las globales
                 dummy_tools = a.get_tools([])
                 for t in dummy_tools:
+                    # Para evitar "AttributeError" al evaluar t.__name__ o t.__doc__ cuando
+                    # t es una herramienta de clase (como StructuredTool de langchain), usamos
+                    # getattr o hasattr adecuadamente.
+                    t_name = getattr(t, "name", None) or getattr(t, "__name__", "Sin nombre")
+                    t_desc = getattr(t, "description", None) or getattr(t, "__doc__", "Sin descripción")
+                    if not t_desc:
+                        t_desc = "Sin descripción"
+                        
                     tools_list.append({
-                        "name": getattr(t, "name", t.__name__),
-                        "description": getattr(t, "description", t.__doc__ or "Sin descripción")
+                        "name": t_name,
+                        "description": str(t_desc).strip()
                     })
-            except:
-                pass
+            except Exception as e:
+                print(f"[get_agents UI] Advertencia: fallo extrayendo herramientas de {a.name}: {e}")
 
             result.append({
                 "name": a.name,
