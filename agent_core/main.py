@@ -288,7 +288,9 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
             i += 1
         
         if len(lightweight_messages) > MAX_CONTEXT_MESSAGES:
-            lightweight_messages = lightweight_messages[-MAX_CONTEXT_MESSAGES:]
+            # Preservar siempre el primer mensaje (el prompt original del usuario) para no perder el norte de la tarea
+            first_msg = lightweight_messages[0]
+            lightweight_messages = [first_msg] + lightweight_messages[-(MAX_CONTEXT_MESSAGES-1):]
         
         print(f">> Supervisor evaluando (historial: {len(lightweight_messages)} msjs, filtrados de {len(clean_messages)})...")
         status_bus.publish_status("🧠 Supervisor analizando la solicitud...")
@@ -378,7 +380,9 @@ ATENCIÓN - REGLAS PARA SUB-AGENTES TRABAJADORES:
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
         if len(clean_messages) > MAX_CONTEXT_MESSAGES:
-            clean_messages = clean_messages[-MAX_CONTEXT_MESSAGES:]
+            # Preservar siempre el prompt original del usuario en índice 0
+            first_msg = clean_messages[0]
+            clean_messages = [first_msg] + clean_messages[-(MAX_CONTEXT_MESSAGES-1):]
         
         clean_messages = _sanitize_messages_for_gemini(clean_messages)
         
