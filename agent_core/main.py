@@ -801,11 +801,9 @@ class SelfExtendingAgent:
 
                 # ── 1. Stream de tokens del LLM ──────────────────────────────────
                 if kind == "on_chat_model_stream":
-                    # Solo emitir tokens de nodos worker (no supervisor, no tool nodes)
-                            # No emitimos tokens de workers en tiempo real (según solicitud usuario)
-                            # para que solo se vea el resultado final cuando el flujo termine.
-                            # full_response += text    <- No lo sumamos para evitar duplicados en 'done'
-                            pass
+                    # No emitimos tokens parciales en tiempo real.
+                    # La respuesta final se captura completa en on_chat_model_end.
+                    pass
 
                 # ── 2. Inicio de un nodo → publicar status ───────────────────────
                 elif kind == "on_chain_start" and node_name:
@@ -820,14 +818,13 @@ class SelfExtendingAgent:
 
                 # ── 3. Fin de un nodo supervisor → capturar respuesta directa ────
                 elif kind == "on_chain_end" and node_name == "supervisor":
-                    # Si el supervisor respondió directamente (sin delegar), capturar su texto
-                    # Esto ocurre cuando el supervisor decide FINISH en el primer paso
                     output = event.get("data", {}).get("output", {})
                     if isinstance(output, dict) and "messages" in output:
                         msgs = output["messages"]
-                        if msgs:
+                        next_node_val = output.get("next_node", "")
+                        is_finishing = next_node_val == "END"
+                        if msgs and is_finishing:
                             last_msg = msgs[-1]
-                            # Solo si NO es un tool_call (routing call)
                             has_tc = hasattr(last_msg, "tool_calls") and last_msg.tool_calls
                             if not has_tc:
                                 raw = last_msg.content if hasattr(last_msg, "content") else ""
@@ -836,17 +833,33 @@ class SelfExtendingAgent:
                                 if raw and isinstance(raw, str):
                                     supervisor_fallback = raw.strip()
 
-                    # Caso especial: Capturar 'respuesta_conversacional' de la herramienta 'Route'
-                    if isinstance(output, AIMessage) and output.tool_calls:
-                        for tc in output.tool_calls:
-                            if tc.get("name") == "Route":
-                                args = tc.get("args", {})
-                                if args.get("next_node", "").lower() in ("finish", "end"):
-                                    supervisor_fallback = args.get("respuesta_conversacional", "").strip()
-
-                # ── 4. Fin del LLM call → capturar usage ────────────────────────
+                # ── 4. Fin del LLM call → capturar usage + respuesta worker ─────
                 elif kind == "on_chat_model_end":
                     response_obj = event.get("data", {}).get("output")
+                    
+                    # Capturar la respuesta textual final del worker
+                    if response_obj and node_name in worker_nodes:
+                        has_tc = hasattr(response_obj, "tool_calls") and response_obj.tool_calls
+                        if not has_tc:
+                            # Es la respuesta final (sin tool_calls) → capturarla
+                            raw_content = getattr(response_obj, "content", "")
+                            if isinstance(raw_content, list):
+                                raw_content = "".join(
+                                    p.get("text", "") for p in raw_content
+                                    if isinstance(p, dict) and p.get("type") == "text"
+                                )
+                            if raw_content and isinstance(raw_content, str):
+                                full_response = raw_content.strip()
+                        else:
+                            # Tiene tool_calls → notificar status y resetear
+                            for tc in response_obj.tool_calls:
+                                tool_name = tc.get("name", "herramienta") if isinstance(tc, dict) else getattr(tc, "name", "herramienta")
+                                msg = f"🔧 Usando herramienta: **{tool_name}**"
+                                status_bus.publish_status(msg)
+                                yield {"type": "status", "content": msg}
+                            full_response = ""
+                    
+                    # Trackeo de tokens y costos
                     if response_obj and hasattr(response_obj, "usage_metadata") and response_obj.usage_metadata:
                         i_toks = response_obj.usage_metadata.get("input_tokens", 0)
                         o_toks = response_obj.usage_metadata.get("output_tokens", 0)
@@ -868,7 +881,6 @@ class SelfExtendingAgent:
                                     output_tokens=o_toks,
                                     thread_id=thread_id
                                 )
-                                # Acumular el total de la respuesta para el frontend
                                 total_usage["input_tokens"] += usage_record.get("input_tokens", 0)
                                 total_usage["output_tokens"] += usage_record.get("output_tokens", 0)
                                 total_usage["cost_usd"] += usage_record.get("cost_usd", 0.0)
@@ -877,18 +889,6 @@ class SelfExtendingAgent:
                                     
                             except Exception as e:
                                 print(f"[stream] Error trackeando tokens: {e}")
-
-                    # Si el nodo tiene tool_calls, reset full_response para no mezclar
-                    # el "thinking" con la respuesta final
-                    if response_obj and hasattr(response_obj, "tool_calls") and response_obj.tool_calls:
-                        if node_name in worker_nodes:
-                            for tc in response_obj.tool_calls:
-                                tool_name = tc.get("name", "herramienta") if isinstance(tc, dict) else getattr(tc, "name", "herramienta")
-                                msg = f"🔧 Usando herramienta: **{tool_name}**"
-                                status_bus.publish_status(msg)
-                                yield {"type": "status", "content": msg}
-                            # Reset: lo que se escribió no es la respuesta final
-                            full_response = ""
 
         except Exception as e:
             error_traceback = traceback.format_exc()

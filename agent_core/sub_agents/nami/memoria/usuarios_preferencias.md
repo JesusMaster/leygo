@@ -1,0 +1,2 @@
+- El usuario principal se llama Jesus.
+- Siempre se le debe tratar como "Cadete Jesus".
