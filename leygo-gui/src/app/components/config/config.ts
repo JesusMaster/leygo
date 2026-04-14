@@ -27,6 +27,7 @@ export class ConfigComponent implements OnInit {
   ollamaModels = signal<string[]>([]);
   geminiModels = signal<{name: string, displayName: string}[]>([]);
   anthropicModels = signal<{name: string, displayName: string}[]>([]);
+  anthropicKeyInput = '';
 
   ngOnInit() {
     this.loadData();
@@ -54,6 +55,9 @@ export class ConfigComponent implements OnInit {
         this.ollamaUrlInput = data['OLLAMA_BASE_URL'];
       } else {
         this.ollamaUrlInput = 'http://host.docker.internal:11434';
+      }
+      if (data['ANTHROPIC_API_KEY']) {
+        this.anthropicKeyInput = data['ANTHROPIC_API_KEY'];
       }
     });
 
@@ -268,6 +272,19 @@ export class ConfigComponent implements OnInit {
   saveOllamaUrl() {
     if (!this.ollamaUrlInput) return;
     this.updateVar('OLLAMA_BASE_URL', this.ollamaUrlInput);
+  }
+
+  saveAnthropicKey() {
+    if (!this.anthropicKeyInput) return;
+    this.updateVar('ANTHROPIC_API_KEY', this.anthropicKeyInput);
+    // Recargar modelos después de guardar la key
+    setTimeout(() => {
+      this.api.getAnthropicModels().subscribe(res => {
+        if (res.models && res.models.length > 0) {
+          this.anthropicModels.set(res.models);
+        }
+      });
+    }, 1000);
   }
 
   isKnownModel(value: string): boolean {

@@ -125,6 +125,35 @@
         </div>
       </div>
 
+      <!-- Anthropic Configuration Card -->
+      <div class="config-card glass highlight" style="border-top: 4px solid #d97706;">
+        <div class="card-icon" style="color: #d97706; margin-bottom: 0px;"><i class="ph-fill ph-brain"></i></div>
+        <h3 style="font-size: 1.35rem; margin-top: -8px; margin-bottom: 4px;">Anthropic (Claude)</h3>
+        <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Conecta modelos Claude para razonamiento avanzado y análisis profundo.</p>
+        
+        <div style="margin-bottom: 15px;">
+           @if (anthropicModels().length > 0) {
+             <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+               <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
+               Conectado ({{ anthropicModels().length }} modelos disponibles)
+             </span>
+           } @else {
+             <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+               <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
+               Sin API Key configurada
+             </span>
+           }
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+           <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">API Key</label>
+           <div style="display: flex; gap: 8px;">
+               <input type="password" [(ngModel)]="anthropicKeyInput" placeholder="sk-ant-api03-..." style="flex: 1; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px;">
+               <button class="save-btn" style="border: 1px solid var(--border-light)" (click)="saveAnthropicKey()"><i class="ph ph-floppy-disk"></i></button>
+           </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Env Vars Card -->
