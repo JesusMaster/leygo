@@ -889,8 +889,10 @@ class SelfExtendingAgent:
                                 if mod_name == "Desconocido":
                                     mod_name = response_obj.response_metadata.get("model", "Desconocido")
                                 
-                                # Si no tiene prefijo pero sabemos que es de Ollama o local
-                                if mod_name != "Desconocido" and "gemini" not in mod_name.lower() and not mod_name.startswith("ollama/"):
+                                # Si no tiene prefijo conocido, asumir que es local (Ollama)
+                                _mod_lower = mod_name.lower()
+                                is_known_cloud = any(p in _mod_lower for p in ["gemini", "claude", "gpt", "o1", "o3"])
+                                if mod_name != "Desconocido" and not is_known_cloud and not mod_name.startswith("ollama/"):
                                     mod_name = f"ollama/{mod_name}"
                             try:
                                 usage_record = log_token_usage(
