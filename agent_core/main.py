@@ -435,10 +435,11 @@ class SelfExtendingAgent:
             
         # Initialize the LLM
         try:
-            self.llm = get_llm_instance(model_name="gemini-2.5-flash", temperature=0.2)
+            prov = os.environ.get("MODEL_PROVIDER", "gemini-2.5-flash")
+            self.llm = get_llm_instance(model_name=prov, temperature=0.2)
         except Exception as e:
              self.llm = None
-             print(f"Warning: Failed to initialize Gemini LLM. Ensure GOOGLE_API_KEY is set. Error: {e}")
+             print(f"Warning: Failed to initialize Default LLM. Error: {e}")
 
         # The graph and memory saver
         self.graph = None
@@ -452,7 +453,8 @@ class SelfExtendingAgent:
         # Re-inicializar LLM si estaba en None (común tras primer setup fallido por falta de llaves)
         if not self.llm:
             try:
-                self.llm = get_llm_instance(model_name="gemini-2.0-flash", temperature=0.2)
+                prov = os.environ.get("MODEL_PROVIDER", "gemini-2.0-flash")
+                self.llm = get_llm_instance(model_name=prov, temperature=0.2)
                 print("=> LLM principal inicializado correctamente tras el Setup.")
             except Exception as e:
                 print(f"=> Falló intento de inicializar LLM tras el Setup: {e}")
@@ -687,6 +689,11 @@ class SelfExtendingAgent:
                                     mod_name = "Desconocido"
                                     if hasattr(msg, "response_metadata") and msg.response_metadata:
                                         mod_name = msg.response_metadata.get("model_name", "Desconocido")
+                                        if mod_name == "Desconocido":
+                                            mod_name = msg.response_metadata.get("model", "Desconocido")
+                                            # If it lacks prefix but we know it's local
+                                            if mod_name != "Desconocido" and "gemini" not in mod_name.lower() and not mod_name.startswith("ollama/"):
+                                                mod_name = f"ollama/{mod_name}"
                                         
                                     try:
                                         usage_record = log_token_usage(

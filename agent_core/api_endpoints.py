@@ -312,8 +312,10 @@ async def update_config(req: ConfigUpdateRequest, request: Request):
         agent = request.app.state.agent
         if agent:
             try:
-                from langchain_google_genai import ChatGoogleGenerativeAI
-                agent.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.2)
+                from main import get_llm_instance
+                # Tomar modelo principal default si se modificó
+                main_model = os.environ.get("MODEL_PROVIDER", "gemini-2.5-flash")
+                agent.llm = get_llm_instance(model_name=main_model, temperature=0.2)
                 await agent.initialize()
                 print(f"  [Hot-Reload] Variable crítica '{req.key}' actualizada. Agente re-inicializado.")
             except Exception as e:
