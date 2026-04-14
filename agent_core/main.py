@@ -58,13 +58,14 @@ def get_llm_instance(model_name: str = "gemini-2.5-flash", temperature: float = 
         if any(keyword in model_name_lower for keyword in ["gemma", "llama", "deepseek", "qwen", "mistral", "phi"]):
             if "gemini" not in model_name_lower:
                 model_name = f"ollama/{model_name}"
+                model_name_lower = model_name.lower()
 
+    # --- Ollama (local) ---
     if model_name.startswith("ollama/"):
         try:
             from langchain_ollama import ChatOllama
         except ImportError:
             from langchain_community.chat_models import ChatOllama
-        # Usamos host.docker.internal para que el contenedor pueda llegar al host nativo
         ollama_base_url = os.environ.get("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
         return ChatOllama(
             model=model_name.replace("ollama/", ""),
@@ -72,6 +73,20 @@ def get_llm_instance(model_name: str = "gemini-2.5-flash", temperature: float = 
             temperature=temperature
         )
 
+    # --- Anthropic (Claude) ---
+    if "claude" in model_name_lower:
+        from langchain_anthropic import ChatAnthropic
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise ValueError("Falta configurar ANTHROPIC_API_KEY en el entorno para usar modelos Claude.")
+        return ChatAnthropic(
+            model=model_name,
+            api_key=api_key,
+            temperature=temperature,
+            max_tokens=max_tokens
+        )
+
+    # --- Google Gemini (default) ---
     api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("Falta configurar GOOGLE_API_KEY o GEMINI_API_KEY en el entorno.")

@@ -96,7 +96,18 @@ def log_token_usage(user_input: str, model: str, input_tokens: int, output_token
 
     if (precio_in <= 0.0 or precio_out <= 0.0) and not model.startswith("ollama/"):
         _lower = model.lower()
-        if "lite" in _lower:
+        # Anthropic Claude pricing (per 1M tokens)
+        if "claude" in _lower:
+            if "opus" in _lower:
+                precio_in, precio_out = 15.00, 75.00
+            elif "sonnet" in _lower:
+                precio_in, precio_out = 3.00, 15.00
+            elif "haiku" in _lower:
+                precio_in, precio_out = 0.25, 1.25
+            else:
+                precio_in, precio_out = 3.00, 15.00  # Default Claude
+        # Gemini fallback pricing
+        elif "lite" in _lower:
             precio_in, precio_out = 0.25, 1.50
         elif "pro" in _lower:
             precio_in, precio_out = 2.00, 12.00
