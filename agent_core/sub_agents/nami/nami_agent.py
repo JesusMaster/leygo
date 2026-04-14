@@ -54,28 +54,47 @@ def convert_aviation_units(
     Convierte entre diferentes unidades metricas e imperiales usadas en aviacion.
     Unidades soportadas:
     - Distancia: 'ft' (pies), 'm' (metros), 'nm' (millas nauticas), 'km' (kilometros)
-    - Velocidad: 'knots' (nudos), 'kmh' (kilometros por hora)
+    - Velocidad: 'knots' (nudos), 'kmh' (kilometros por hora), 'mph' (millas por hora)
+    - Altitud: 'fl' (flight level, en centenas de pies) a 'ft' o 'm'
+    Soporta TODAS las combinaciones entre unidades del mismo tipo.
     """
-    conversions = {
-        'ft_to_m': 0.3048,
-        'm_to_ft': 3.28084,
-        'nm_to_km': 1.852,
-        'km_to_nm': 0.539957,
-        'knots_to_kmh': 1.852,
-        'kmh_to_knots': 0.539957
-    }
-    conversion_key = f"{from_unit.lower()}_to_{to_unit.lower()}"
+    from_u = from_unit.lower().strip()
+    to_u = to_unit.lower().strip()
 
-    if conversion_key in conversions:
-        result = value * conversions[conversion_key]
-        return f"{value} {from_unit} equivale a {result:.2f} {to_unit}."
-    elif f"{to_unit.lower()}_to_{from_unit.lower()}" in conversions:
-        # Inversa
-        inv_key = f"{to_unit.lower()}_to_{from_unit.lower()}"
-        result = value / conversions[inv_key]
-        return f"{value} {from_unit} equivale a {result:.2f} {to_unit}."
-    else:
-        return f"Error: Conversion de '{from_unit}' a '{to_unit}' no soportada. Revisa las unidades disponibles."
+    if from_u == to_u:
+        return f"{value} {from_unit} equivale a {value:.2f} {to_unit} (misma unidad)."
+
+    # Factores de conversion a unidad base (metros para distancia, km/h para velocidad)
+    distance_to_meters = {
+        'ft': 0.3048,
+        'm': 1.0,
+        'km': 1000.0,
+        'nm': 1852.0,
+        'fl': 0.3048 * 100,  # 1 FL = 100 ft
+    }
+
+    speed_to_kmh = {
+        'knots': 1.852,
+        'kn': 1.852,
+        'kmh': 1.0,
+        'km/h': 1.0,
+        'mph': 1.60934,
+    }
+
+    # Intentar conversion de distancia
+    if from_u in distance_to_meters and to_u in distance_to_meters:
+        value_in_meters = value * distance_to_meters[from_u]
+        result = value_in_meters / distance_to_meters[to_u]
+        return f"{value} {from_unit} equivale a {result:.4f} {to_unit}."
+
+    # Intentar conversion de velocidad
+    if from_u in speed_to_kmh and to_u in speed_to_kmh:
+        value_in_kmh = value * speed_to_kmh[from_u]
+        result = value_in_kmh / speed_to_kmh[to_u]
+        return f"{value} {from_unit} equivale a {result:.4f} {to_unit}."
+
+    all_units = list(distance_to_meters.keys()) + list(speed_to_kmh.keys())
+    return f"Error: No se puede convertir '{from_unit}' a '{to_unit}'. Unidades soportadas: {', '.join(all_units)}. No se puede mezclar distancia con velocidad."
 
 
 # --- Clase del Agente ---
