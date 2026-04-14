@@ -92,12 +92,16 @@ def get_llm_instance(model_name: str = "gemini-2.5-flash", temperature: float = 
         api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
             raise ValueError("Falta configurar OPENAI_API_KEY en el entorno para usar modelos OpenAI.")
-        return ChatOpenAI(
-            model=model_name,
-            api_key=api_key,
-            temperature=temperature,
-            max_tokens=max_tokens
-        )
+        # O-series (o1, o3, o4) son modelos de razonamiento que NO soportan temperature
+        is_reasoning = any(model_name_lower.startswith(p) for p in ["o1", "o3", "o4"])
+        kwargs = {
+            "model": model_name,
+            "api_key": api_key,
+            "max_tokens": max_tokens,
+        }
+        if not is_reasoning:
+            kwargs["temperature"] = temperature
+        return ChatOpenAI(**kwargs)
 
     # --- Google Gemini (default) ---
     api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
