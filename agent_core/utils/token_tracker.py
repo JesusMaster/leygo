@@ -47,6 +47,9 @@ def get_prices_from_json(model_id: str) -> tuple[float, float]:
     Busca el precio por cada 1M de tokens en gemini_cost.json para el modelo específico.
     Retorna: (precio_in, precio_out)
     """
+    if model_id.startswith("ollama/"):
+        return 0.0, 0.0
+
     precio_in = 0.50
     precio_out = 3.00
 
@@ -91,7 +94,7 @@ def log_token_usage(user_input: str, model: str, input_tokens: int, output_token
     """
     precio_in, precio_out = get_prices_from_json(model)
 
-    if precio_in <= 0.0 or precio_out <= 0.0:
+    if (precio_in <= 0.0 or precio_out <= 0.0) and not model.startswith("ollama/"):
         _lower = model.lower()
         if "lite" in _lower:
             precio_in, precio_out = 0.25, 1.50

@@ -252,6 +252,28 @@ async def get_config():
     config = dotenv_values(env_path)
     return config
 
+@router.get("/ollama/tags")
+async def get_ollama_tags():
+    """Consulta la API local de Ollama para listar los modelos instalados."""
+    try:
+        import urllib.request
+        import json
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+        from dotenv import dotenv_values
+        config = dotenv_values(env_path)
+        base_url = config.get("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
+        
+        req = urllib.request.Request(f"{base_url}/api/tags")
+        with urllib.request.urlopen(req, timeout=5.0) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode('utf-8'))
+                models = [m.get("name") for m in data.get("models", [])]
+                return {"models": models}
+        return {"models": []}
+    except Exception as e:
+        print(f"[Ollama] Error al obtener tags: {e}")
+        return {"models": [], "error": str(e)}
+
 @router.post("/config")
 async def update_config(req: ConfigUpdateRequest, request: Request):
     """Actualiza una variable de entorno en el archivo .env."""

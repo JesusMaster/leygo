@@ -123,4 +123,9 @@ export class ApiService {
   getTelegramStatus(): Observable<any> {
     return this.http.get(`${this.baseUrl}/config/telegram/status`);
   }
+
+  getOllamaTags(): Observable<{models: string[], error?: string}> {
+    return this.http.get<{models: string[], error?: string}>(`${this.baseUrl}/ollama/tags`);
+  }
 }
+

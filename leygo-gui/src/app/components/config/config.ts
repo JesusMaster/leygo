@@ -23,12 +23,28 @@ export class ConfigComponent implements OnInit {
   newKey = '';
   newValue = '';
 
+  ollamaUrlInput = '';
+  ollamaModels = signal<string[]>([]);
+
   ngOnInit() {
     this.loadData();
+    this.api.getOllamaTags().subscribe(res => {
+      if (res.models && res.models.length > 0) {
+        this.ollamaModels.set(res.models);
+      }
+    });
   }
 
   loadData() {
-    this.api.getConfig().subscribe(data => this.config.set(data));
+    this.api.getConfig().subscribe(data => {
+      this.config.set(data);
+      if (data['OLLAMA_BASE_URL']) {
+        this.ollamaUrlInput = data['OLLAMA_BASE_URL'];
+      } else {
+        this.ollamaUrlInput = 'http://host.docker.internal:11434';
+      }
+    });
+
     this.api.getAuthStatus().subscribe(status => {
       let restored = false;
       if (typeof localStorage !== 'undefined') {
@@ -235,6 +251,11 @@ export class ConfigComponent implements OnInit {
     this.updateVar(this.newKey, this.newValue);
     this.newKey = '';
     this.newValue = '';
+  }
+
+  saveOllamaUrl() {
+    if (!this.ollamaUrlInput) return;
+    this.updateVar('OLLAMA_BASE_URL', this.ollamaUrlInput);
   }
 
   getEnvKeys() {

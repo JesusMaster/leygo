@@ -116,7 +116,8 @@
   align-items: center;
 }
 
-.value-input input {
+.value-input input,
+.value-input select.model-select {
   background: #f9fafb;
   border: 1px solid var(--border-light);
   border-radius: 8px;
@@ -126,9 +127,11 @@
   font-size: 0.9em;
   color: #4b5563;
   transition: border-color 0.2s;
+  appearance: auto;
 }
 
-.value-input input:focus {
+.value-input input:focus,
+.value-input select.model-select:focus {
   outline: none;
   border-color: var(--accent-primary);
 }

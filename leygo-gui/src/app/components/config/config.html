@@ -96,6 +96,35 @@
         </p>
       </div>
 
+      <!-- Ollama Configuration Card -->
+      <div class="config-card glass highlight" style="border-top: 4px solid #f97316;">
+        <div class="card-icon" style="color: #f97316; margin-bottom: 0px;"><i class="ph-fill ph-cpu"></i></div>
+        <h3 style="font-size: 1.35rem; margin-top: -8px; margin-bottom: 4px;">IA Local (Ollama)</h3>
+        <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Conecta tus motores locales para procesamiento gratuito y privado de IA.</p>
+        
+        <div style="margin-bottom: 15px;">
+           @if (ollamaModels().length > 0) {
+             <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+               <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
+               Conectado ({{ ollamaModels().length }} modelos listos)
+             </span>
+           } @else {
+             <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+               <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
+               Desconectado / Carga en proceso
+             </span>
+           }
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+           <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">URL Base Servidor Local</label>
+           <div style="display: flex; gap: 8px;">
+               <input type="text" [(ngModel)]="ollamaUrlInput" placeholder="http://host.docker.internal:11434" style="flex: 1; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px;">
+               <button class="save-btn" style="border: 1px solid var(--border-light)" (click)="saveOllamaUrl()"><i class="ph ph-floppy-disk"></i></button>
+           </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Env Vars Card -->
@@ -114,10 +143,45 @@
                     <span class="key">{{ key }}</span>
                   </div>
                   <div class="value-input">
-                    <input type="text" [value]="config()[key]" #valInput>
-                    <button class="save-btn" title="Guardar cambios" (click)="updateVar(key, valInput.value)">
-                      <i class="ph ph-floppy-disk"></i>
-                    </button>
+                    @if (key.startsWith('MODEL_')) {
+                      <select [ngModel]="config()[key]" #valInput class="model-select">
+                        <optgroup label="Google / Gemini">
+                          <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                          <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+                          <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                        </optgroup>
+                        <optgroup label="OpenAI">
+                          <option value="gpt-4o-mini">gpt-4o-mini</option>
+                          <option value="gpt-4o">gpt-4o</option>
+                          <option value="o3-mini">o3-mini</option>
+                        </optgroup>
+                        <optgroup label="Anthropic">
+                          <option value="claude-3-5-sonnet-latest">claude-3-5-sonnet</option>
+                          <option value="claude-3-7-sonnet-latest">claude-3-7-sonnet</option>
+                        </optgroup>
+                        @if (ollamaModels().length > 0) {
+                          <optgroup label="Ollama (Local)">
+                            @for (modelName of ollamaModels(); track modelName) {
+                              <option [value]="'ollama/' + modelName">ollama/{{ modelName }}</option>
+                            }
+                          </optgroup>
+                        }
+                        <!-- Permite custom value que el backend devuelva -->
+                        @if (config()[key] && !['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-pro', 'gpt-4o-mini', 'gpt-4o', 'o3-mini', 'claude-3-5-sonnet-latest', 'claude-3-7-sonnet-latest'].includes(config()[key]) && !config()[key].startsWith('ollama/')) {
+                          <optgroup label="Personalizado">
+                            <option [value]="config()[key]">{{ config()[key] }}</option>
+                          </optgroup>
+                        }
+                      </select>
+                      <button class="save-btn" title="Guardar cambios" (click)="updateVar(key, valInput.value)">
+                        <i class="ph ph-floppy-disk"></i>
+                      </button>
+                    } @else {
+                      <input type="text" [value]="config()[key]" #valInput>
+                      <button class="save-btn" title="Guardar cambios" (click)="updateVar(key, valInput.value)">
+                        <i class="ph ph-floppy-disk"></i>
+                      </button>
+                    }
                   </div>
                 </div>
               }
