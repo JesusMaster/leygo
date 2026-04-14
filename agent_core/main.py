@@ -908,7 +908,7 @@ class SelfExtendingAgent:
                                 
                                 # Si no tiene prefijo conocido, asumir que es local (Ollama)
                                 _mod_lower = mod_name.lower()
-                                is_known_cloud = any(p in _mod_lower for p in ["gemini", "claude", "gpt", "o1", "o3"])
+                                is_known_cloud = any(p in _mod_lower for p in ["gemini", "claude", "gpt", "o1", "o3", "o4", "chatgpt"])
                                 if mod_name != "Desconocido" and not is_known_cloud and not mod_name.startswith("ollama/"):
                                     mod_name = f"ollama/{mod_name}"
                             try:
