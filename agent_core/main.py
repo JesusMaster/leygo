@@ -24,6 +24,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, ToolMessage, AIMessage
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.graph import StateGraph, START, END
+from langgraph.graph import END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import MemorySaver
@@ -420,6 +421,9 @@ ATENCIÓN - REGLAS PARA SUB-AGENTES TRABAJADORES:
 
 def supervisor_condition(state: AgentState):
     next_node = state.get("next_node", "END")
+    # Normalizar variantes que el LLM pueda emitir
+    if next_node.upper() in ("FINISH", "END", "DONE", "COMPLETE"):
+        return "END"
     return next_node
 
 def create_worker_condition(tools_node_name: str):
@@ -894,18 +898,7 @@ class SelfExtendingAgent:
             error_traceback = traceback.format_exc()
             print(f"\n[stream_message CRITICAL] {e}\n{error_traceback}")
             
-            # Auto-repair en background (igual que process_message)
-            repair_msg = f"@dev URGENTE FALLO DE RED: {error_traceback}"
-            async def auto_repair():
-                try:
-                    heal_cfg = {"configurable": {"thread_id": f"repair_{thread_id}"}, "recursion_limit": 50}
-                    async for _ in self.graph.astream({"messages": [HumanMessage(content=repair_msg)]}, config=heal_cfg, stream_mode="updates"):
-                        pass
-                except Exception:
-                    pass
-            asyncio.create_task(auto_repair())
-            
-            yield {"type": "error", "content": "Ocurrió un error técnico. Activé auto-reparación."}
+            yield {"type": "error", "content": f"Error técnico: {str(e)[:200]}"}
             return
 
         # ── Evento final con texto completo + usage ──────────────────────────────
