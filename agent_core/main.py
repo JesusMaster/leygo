@@ -51,7 +51,10 @@ warnings.filterwarnings('ignore', category=UserWarning, message='.*is not suppor
 def get_llm_instance(model_name: str = "gemini-2.5-flash", temperature: float = 0.2, max_tokens: int = 8192):
     """Instancia centralizada para cargar el modelo de Lenguaje y validar llaves."""
     if model_name.startswith("ollama/"):
-        from langchain_community.chat_models import ChatOllama
+        try:
+            from langchain_ollama import ChatOllama
+        except ImportError:
+            from langchain_community.chat_models import ChatOllama
         # Usamos host.docker.internal para que el contenedor pueda llegar al host nativo
         ollama_base_url = os.environ.get("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
         return ChatOllama(

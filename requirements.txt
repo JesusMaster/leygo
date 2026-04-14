@@ -19,4 +19,4 @@ argon2-cffi
 PyJWT
 yt-dlp
 webvtt-py
-youtube-transcript-api
+youtube-transcript-apilangchain-ollama>=0.2.0
