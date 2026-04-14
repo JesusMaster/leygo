@@ -105,7 +105,23 @@ def log_token_usage(user_input: str, model: str, input_tokens: int, output_token
             elif "haiku" in _lower:
                 precio_in, precio_out = 0.25, 1.25
             else:
-                precio_in, precio_out = 3.00, 15.00  # Default Claude
+                precio_in, precio_out = 3.00, 15.00
+        # OpenAI pricing (per 1M tokens)
+        elif "gpt" in _lower or _lower.startswith("o1") or _lower.startswith("o3") or _lower.startswith("o4"):
+            if "gpt-4o-mini" in _lower:
+                precio_in, precio_out = 0.15, 0.60
+            elif "gpt-4o" in _lower:
+                precio_in, precio_out = 2.50, 10.00
+            elif "gpt-4-turbo" in _lower:
+                precio_in, precio_out = 10.00, 30.00
+            elif _lower.startswith("o1"):
+                precio_in, precio_out = 15.00, 60.00
+            elif _lower.startswith("o3"):
+                precio_in, precio_out = 2.00, 8.00
+            elif _lower.startswith("o4"):
+                precio_in, precio_out = 2.00, 8.00
+            else:
+                precio_in, precio_out = 2.50, 10.00  # Default OpenAI
         # Gemini fallback pricing
         elif "lite" in _lower:
             precio_in, precio_out = 0.25, 1.50

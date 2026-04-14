@@ -28,6 +28,8 @@ export class ConfigComponent implements OnInit {
   geminiModels = signal<{name: string, displayName: string}[]>([]);
   anthropicModels = signal<{name: string, displayName: string}[]>([]);
   anthropicKeyInput = '';
+  openaiModels = signal<{name: string, displayName: string}[]>([]);
+  openaiKeyInput = '';
 
   ngOnInit() {
     this.loadData();
@@ -46,6 +48,11 @@ export class ConfigComponent implements OnInit {
         this.anthropicModels.set(res.models);
       }
     });
+    this.api.getOpenaiModels().subscribe(res => {
+      if (res.models && res.models.length > 0) {
+        this.openaiModels.set(res.models);
+      }
+    });
   }
 
   loadData() {
@@ -58,6 +65,9 @@ export class ConfigComponent implements OnInit {
       }
       if (data['ANTHROPIC_API_KEY']) {
         this.anthropicKeyInput = data['ANTHROPIC_API_KEY'];
+      }
+      if (data['OPENAI_API_KEY']) {
+        this.openaiKeyInput = data['OPENAI_API_KEY'];
       }
     });
 
@@ -277,7 +287,6 @@ export class ConfigComponent implements OnInit {
   saveAnthropicKey() {
     if (!this.anthropicKeyInput) return;
     this.updateVar('ANTHROPIC_API_KEY', this.anthropicKeyInput);
-    // Recargar modelos después de guardar la key
     setTimeout(() => {
       this.api.getAnthropicModels().subscribe(res => {
         if (res.models && res.models.length > 0) {
@@ -287,15 +296,24 @@ export class ConfigComponent implements OnInit {
     }, 1000);
   }
 
+  saveOpenaiKey() {
+    if (!this.openaiKeyInput) return;
+    this.updateVar('OPENAI_API_KEY', this.openaiKeyInput);
+    setTimeout(() => {
+      this.api.getOpenaiModels().subscribe(res => {
+        if (res.models && res.models.length > 0) {
+          this.openaiModels.set(res.models);
+        }
+      });
+    }, 1000);
+  }
+
   isKnownModel(value: string): boolean {
     if (!value) return true;
-    // Check Ollama models
     if (value.startsWith('ollama/')) return true;
-    // Check dynamically loaded Gemini models
     if (this.geminiModels().some(m => m.name === value)) return true;
-    // Check dynamically loaded Anthropic models
     if (this.anthropicModels().some(m => m.name === value)) return true;
-    // Fallback static list
+    if (this.openaiModels().some(m => m.name === value)) return true;
     const staticModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-pro'];
     return staticModels.includes(value);
   }

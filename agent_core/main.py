@@ -86,6 +86,19 @@ def get_llm_instance(model_name: str = "gemini-2.5-flash", temperature: float = 
             max_tokens=max_tokens
         )
 
+    # --- OpenAI (GPT / O-series) ---
+    if any(p in model_name_lower for p in ["gpt", "o1-", "o3-", "o4-", "chatgpt"]):
+        from langchain_openai import ChatOpenAI
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("Falta configurar OPENAI_API_KEY en el entorno para usar modelos OpenAI.")
+        return ChatOpenAI(
+            model=model_name,
+            api_key=api_key,
+            temperature=temperature,
+            max_tokens=max_tokens
+        )
+
     # --- Google Gemini (default) ---
     api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
     if not api_key:

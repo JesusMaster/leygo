@@ -135,4 +135,8 @@ export class ApiService {
   getAnthropicModels(): Observable<{models: {name: string, displayName: string}[], error?: string}> {
     return this.http.get<{models: {name: string, displayName: string}[], error?: string}>(`${this.baseUrl}/anthropic/models`);
   }
+
+  getOpenaiModels(): Observable<{models: {name: string, displayName: string}[], error?: string}> {
+    return this.http.get<{models: {name: string, displayName: string}[], error?: string}>(`${this.baseUrl}/openai/models`);
+  }
 }

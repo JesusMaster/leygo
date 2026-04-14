@@ -339,6 +339,41 @@ async def get_anthropic_models():
         print(f"[Anthropic] Error al obtener modelos: {e}")
         return {"models": [], "error": str(e)}
 
+@router.get("/openai/models")
+async def get_openai_models():
+    """Consulta la API de OpenAI para listar los modelos disponibles."""
+    try:
+        import urllib.request
+        import json
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+        from dotenv import dotenv_values
+        config = dotenv_values(env_path)
+        api_key = config.get("OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
+        
+        if not api_key:
+            return {"models": [], "error": "OPENAI_API_KEY no configurada"}
+        
+        url = "https://api.openai.com/v1/models"
+        req = urllib.request.Request(url)
+        req.add_header("Authorization", f"Bearer {api_key}")
+        with urllib.request.urlopen(req, timeout=10.0) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode('utf-8'))
+                models = []
+                # Filtrar solo modelos de chat (gpt, o1, o3, o4)
+                chat_prefixes = ("gpt-", "o1", "o3", "o4", "chatgpt")
+                for m in data.get("data", []):
+                    model_id = m.get("id", "")
+                    if any(model_id.startswith(p) for p in chat_prefixes):
+                        models.append({"name": model_id, "displayName": model_id})
+                # Ordenar: modelos más recientes primero
+                models.sort(key=lambda x: x["name"], reverse=True)
+                return {"models": models}
+        return {"models": []}
+    except Exception as e:
+        print(f"[OpenAI] Error al obtener modelos: {e}")
+        return {"models": [], "error": str(e)}
+
 @router.post("/config")
 async def update_config(req: ConfigUpdateRequest, request: Request):
     """Actualiza una variable de entorno en el archivo .env."""
