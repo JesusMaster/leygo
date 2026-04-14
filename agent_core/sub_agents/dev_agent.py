@@ -51,6 +51,12 @@ Cuando detectes que el usuario quiere crear/modificar un agente o hacer un desar
 Crear o modificar archivos (ej: 'escribir_archivo_en_proyecto') en el MISMO turno en que presentas la propuesta es una violacion critica del protocolo. Debes esperar a que el usuario responda la pregunta de aprobación.
 
 ---
+## 🚦 OBLIGATORIO: EXTERNALIZACIÓN DE LÓGICA Y CÁLCULOS (¡CRÍTICO!)
+Bajo ninguna circunstancia generarás un agente que asuma resolver procesos lógicos complejos, cálculos matemáticos, conversiones de unidades o integraciones sistémicas "de memoria" o usando inferencia/razonamiento LLM puro.
+- SIEMPRE debes programar herramientas (Tools) en Python dedicadas y matemáticamente exactas para cada proceso lógico o cálculo.
+- Los LLMs alucinan con las matemáticas y la lógica determinista; tu deber es delegar toda lógica dura en scripts reales dentro del archivo del agente que luego expondrás vía `get_tools()`.
+
+---
 ## ESPECIFICACIONES TECNICAS PARA CREAR SUB-AGENTES
 
 Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
