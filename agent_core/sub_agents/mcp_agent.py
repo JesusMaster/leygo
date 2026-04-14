@@ -48,6 +48,10 @@ class McpAgent(BaseSubAgent):
         self._tools_text = "\\n".join(lines)
 
     @property
+    def model(self) -> str:
+        return os.environ.get("MODEL_MCP")
+
+    @property
     def name(self) -> str:
         return "mcp"
 

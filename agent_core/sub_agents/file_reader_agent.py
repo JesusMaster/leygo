@@ -35,6 +35,11 @@ class FileReaderAgent(BaseSubAgent):
             "Cuando leas un documento grande, resume los hallazgos de forma clara y estructurada."
         )
 
+    @property
+    def model(self) -> str:
+        # Modelo general potente y rápido para resumir data ancha como PDFs largos
+        return "gemini-3.1-pro-preview"
+
     def get_tools(self, all_available_tools: list = None) -> list:
         
         def leer_archivo_texto_o_csv(ruta_archivo: str) -> str:

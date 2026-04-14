@@ -39,7 +39,7 @@ from agent_core.sub_agents.base import BaseSubAgent
 from auto_coder import crear_y_ejecutar_herramienta_local, usar_herramienta_local, escribir_archivo_en_proyecto, eliminar_archivo_en_proyecto, instalar_dependencia_python
 from web_tools import buscar_en_internet
 from scheduler_manager import crear_recordatorio_solo_texto_para_usuario, listar_tareas_programadas, start_scheduler, stop_scheduler, crear_rutina_texto_periodica_para_usuario, eliminar_tarea_programada, agendar_accion_autonoma_agente, agendar_rutina_autonoma_agente
-from google_tools import leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo, leer_google_doc, buscar_archivos_drive
+from google_tools import leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, leer_hilo_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, comprobar_disponibilidad_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo, leer_google_doc, buscar_archivos_drive, crear_google_doc
 
 MAX_CONTEXT_MESSAGES = 15
 MAX_MESSAGE_CHARS = 20000  # ~5000 tokens por mensaje individual como maximo
@@ -63,7 +63,7 @@ def get_llm_instance(model_name: str = "gemini-2.5-flash", temperature: float = 
 def get_fallback_local_tools() -> list:
     """Retorna la lista de todas las herramientas locales estaticas."""
     return [
-        crear_y_ejecutar_herramienta_local, usar_herramienta_local, escribir_archivo_en_proyecto, eliminar_archivo_en_proyecto, instalar_dependencia_python, memory_utils.administrar_memoria_episodica, memory_utils.administrar_memoria_procedimental, buscar_en_internet, crear_recordatorio_solo_texto_para_usuario, agendar_accion_autonoma_agente, listar_tareas_programadas, crear_rutina_texto_periodica_para_usuario, agendar_rutina_autonoma_agente, eliminar_tarea_programada, leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo, leer_google_doc, buscar_archivos_drive
+        crear_y_ejecutar_herramienta_local, usar_herramienta_local, escribir_archivo_en_proyecto, eliminar_archivo_en_proyecto, instalar_dependencia_python, memory_utils.administrar_memoria_episodica, memory_utils.administrar_memoria_procedimental, buscar_en_internet, crear_recordatorio_solo_texto_para_usuario, agendar_accion_autonoma_agente, listar_tareas_programadas, crear_rutina_texto_periodica_para_usuario, agendar_rutina_autonoma_agente, eliminar_tarea_programada, leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, leer_hilo_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, comprobar_disponibilidad_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo, leer_google_doc, buscar_archivos_drive, crear_google_doc
     ]
 
 class AgentState(TypedDict):

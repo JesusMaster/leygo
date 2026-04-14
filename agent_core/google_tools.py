@@ -11,12 +11,14 @@ from google_auth import get_google_credentials
 # ==========================================================
 
 @tool
-def leer_correos_recientes(max_resultados: int = 5) -> str:
+def leer_correos_recientes(max_resultados: int = 25, solo_no_leidos: bool = False, busqueda: str = "") -> str:
     """
     Lee los correos más recientes en la bandeja de entrada del usuario usando Gmail API.
     
     Args:
-        max_resultados: El número máximo de correos a recuperar (por defecto 5, máximo 20).
+        max_resultados: El número máximo de correos a recuperar (por defecto 25).
+        solo_no_leidos: Si es True, filtra y devuelve exclusivamente los correos que NO han sido leídos.
+        busqueda: (Opcional) Texto o filtro tipo Gmail (ej. 'from:netflix' o 'proyecto') para una búsqueda específica.
     Returns:
         Un resumen en texto de los correos encontrados con remitente, asunto y snippet.
     """
@@ -26,8 +28,23 @@ def leer_correos_recientes(max_resultados: int = 5) -> str:
 
     try:
         service = build('gmail', 'v1', credentials=creds)
-        # Buscar en INBOX
-        results = service.users().messages().list(userId='me', labelIds=['INBOX'], maxResults=max_resultados).execute()
+        
+        list_options = {
+            'userId': 'me',
+            'maxResults': max_resultados
+        }
+        
+        if not busqueda:
+            etiquetas_busqueda = ['INBOX']
+            if solo_no_leidos:
+                etiquetas_busqueda.append('UNREAD')
+            list_options['labelIds'] = etiquetas_busqueda
+        else:
+            query_parts = [busqueda]
+            if solo_no_leidos: query_parts.append('is:unread')
+            list_options['q'] = " ".join(query_parts)
+            
+        results = service.users().messages().list(**list_options).execute()
         messages = results.get('messages', [])
 
         if not messages:
@@ -66,6 +83,52 @@ def leer_correos_recientes(max_resultados: int = 5) -> str:
         
     except HttpError as error:
         return f"Ocurrió un error al leer Gmail: {error}"
+
+@tool
+def leer_hilo_correo(thread_id: str) -> str:
+    """
+    Lee un hilo completo de correos de Gmail para mantener el contexto histórico antes de responder o resumir.
+    
+    Args:
+        thread_id: El ID del hilo a leer (se obtiene como 'Thread' en la salida de leer_correos_recientes).
+    Returns:
+        El contenido histórico de los mensajes dentro de ese hilo.
+    """
+    creds = get_google_credentials()
+    if not creds:
+        return "Error: No se pudo verificar la autorización de Google."
+
+    try:
+        service = build('gmail', 'v1', credentials=creds)
+        thread = service.users().threads().get(userId='me', id=thread_id).execute()
+        messages = thread.get('messages', [])
+        
+        historial = [f"--- HILO DE CORREOS ({len(messages)} mensajes) ---"]
+        for msg in messages:
+            headers = msg.get('payload', {}).get('headers', [])
+            sender = next((h['value'] for h in headers if h['name'] == 'From'), "Desconocido")
+            date_sent = next((h['value'] for h in headers if h['name'] == 'Date'), "Desconocido")
+            snippet = msg.get('snippet', '')
+            
+            body_text = snippet
+            try:
+                parts = msg.get('payload', {}).get('parts', [])
+                for part in parts:
+                    if part.get('mimeType') == 'text/plain':
+                        data = part.get('body', {}).get('data', '')
+                        if data:
+                            import base64
+                            body_text = base64.urlsafe_b64decode(data).decode('utf-8')
+                            body_text = body_text.replace('\r\n', '\n').strip()[:1000] # Limitar a 1k chars por msg
+                            break
+            except Exception:
+                pass
+                
+            historial.append(f"\n> MENSAJE DE: {sender} (Fecha: {date_sent})\n{body_text}\n" + ("-"*40))
+            
+        return "\n".join(historial)
+    except HttpError as error:
+        return f"Ocurrió un error al leer el hilo de correos: {error}"
 
 @tool
 def enviar_correo(destinatario: str, asunto: str, cuerpo: str, responde_a_message_id: str = None, thread_id: str = None) -> str:
@@ -200,12 +263,14 @@ def modificar_etiquetas_correo(mensaje_id: str, etiquetas_a_agregar: list[str] =
 # ==========================================================
 
 @tool
-def listar_eventos_calendario(dias_a_futuro: int = 7) -> str:
+def listar_eventos_calendario(dias_a_futuro: int = 7, fecha_inicio_iso: str = None, fecha_fin_iso: str = None) -> str:
     """
-    Obtiene los próximos eventos del Google Calendar principal del usuario.
+    Obtiene los eventos del Google Calendar principal del usuario. Permite buscar en el futuro o en fechas específicas/pasadas.
     
     Args:
-        dias_a_futuro: Cuántos días en el futuro buscar eventos (por defecto 7).
+        dias_a_futuro: Cuántos días buscar si no se dan fechas exactas (por defecto 7).
+        fecha_inicio_iso: (Opcional) Fecha de inicio estricta en ISO (ej. '2026-05-10T00:00:00Z').
+        fecha_fin_iso: (Opcional) Fecha final estricta. Si pasas inicio pero no fin, asume 1 día tras el inicio.
     Returns:
         Una lista de eventos en texto legible.
     """
@@ -218,8 +283,19 @@ def listar_eventos_calendario(dias_a_futuro: int = 7) -> str:
 
         # Configurar límites de tiempo
         now = datetime.datetime.utcnow()
-        timeMin = now.isoformat() + 'Z'  # 'Z' indica UTC
-        timeMax = (now + datetime.timedelta(days=dias_a_futuro)).isoformat() + 'Z'
+        if fecha_inicio_iso:
+            timeMin = fecha_inicio_iso if fecha_inicio_iso.endswith('Z') or '+' in fecha_inicio_iso else fecha_inicio_iso + 'Z'
+            if fecha_fin_iso:
+                timeMax = fecha_fin_iso if fecha_fin_iso.endswith('Z') or '+' in fecha_fin_iso else fecha_fin_iso + 'Z'
+            else:
+                try:
+                    dt = datetime.datetime.fromisoformat(timeMin.replace('Z', '+00:00'))
+                    timeMax = (dt + datetime.timedelta(days=1)).isoformat()
+                except:
+                    timeMax = (now + datetime.timedelta(days=dias_a_futuro)).isoformat() + 'Z'
+        else:
+            timeMin = now.isoformat() + 'Z'
+            timeMax = (now + datetime.timedelta(days=dias_a_futuro)).isoformat() + 'Z'
 
         events_result = service.events().list(
             calendarId='primary', timeMin=timeMin, timeMax=timeMax,
@@ -324,6 +400,47 @@ def responder_evento_calendario(evento_id: str, respuesta: str) -> str:
 
     except HttpError as error:
         return f"Ocurrió un error al responder la invitación: {error}"
+
+@tool
+def comprobar_disponibilidad_calendario(fecha_inicio_iso: str, fecha_fin_iso: str) -> str:
+    """
+    Analiza la agenda del usuario buscando conflictos, reuniones o huecos libres 
+    (Free/Busy) en un rango de fechas. Muy útil antes de agendar un evento nuevo.
+    
+    Args:
+        fecha_inicio_iso: Fecha/hora de inicio en ISO (ej: '2026-03-12T09:00:00Z').
+        fecha_fin_iso: Fecha/hora de fin en ISO (ej: '2026-03-12T18:00:00Z').
+    Returns:
+        Un informe textual detallando si el espacio está libre u ocupado.
+    """
+    creds = get_google_credentials()
+    if not creds:
+        return "Error: No se pudo verificar la autorización de Google."
+
+    try:
+        service = build('calendar', 'v3', credentials=creds)
+        
+        body = {
+            "timeMin": fecha_inicio_iso if fecha_inicio_iso.endswith('Z') or '+' in fecha_inicio_iso else fecha_inicio_iso + 'Z',
+            "timeMax": fecha_fin_iso if fecha_fin_iso.endswith('Z') or '+' in fecha_fin_iso else fecha_fin_iso + 'Z',
+            "items": [{"id": "primary"}]
+        }
+        
+        freebusy_result = service.freebusy().query(body=body).execute()
+        calendars = freebusy_result.get('calendars', {})
+        primary_cal = calendars.get('primary', {})
+        busy_slots = primary_cal.get('busy', [])
+        
+        if not busy_slots:
+            return f"✅ ¡Todo despejado! No hay conflictos programados en este rango ({fecha_inicio_iso} - {fecha_fin_iso})."
+            
+        res = [f"⚠️ Cuidado: Hay {len(busy_slots)} espacio(s) Ocupado(s) en este lapso de tiempo:"]
+        for b in busy_slots:
+            res.append(f"- Desde {b.get('start')} hasta {b.get('end')}")
+            
+        return "\n".join(res)
+    except HttpError as error:
+        return f"Ocurrió un error al verificar disponibilidad: {error}"
 
 @tool
 def crear_evento_calendario(titulo: str, descripcion: str, fecha_hora_inicio_iso: str, duracion_minutos: int = 60, invitados: list[str] = None, con_meet: bool = False) -> str:
@@ -783,3 +900,47 @@ def buscar_archivos_drive(nombre: str, max_resultados: int = 10) -> str:
         return f"Ocurrió un error al buscar en Google Drive: {error}"
     except Exception as error:
         return f"Ocurrió un error inesperado al buscar en Google Drive: {error}"
+
+@tool
+def crear_google_doc(titulo: str, contenido: str) -> str:
+    """
+    Crea un nuevo documento de texto en Google Docs con el título y contenido especificados.
+    Útil para redactar actas, reportes, notas y resúmenes largos.
+    
+    Args:
+        titulo: El título del documento (ej. 'Resumen de la semana').
+        contenido: El texto inicial a insertar en el documento.
+    Returns:
+        Un mensaje de confirmación con el link directo para editar/ver.
+    """
+    creds = get_google_credentials()
+    if not creds:
+        return "Error: No se pudo verificar la autorización de Google."
+
+    try:
+        docs_service = build('docs', 'v1', credentials=creds)
+        # 1. Crear documento vacío
+        doc = docs_service.documents().create(body={'title': titulo}).execute()
+        doc_id = doc['documentId']
+        
+        # 2. Insertar texto si se provee
+        if contenido and contenido.strip():
+            contenido = contenido.replace('\\n', '\n')
+            requests = [
+                {
+                    'insertText': {
+                        'location': {
+                            'index': 1,
+                        },
+                        'text': contenido
+                    }
+                }
+            ]
+            docs_service.documents().batchUpdate(documentId=doc_id, body={'requests': requests}).execute()
+            
+        return f"Documento creado exitosamente en tu Google Drive.\nTítulo: '{titulo}'\nURL: https://docs.google.com/document/d/{doc_id}/edit"
+        
+    except HttpError as error:
+        return f"Ocurrió un error de la API al crear el documento: {error}"
+    except Exception as error:
+        return f"Ocurrió un error inesperado al crear el documento: {error}"

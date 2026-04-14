@@ -4,6 +4,10 @@ from .base import BaseSubAgent
 
 class AssistantAgent(BaseSubAgent):
     @property
+    def model(self) -> str:
+        return os.environ.get("MODEL_ASSISTANT")
+
+    @property
     def name(self) -> str:
         return "assistant"
         
