@@ -694,9 +694,10 @@ class SelfExtendingAgent:
                                         mod_name = msg.response_metadata.get("model_name", "Desconocido")
                                         if mod_name == "Desconocido":
                                             mod_name = msg.response_metadata.get("model", "Desconocido")
-                                            # If it lacks prefix but we know it's local
-                                            if mod_name != "Desconocido" and "gemini" not in mod_name.lower() and not mod_name.startswith("ollama/"):
-                                                mod_name = f"ollama/{mod_name}"
+                                        
+                                        # If it lacks prefix but we know it's local
+                                        if mod_name != "Desconocido" and "gemini" not in mod_name.lower() and not mod_name.startswith("ollama/"):
+                                            mod_name = f"ollama/{mod_name}"
                                         
                                     try:
                                         usage_record = log_token_usage(
@@ -845,6 +846,12 @@ class SelfExtendingAgent:
                             mod_name = "Desconocido"
                             if hasattr(response_obj, "response_metadata"):
                                 mod_name = response_obj.response_metadata.get("model_name", "Desconocido")
+                                if mod_name == "Desconocido":
+                                    mod_name = response_obj.response_metadata.get("model", "Desconocido")
+                                
+                                # Si no tiene prefijo pero sabemos que es de Ollama o local
+                                if mod_name != "Desconocido" and "gemini" not in mod_name.lower() and not mod_name.startswith("ollama/"):
+                                    mod_name = f"ollama/{mod_name}"
                             try:
                                 usage_record = log_token_usage(
                                     user_input=f"[{node_name}] {user_input[:50]}...",
