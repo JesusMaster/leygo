@@ -26,6 +26,7 @@ export class ConfigComponent implements OnInit {
   ollamaUrlInput = '';
   ollamaModels = signal<string[]>([]);
   geminiModels = signal<{name: string, displayName: string}[]>([]);
+  geminiKeyInput = '';
   anthropicModels = signal<{name: string, displayName: string}[]>([]);
   anthropicKeyInput = '';
   openaiModels = signal<{name: string, displayName: string}[]>([]);
@@ -62,6 +63,9 @@ export class ConfigComponent implements OnInit {
         this.ollamaUrlInput = data['OLLAMA_BASE_URL'];
       } else {
         this.ollamaUrlInput = 'http://host.docker.internal:11434';
+      }
+      if (data['GOOGLE_API_KEY']) {
+        this.geminiKeyInput = data['GOOGLE_API_KEY'];
       }
       if (data['ANTHROPIC_API_KEY']) {
         this.anthropicKeyInput = data['ANTHROPIC_API_KEY'];
@@ -282,6 +286,18 @@ export class ConfigComponent implements OnInit {
   saveOllamaUrl() {
     if (!this.ollamaUrlInput) return;
     this.updateVar('OLLAMA_BASE_URL', this.ollamaUrlInput);
+  }
+
+  saveGeminiKey() {
+    if (!this.geminiKeyInput) return;
+    this.updateVar('GOOGLE_API_KEY', this.geminiKeyInput);
+    setTimeout(() => {
+      this.api.getGeminiModels().subscribe(res => {
+        if (res.models && res.models.length > 0) {
+          this.geminiModels.set(res.models);
+        }
+      });
+    }, 1000);
   }
 
   saveAnthropicKey() {
