@@ -131,4 +131,8 @@ export class ApiService {
   getGeminiModels(): Observable<{models: {name: string, displayName: string}[], error?: string}> {
     return this.http.get<{models: {name: string, displayName: string}[], error?: string}>(`${this.baseUrl}/gemini/models`);
   }
+
+  getAnthropicModels(): Observable<{models: {name: string, displayName: string}[], error?: string}> {
+    return this.http.get<{models: {name: string, displayName: string}[], error?: string}>(`${this.baseUrl}/anthropic/models`);
+  }
 }

@@ -307,6 +307,38 @@ async def get_gemini_models():
         print(f"[Gemini] Error al obtener modelos: {e}")
         return {"models": [], "error": str(e)}
 
+@router.get("/anthropic/models")
+async def get_anthropic_models():
+    """Consulta la API de Anthropic para listar los modelos disponibles."""
+    try:
+        import urllib.request
+        import json
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+        from dotenv import dotenv_values
+        config = dotenv_values(env_path)
+        api_key = config.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_API_KEY", "")
+        
+        if not api_key:
+            return {"models": [], "error": "ANTHROPIC_API_KEY no configurada"}
+        
+        url = "https://api.anthropic.com/v1/models"
+        req = urllib.request.Request(url)
+        req.add_header("x-api-key", api_key)
+        req.add_header("anthropic-version", "2023-06-01")
+        with urllib.request.urlopen(req, timeout=10.0) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode('utf-8'))
+                models = []
+                for m in data.get("data", []):
+                    model_id = m.get("id", "")
+                    display = m.get("display_name", model_id)
+                    models.append({"name": model_id, "displayName": display})
+                return {"models": models}
+        return {"models": []}
+    except Exception as e:
+        print(f"[Anthropic] Error al obtener modelos: {e}")
+        return {"models": [], "error": str(e)}
+
 @router.post("/config")
 async def update_config(req: ConfigUpdateRequest, request: Request):
     """Actualiza una variable de entorno en el archivo .env."""

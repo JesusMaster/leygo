@@ -163,6 +163,13 @@
                             }
                           </optgroup>
                         }
+                        @if (anthropicModels().length > 0) {
+                          <optgroup label="Anthropic">
+                            @for (model of anthropicModels(); track model.name) {
+                              <option [value]="model.name">{{ model.displayName }}</option>
+                            }
+                          </optgroup>
+                        }
                         @if (config()[key] && !isKnownModel(config()[key])) {
                           <optgroup label="Personalizado">
                             <option [value]="config()[key]">{{ config()[key] }}</option>

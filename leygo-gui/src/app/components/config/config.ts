@@ -26,6 +26,7 @@ export class ConfigComponent implements OnInit {
   ollamaUrlInput = '';
   ollamaModels = signal<string[]>([]);
   geminiModels = signal<{name: string, displayName: string}[]>([]);
+  anthropicModels = signal<{name: string, displayName: string}[]>([]);
 
   ngOnInit() {
     this.loadData();
@@ -37,6 +38,11 @@ export class ConfigComponent implements OnInit {
     this.api.getGeminiModels().subscribe(res => {
       if (res.models && res.models.length > 0) {
         this.geminiModels.set(res.models);
+      }
+    });
+    this.api.getAnthropicModels().subscribe(res => {
+      if (res.models && res.models.length > 0) {
+        this.anthropicModels.set(res.models);
       }
     });
   }
@@ -270,6 +276,8 @@ export class ConfigComponent implements OnInit {
     if (value.startsWith('ollama/')) return true;
     // Check dynamically loaded Gemini models
     if (this.geminiModels().some(m => m.name === value)) return true;
+    // Check dynamically loaded Anthropic models
+    if (this.anthropicModels().some(m => m.name === value)) return true;
     // Fallback static list
     const staticModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-pro'];
     return staticModels.includes(value);
