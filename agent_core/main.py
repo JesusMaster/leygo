@@ -50,6 +50,14 @@ warnings.filterwarnings('ignore', category=UserWarning, message='.*is not suppor
 
 def get_llm_instance(model_name: str = "gemini-2.5-flash", temperature: float = 0.2, max_tokens: int = 8192):
     """Instancia centralizada para cargar el modelo de Lenguaje y validar llaves."""
+    model_name_lower = model_name.lower()
+    
+    # Auto-correccion para modelos locales que olvidaron el prefijo ollama/
+    if not model_name_lower.startswith("ollama/"):
+        if any(keyword in model_name_lower for keyword in ["gemma", "llama", "deepseek", "qwen", "mistral", "phi"]):
+            if "gemini" not in model_name_lower:
+                model_name = f"ollama/{model_name}"
+
     if model_name.startswith("ollama/"):
         try:
             from langchain_ollama import ChatOllama
