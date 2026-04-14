@@ -25,12 +25,18 @@ export class ConfigComponent implements OnInit {
 
   ollamaUrlInput = '';
   ollamaModels = signal<string[]>([]);
+  geminiModels = signal<{name: string, displayName: string}[]>([]);
 
   ngOnInit() {
     this.loadData();
     this.api.getOllamaTags().subscribe(res => {
       if (res.models && res.models.length > 0) {
         this.ollamaModels.set(res.models);
+      }
+    });
+    this.api.getGeminiModels().subscribe(res => {
+      if (res.models && res.models.length > 0) {
+        this.geminiModels.set(res.models);
       }
     });
   }
@@ -256,6 +262,17 @@ export class ConfigComponent implements OnInit {
   saveOllamaUrl() {
     if (!this.ollamaUrlInput) return;
     this.updateVar('OLLAMA_BASE_URL', this.ollamaUrlInput);
+  }
+
+  isKnownModel(value: string): boolean {
+    if (!value) return true;
+    // Check Ollama models
+    if (value.startsWith('ollama/')) return true;
+    // Check dynamically loaded Gemini models
+    if (this.geminiModels().some(m => m.name === value)) return true;
+    // Fallback static list
+    const staticModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-pro'];
+    return staticModels.includes(value);
   }
 
   getEnvKeys() {

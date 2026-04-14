@@ -274,6 +274,39 @@ async def get_ollama_tags():
         print(f"[Ollama] Error al obtener tags: {e}")
         return {"models": [], "error": str(e)}
 
+@router.get("/gemini/models")
+async def get_gemini_models():
+    """Consulta la API de Google para listar los modelos Gemini disponibles."""
+    try:
+        import urllib.request
+        import json
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+        from dotenv import dotenv_values
+        config = dotenv_values(env_path)
+        api_key = config.get("GOOGLE_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
+        
+        if not api_key:
+            return {"models": [], "error": "GOOGLE_API_KEY no configurada"}
+        
+        url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}"
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=10.0) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode('utf-8'))
+                models = []
+                for m in data.get("models", []):
+                    # Solo modelos que soporten generateContent (chat/completions)
+                    methods = m.get("supportedGenerationMethods", [])
+                    if "generateContent" in methods:
+                        name = m.get("name", "").replace("models/", "")
+                        display = m.get("displayName", name)
+                        models.append({"name": name, "displayName": display})
+                return {"models": models}
+        return {"models": []}
+    except Exception as e:
+        print(f"[Gemini] Error al obtener modelos: {e}")
+        return {"models": [], "error": str(e)}
+
 @router.post("/config")
 async def update_config(req: ConfigUpdateRequest, request: Request):
     """Actualiza una variable de entorno en el archivo .env."""

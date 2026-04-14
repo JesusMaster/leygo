@@ -127,5 +127,8 @@ export class ApiService {
   getOllamaTags(): Observable<{models: string[], error?: string}> {
     return this.http.get<{models: string[], error?: string}>(`${this.baseUrl}/ollama/tags`);
   }
-}
 
+  getGeminiModels(): Observable<{models: {name: string, displayName: string}[], error?: string}> {
+    return this.http.get<{models: {name: string, displayName: string}[], error?: string}>(`${this.baseUrl}/gemini/models`);
+  }
+}
