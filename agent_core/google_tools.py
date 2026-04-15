@@ -281,21 +281,36 @@ def listar_eventos_calendario(dias_a_futuro: int = 7, fecha_inicio_iso: str = No
     try:
         service = build('calendar', 'v3', credentials=creds)
 
+        # Helper: garantizar formato RFC3339 estricto
+        def normalizar_iso(fecha_str: str) -> str:
+            if not fecha_str: return None
+            # Quitar Z para normalizar
+            fecha_str = fecha_str.replace('Z', '')
+            # Si es solo fecha (ej: 2026-04-29), agregar hora 00:00:00
+            if 'T' not in fecha_str:
+                fecha_str += 'T00:00:00'
+            # Asegurar timezone offset or Z
+            if '+' not in fecha_str and '-' not in fecha_str.split('T')[1]:
+                fecha_str += 'Z'
+            return fecha_str
+            
         # Configurar límites de tiempo
         now = datetime.datetime.utcnow()
         if fecha_inicio_iso:
-            timeMin = fecha_inicio_iso if fecha_inicio_iso.endswith('Z') or '+' in fecha_inicio_iso else fecha_inicio_iso + 'Z'
+            timeMin = normalizar_iso(fecha_inicio_iso)
             if fecha_fin_iso:
-                timeMax = fecha_fin_iso if fecha_fin_iso.endswith('Z') or '+' in fecha_fin_iso else fecha_fin_iso + 'Z'
+                timeMax = normalizar_iso(fecha_fin_iso)
             else:
                 try:
-                    dt = datetime.datetime.fromisoformat(timeMin.replace('Z', '+00:00'))
-                    timeMax = (dt + datetime.timedelta(days=1)).isoformat()
-                except:
-                    timeMax = (now + datetime.timedelta(days=dias_a_futuro)).isoformat() + 'Z'
+                    dt_str = timeMin.replace('Z', '+00:00')
+                    dt = datetime.datetime.fromisoformat(dt_str)
+                    dt_end = dt + datetime.timedelta(days=1)
+                    timeMax = dt_end.strftime('%Y-%m-%dT%H:%M:%SZ')
+                except Exception as e:
+                    timeMax = (now + datetime.timedelta(days=dias_a_futuro)).strftime('%Y-%m-%dT%H:%M:%SZ')
         else:
-            timeMin = now.isoformat() + 'Z'
-            timeMax = (now + datetime.timedelta(days=dias_a_futuro)).isoformat() + 'Z'
+            timeMin = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+            timeMax = (now + datetime.timedelta(days=dias_a_futuro)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
         events_result = service.events().list(
             calendarId='primary', timeMin=timeMin, timeMax=timeMax,
@@ -420,9 +435,16 @@ def comprobar_disponibilidad_calendario(fecha_inicio_iso: str, fecha_fin_iso: st
     try:
         service = build('calendar', 'v3', credentials=creds)
         
+        def normalizar_iso(fecha_str: str) -> str:
+            if not fecha_str: return None
+            fecha_str = fecha_str.replace('Z', '')
+            if 'T' not in fecha_str: fecha_str += 'T00:00:00'
+            if '+' not in fecha_str and '-' not in fecha_str.split('T')[1]: fecha_str += 'Z'
+            return fecha_str
+            
         body = {
-            "timeMin": fecha_inicio_iso if fecha_inicio_iso.endswith('Z') or '+' in fecha_inicio_iso else fecha_inicio_iso + 'Z',
-            "timeMax": fecha_fin_iso if fecha_fin_iso.endswith('Z') or '+' in fecha_fin_iso else fecha_fin_iso + 'Z',
+            "timeMin": normalizar_iso(fecha_inicio_iso),
+            "timeMax": normalizar_iso(fecha_fin_iso),
             "items": [{"id": "primary"}]
         }
         
@@ -466,18 +488,27 @@ def crear_evento_calendario(titulo: str, descripcion: str, fecha_hora_inicio_iso
         import uuid
         service = build('calendar', 'v3', credentials=creds)
         
-        start_time = datetime.datetime.fromisoformat(fecha_hora_inicio_iso)
+        # 1. Normalizar fecha
+        fecha_norm = fecha_hora_inicio_iso.replace('Z', '')
+        if 'T' not in fecha_norm: fecha_norm += 'T00:00:00'
+        if '+' not in fecha_norm and '-' not in fecha_norm.split('T')[1]:
+            fecha_norm += '+00:00'
+        else:
+            # Asegurar formato compatible con fromisoformat
+            pass
+            
+        start_time = datetime.datetime.fromisoformat(fecha_norm)
         end_time = start_time + datetime.timedelta(minutes=duracion_minutos)
         
         event = {
           'summary': titulo,
           'description': descripcion,
           'start': {
-            'dateTime': start_time.isoformat(),
+            'dateTime': start_time.strftime('%Y-%m-%dT%H:%M:%S%z') or start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
             'timeZone': 'UTC',
           },
           'end': {
-            'dateTime': end_time.isoformat(),
+            'dateTime': end_time.strftime('%Y-%m-%dT%H:%M:%S%z') or end_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
             'timeZone': 'UTC',
           },
         }
