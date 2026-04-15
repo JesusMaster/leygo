@@ -800,6 +800,81 @@ async def update_task_instruction(task_id: str, req: TaskUpdateRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error actualizando tarea: {e}")
 
+# Rutas estáticas ANTES de las parameterizadas para evitar conflictos en FastAPI
+@router.get("/tasks/logs/all")
+async def get_all_task_execution_logs(limit: int = 200):
+    """Devuelve el historial de ejecuciones de todas las tareas."""
+    try:
+        from utils.task_logger import get_all_task_logs
+        return get_all_task_logs(limit=limit)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error leyendo logs: {e}")
+
+@router.post("/tasks/{task_id}/run")
+async def run_task_now(task_id: str):
+    """Ejecuta una tarea programada inmediatamente sin alterar su próximo horario."""
+    try:
+        job = scheduler.get_job(task_id)
+        if not job:
+            raise HTTPException(status_code=404, detail="Tarea no encontrada")
+        
+        func = job.func
+        args = list(job.args) if job.args else []
+        
+        async def run_in_background():
+            try:
+                await func(*args, _trigger_type="manual", _job_id=task_id)
+            except TypeError:
+                await func(*args)
+        
+        asyncio.create_task(run_in_background())
+        return {"status": "ok", "message": f"Tarea '{job.name}' ejecutándose en background."}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error ejecutando tarea: {e}")
+
+@router.post("/tasks/{task_id}/pause")
+async def pause_task(task_id: str):
+    """Pausa una tarea programada (no la elimina, solo detiene su ejecución)."""
+    try:
+        job = scheduler.get_job(task_id)
+        if not job:
+            raise HTTPException(status_code=404, detail="Tarea no encontrada")
+        
+        scheduler.pause_job(task_id)
+        guardar_estado_jobs()
+        return {"status": "ok", "message": f"Tarea '{job.name}' pausada."}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error pausando tarea: {e}")
+
+@router.post("/tasks/{task_id}/resume")
+async def resume_task(task_id: str):
+    """Reanuda una tarea previamente pausada."""
+    try:
+        job = scheduler.get_job(task_id)
+        if not job:
+            raise HTTPException(status_code=404, detail="Tarea no encontrada")
+        
+        scheduler.resume_job(task_id)
+        guardar_estado_jobs()
+        return {"status": "ok", "message": f"Tarea '{job.name}' reanudada."}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reanudando tarea: {e}")
+
+@router.get("/tasks/{task_id}/logs")
+async def get_task_execution_logs(task_id: str, limit: int = 50):
+    """Devuelve el historial de ejecuciones de una tarea específica."""
+    try:
+        from utils.task_logger import get_task_logs
+        return get_task_logs(task_id, limit=limit)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error leyendo logs: {e}")
+
 # --- MCP MANAGER API ---
 
 import yaml

@@ -5,6 +5,68 @@
       <h2>Agente: <span class="highlight">{{ agentName() }}</span></h2>
     </div>
     <div class="header-right">
+
+      <!-- Model Selector -->
+      <div class="model-selector-wrapper">
+        <button 
+          class="btn-model-selector" 
+          (click)="toggleModelSelector(); $event.stopPropagation()"
+          [class.open]="modelSelectorOpen()"
+          [disabled]="modelsLoading()"
+          title="Cambiar modelo del agente">
+          @if (modelsLoading()) {
+            <i class="ph ph-spinner model-spinner"></i>
+            <span>Cargando modelos...</span>
+          } @else {
+            <span class="provider-badge" [attr.data-provider]="selectedModelProvider()">
+              {{ providerIcon(selectedModelProvider()) }}
+            </span>
+            <span class="model-label">{{ selectedModelLabel() }}</span>
+            @if (savingModel()) {
+              <i class="ph ph-spinner model-saving-spinner"></i>
+            } @else {
+              <i class="ph ph-caret-down" [class.rotated]="modelSelectorOpen()"></i>
+            }
+          }
+        </button>
+
+        @if (modelSelectorOpen()) {
+          <div class="model-dropdown">
+            <div class="model-dropdown-header">
+              <i class="ph ph-cpu"></i>
+              Modelo del Agente
+            </div>
+
+            @for (provider of providerGroups(); track provider) {
+              <div class="model-group">
+                <div class="model-group-label">
+                  <span class="group-icon" [attr.data-provider]="provider">{{ providerIcon(provider) }}</span>
+                  {{ providerLabel(provider) }}
+                </div>
+                @for (model of groupedModels()[provider]; track model.value) {
+                  <div 
+                    class="model-option" 
+                    [class.selected]="model.value === selectedModel()"
+                    (click)="selectModel(model.value)">
+                    <span class="model-option-label">{{ model.label }}</span>
+                    @if (model.value === selectedModel()) {
+                      <i class="ph ph-check"></i>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            @if (providerGroups().length === 0) {
+              <div class="model-dropdown-empty">
+                <i class="ph ph-warning"></i>
+                No hay modelos disponibles. Configura tus API Keys.
+              </div>
+            }
+          </div>
+        }
+      </div>
+
       <button class="btn-primary" (click)="saveAll()" [disabled]="saving() || loading()">
         <i class="ph" [ngClass]="saving() ? 'ph-spinner' : 'ph-floppy-disk'"></i> 
         {{ saving() ? 'Guardando...' : 'Guardar y Recargar' }}

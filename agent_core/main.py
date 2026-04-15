@@ -852,22 +852,38 @@ class SelfExtendingAgent:
                         status_bus.publish_status(msg)
                         yield {"type": "status", "content": msg}
 
-                # ── 3. Fin de un nodo supervisor → capturar respuesta directa ────
-                elif kind == "on_chain_end" and node_name == "supervisor":
+                # ── 3. Fin de un nodo → capturar respuesta ──────────────────────
+                elif kind == "on_chain_end" and node_name:
                     output = event.get("data", {}).get("output", {})
                     if isinstance(output, dict) and "messages" in output:
                         msgs = output["messages"]
-                        next_node_val = output.get("next_node", "")
-                        is_finishing = next_node_val == "END"
-                        if msgs and is_finishing:
+                        
+                        # 3a. Supervisor terminando → capturar supervisor_fallback
+                        if node_name == "supervisor":
+                            next_node_val = output.get("next_node", "")
+                            is_finishing = next_node_val == "END"
+                            if msgs and is_finishing:
+                                last_msg = msgs[-1]
+                                has_tc = hasattr(last_msg, "tool_calls") and last_msg.tool_calls
+                                if not has_tc:
+                                    raw = last_msg.content if hasattr(last_msg, "content") else ""
+                                    if isinstance(raw, list):
+                                        raw = "".join(p.get("text", "") for p in raw if isinstance(p, dict) and p.get("type") == "text")
+                                    if raw and isinstance(raw, str):
+                                        supervisor_fallback = raw.strip()
+                        
+                        # 3b. Worker terminando sin tool_calls → backup capture
+                        elif node_name in worker_nodes and msgs:
                             last_msg = msgs[-1]
                             has_tc = hasattr(last_msg, "tool_calls") and last_msg.tool_calls
                             if not has_tc:
                                 raw = last_msg.content if hasattr(last_msg, "content") else ""
                                 if isinstance(raw, list):
                                     raw = "".join(p.get("text", "") for p in raw if isinstance(p, dict) and p.get("type") == "text")
-                                if raw and isinstance(raw, str):
-                                    supervisor_fallback = raw.strip()
+                                if raw and isinstance(raw, str) and raw.strip():
+                                    # Solo guardar si no hay respuesta previa (backup)
+                                    if not full_response:
+                                        full_response = raw.strip()
 
                 # ── 4. Fin del LLM call → capturar usage + respuesta worker ─────
                 elif kind == "on_chat_model_end":

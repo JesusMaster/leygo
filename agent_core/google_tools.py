@@ -11,7 +11,7 @@ from google_auth import get_google_credentials
 # ==========================================================
 
 @tool
-def leer_correos_recientes(max_resultados: int = 25, solo_no_leidos: bool = False, busqueda: str = "") -> str:
+def leer_correos_recientes(max_resultados: int = 5, solo_no_leidos: bool = False, busqueda: str = "") -> str:
     """
     Lee los correos más recientes en la bandeja de entrada del usuario usando Gmail API.
     

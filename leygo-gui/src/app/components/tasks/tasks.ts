@@ -24,6 +24,14 @@ export class TasksComponent implements OnInit {
     is_agent_action: false
   };
 
+  // Ejecución manual
+  runningTaskId = signal<string | null>(null);
+
+  // Logs de ejecución
+  expandedLogTaskId = signal<string | null>(null);
+  taskLogs = signal<any[]>([]);
+  logsLoading = signal(false);
+
   ngOnInit() {
     this.loadTasks();
   }
@@ -40,9 +48,13 @@ export class TasksComponent implements OnInit {
   }
 
   deleteTask(id: string) {
-    if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
       this.api.deleteTask(id).subscribe({
-        next: () => this.loadTasks()
+        next: () => this.loadTasks(),
+        error: (err) => {
+          console.error('Error deleting task:', err);
+          alert('Hubo un error al eliminar la tarea');
+        }
       });
     }
   }
@@ -68,6 +80,60 @@ export class TasksComponent implements OnInit {
       next: () => {
         this.cancelEditing();
         this.loadTasks();
+      }
+    });
+  }
+  runTask(taskId: string) {
+    this.runningTaskId.set(taskId);
+    this.api.runTask(taskId).subscribe({
+      next: () => {
+        setTimeout(() => this.runningTaskId.set(null), 3000);
+      },
+      error: () => this.runningTaskId.set(null)
+    });
+  }
+
+  pauseTask(taskId: string) {
+    if (window.confirm('¿Pausar esta tarea?')) {
+      this.api.pauseTask(taskId).subscribe({
+        next: () => this.loadTasks(),
+        error: (err) => {
+          console.error('Error pausing task:', err);
+          alert('Error al pausar la tarea. ' + (err.error?.detail || ''));
+        }
+      });
+    }
+  }
+
+  resumeTask(taskId: string) {
+    if (window.confirm('¿Reanudar esta tarea?')) {
+      this.api.resumeTask(taskId).subscribe({
+        next: () => this.loadTasks(),
+        error: (err) => {
+          console.error('Error resuming task:', err);
+          alert('Error al reanudar la tarea. ' + (err.error?.detail || ''));
+        }
+      });
+    }
+  }
+
+  toggleLogs(taskId: string) {
+    if (this.expandedLogTaskId() === taskId) {
+      this.expandedLogTaskId.set(null);
+      this.taskLogs.set([]);
+      return;
+    }
+    
+    this.expandedLogTaskId.set(taskId);
+    this.logsLoading.set(true);
+    this.api.getTaskLogs(taskId).subscribe({
+      next: (logs) => {
+        this.taskLogs.set(logs);
+        this.logsLoading.set(false);
+      },
+      error: () => {
+        this.taskLogs.set([]);
+        this.logsLoading.set(false);
       }
     });
   }

@@ -1,14 +1,15 @@
 import os
 import asyncio
 import json
+import time
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.events import EVENT_JOB_EXECUTED
 from langchain_core.tools import tool
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
 from telegram import Bot
+from utils.task_logger import log_task_start, log_task_end
 
 # Timezone del usuario (configurable vía .env), por defecto Chile
 TIMEZONE_STR = os.getenv("TZ", "America/Santiago")
@@ -46,11 +47,16 @@ def guardar_estado_jobs():
         }
         
         # Guardar atributos según el tipo de trigger
+        is_paused = False
         if job.next_run_time:
             job_info["next_run_time_iso"] = job.next_run_time.isoformat()
         else:
-            if not hasattr(job.trigger, 'interval') and not hasattr(job.trigger, 'fields'):
+            if hasattr(job.trigger, 'interval') or hasattr(job.trigger, 'fields'):
+                is_paused = True # Es recurrente pero no tiene next run -> está pausado
+            else:
                 continue # Si ya pasó y no tiene next run, y no es intervalo/cron, ignorar
+        
+        job_info["paused"] = is_paused
                 
         if hasattr(job.trigger, 'interval'):
             job_info["type"] = "interval"
@@ -156,6 +162,11 @@ def cargar_estado_jobs():
                             name=name,
                             id=job_id
                         )
+            
+            # Reaplicar estado de pausa si corresponde
+            if job_info.get("paused") and scheduler.get_job(job_id):
+                scheduler.pause_job(job_id)
+                
         print(f"=> Se cargaron {len(scheduler.get_jobs())} tareas del almacenamiento episódico.")
     except Exception as e:
         print(f"Error cargando recordatorios: {e}")
@@ -174,9 +185,24 @@ def _resolve_chat_id(chat_id: str) -> str:
     
     return None  # No se pudo resolver
 
-async def send_telegram_reminder(chat_id: str, mensaje: str):
+def _resolve_job_id(func, chat_id: str, content: str) -> str:
+    """Busca el job_id real en el scheduler para ejecuciones automáticas."""
+    try:
+        for job in scheduler.get_jobs():
+            if job.func == func and job.args and len(job.args) >= 2:
+                if str(job.args[0]) == str(chat_id) and str(job.args[1]) == str(content):
+                    return job.id
+    except Exception:
+        pass
+    return "unknown"
+
+async def send_telegram_reminder(chat_id: str, mensaje: str, _trigger_type: str = "scheduled", _job_id: str = ""):
     """Callback function executed by the scheduler."""
     global TELEGRAM_BOT_INSTANCE
+    if not _job_id:
+        _job_id = _resolve_job_id(send_telegram_reminder, chat_id, mensaje)
+    t0 = time.time()
+    row_id = log_task_start(_job_id, mensaje[:50], _trigger_type)
     
     # Intento lazy de cargar el bot si no fue proveído por webhook
     if not TELEGRAM_BOT_INSTANCE:
@@ -184,27 +210,34 @@ async def send_telegram_reminder(chat_id: str, mensaje: str):
         if token:
             TELEGRAM_BOT_INSTANCE = Bot(token=token)
 
-    if TELEGRAM_BOT_INSTANCE:
-        resolved_id = _resolve_chat_id(chat_id)
-        if not resolved_id:
-            print(f"\\n⏰ [RECORDATORIO LOCAL PENDIENTE]: {mensaje}\\n")
-            return
-                 
-        try:
+    try:
+        if TELEGRAM_BOT_INSTANCE:
+            resolved_id = _resolve_chat_id(chat_id)
+            if not resolved_id:
+                print(f"\\n⏰ [RECORDATORIO LOCAL PENDIENTE]: {mensaje}\\n")
+                log_task_end(row_id, "success", "Entregado localmente (sin Telegram)", duration_ms=int((time.time()-t0)*1000))
+                return
+                     
             await TELEGRAM_BOT_INSTANCE.send_message(chat_id=resolved_id, text=f"{mensaje}")
-        except Exception as e:
-            print(f"Error enviando recordatorio por Telegram: {e}")
-    else:
-        print(f"\\n⏰ [RECORDATORIO PENEDIENTE para {chat_id}]: {mensaje}\\n")
+            log_task_end(row_id, "success", "Mensaje enviado por Telegram", duration_ms=int((time.time()-t0)*1000))
+        else:
+            print(f"\\n⏰ [RECORDATORIO PENDIENTE para {chat_id}]: {mensaje}\\n")
+            log_task_end(row_id, "success", "Entregado localmente (bot no disponible)", duration_ms=int((time.time()-t0)*1000))
+    except Exception as e:
+        print(f"Error enviando recordatorio por Telegram: {e}")
+        log_task_end(row_id, "error", error=str(e), duration_ms=int((time.time()-t0)*1000))
         
     # Limpiar JSON tras enviar un date
-    # Le damos un margen pequeño para que la función termine internamente en apscheduler
     asyncio.create_task(asyncio.sleep(2))
     guardar_estado_jobs()
 
-async def send_dynamic_telegram_reminder(chat_id: str, prompt_instruccion: str):
+async def send_dynamic_telegram_reminder(chat_id: str, prompt_instruccion: str, _trigger_type: str = "scheduled", _job_id: str = ""):
     """Callback function executed periodically by the scheduler that uses Gemini to generate the text."""
     global TELEGRAM_BOT_INSTANCE
+    if not _job_id:
+        _job_id = _resolve_job_id(send_dynamic_telegram_reminder, chat_id, prompt_instruccion)
+    t0 = time.time()
+    row_id = log_task_start(_job_id, prompt_instruccion[:50], _trigger_type)
     
     if not TELEGRAM_BOT_INSTANCE:
         token = os.getenv("TELEGRAM_TOKEN")
@@ -215,6 +248,7 @@ async def send_dynamic_telegram_reminder(chat_id: str, prompt_instruccion: str):
     is_exceeded, alert_msg = check_budget_exceeded()
     if is_exceeded:
         print(f"[Scheduler] Bloqueado envío de rutina dinámica por cuota excedida: {prompt_instruccion[:20]}")
+        log_task_end(row_id, "error", error="Cuota mensual excedida", duration_ms=int((time.time()-t0)*1000))
         if TELEGRAM_BOT_INSTANCE:
             resolved_id = _resolve_chat_id(chat_id)
             if resolved_id:
@@ -224,10 +258,12 @@ async def send_dynamic_telegram_reminder(chat_id: str, prompt_instruccion: str):
                     pass
         return
 
-    # Autogenerate text with Gemini
+    # Autogenerate text with LLM (multi-provider)
+    mensaje_dinamico = ""
     try:
+        from main import get_llm_instance
         model_name = os.getenv("MODEL_TASK", "gemini-2.5-flash-lite")
-        mini_llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.7)
+        mini_llm = get_llm_instance(model_name=model_name, temperature=0.7)
         response = await mini_llm.ainvoke(
             [HumanMessage(content=f"Genera un mensaje corto directo y amigable cumpliendo esta instrucción: '{prompt_instruccion}'. No repitas lo mismo de siempre, sé creativo. IMPORTANTE: Devuelve ÚNICAMENTE el mensaje, sin saludos iniciales, sin afirmaciones previas como 'Claro, aquí tienes', ni texto conversacional extra.")]
         )
@@ -243,7 +279,6 @@ async def send_dynamic_telegram_reminder(chat_id: str, prompt_instruccion: str):
             
         content_raw = response.content
         if isinstance(content_raw, list):
-            # En modelos recientes de Langchain, content puede ser un array de bloques.
             content_str = "".join([part.get("text", "") if isinstance(part, dict) else str(part) for part in content_raw])
         else:
             content_str = str(content_raw)
@@ -251,23 +286,33 @@ async def send_dynamic_telegram_reminder(chat_id: str, prompt_instruccion: str):
         mensaje_dinamico = content_str.strip()
     except Exception as e:
         mensaje_dinamico = f"⏰ [Recordatorio Recurrente] (Error generando contenido: {e})"
+        log_task_end(row_id, "error", error=str(e), duration_ms=int((time.time()-t0)*1000))
+        return
 
-    if TELEGRAM_BOT_INSTANCE:
-        resolved_id = _resolve_chat_id(chat_id)
-        if not resolved_id:
-            print(f"\\n⏰ [RUTINA LOCAL PENDIENTE]: {mensaje_dinamico}\\n")
-            return
-                 
-        try:
+    try:
+        if TELEGRAM_BOT_INSTANCE:
+            resolved_id = _resolve_chat_id(chat_id)
+            if not resolved_id:
+                print(f"\\n⏰ [RUTINA LOCAL PENDIENTE]: {mensaje_dinamico}\\n")
+                log_task_end(row_id, "success", result=mensaje_dinamico, duration_ms=int((time.time()-t0)*1000))
+                return
+                     
             await TELEGRAM_BOT_INSTANCE.send_message(chat_id=resolved_id, text=mensaje_dinamico)
-        except Exception as e:
-            print(f"Error enviando rutina por Telegram: {e}")
-    else:
-        print(f"\\n⏰ [RUTINA PENDIENTE para {chat_id}]: {mensaje_dinamico}\\n")
+        else:
+            print(f"\\n⏰ [RUTINA PENDIENTE para {chat_id}]: {mensaje_dinamico}\\n")
+        
+        log_task_end(row_id, "success", result=mensaje_dinamico, duration_ms=int((time.time()-t0)*1000))
+    except Exception as e:
+        print(f"Error enviando rutina por Telegram: {e}")
+        log_task_end(row_id, "error", result=mensaje_dinamico, error=str(e), duration_ms=int((time.time()-t0)*1000))
 
-async def execute_agent_task(chat_id: str, instruccion: str):
+async def execute_agent_task(chat_id: str, instruccion: str, _trigger_type: str = "scheduled", _job_id: str = ""):
     """Ejecuta una acción programada delegando todo el trabajo al Agente Auto-Extensivo."""
     global TELEGRAM_BOT_INSTANCE, GLOBAL_AGENT_INSTANCE
+    if not _job_id:
+        _job_id = _resolve_job_id(execute_agent_task, chat_id, instruccion)
+    t0 = time.time()
+    row_id = log_task_start(_job_id, instruccion[:50], _trigger_type)
     
     if not TELEGRAM_BOT_INSTANCE:
         token = os.getenv("TELEGRAM_TOKEN")
@@ -278,6 +323,7 @@ async def execute_agent_task(chat_id: str, instruccion: str):
     is_exceeded, alert_msg = check_budget_exceeded()
     if is_exceeded:
         print(f"[Scheduler] Bloqueado ejecución de tarea programada por cuota excedida: {instruccion[:20]}")
+        log_task_end(row_id, "error", error="Cuota mensual excedida", duration_ms=int((time.time()-t0)*1000))
         if TELEGRAM_BOT_INSTANCE:
             resolved_id = _resolve_chat_id(chat_id)
             if resolved_id:
@@ -290,7 +336,6 @@ async def execute_agent_task(chat_id: str, instruccion: str):
     try:
         if GLOBAL_AGENT_INSTANCE:
             print(f"\\n[Scheduler] 🤖 Ejecutando TAREA AUTÓNOMA para hilo {chat_id}: {instruccion}")
-            # Procesar el input en background usando el stack de memoria
             respuesta = await GLOBAL_AGENT_INSTANCE.process_message(instruccion, thread_id=chat_id)
             
             # Enviar el resultado del agente mediante el bot a Telegram o GUI
@@ -298,7 +343,6 @@ async def execute_agent_task(chat_id: str, instruccion: str):
             if TELEGRAM_BOT_INSTANCE and resolved_id:
                 import sys
                 try:
-                    # Intento de formateo bonito local si existe
                     from telegram_bot import format_telegram_html
                     from telegram.constants import ParseMode
                     html_response = format_telegram_html(respuesta)
@@ -307,10 +351,14 @@ async def execute_agent_task(chat_id: str, instruccion: str):
                     await TELEGRAM_BOT_INSTANCE.send_message(chat_id=resolved_id, text=respuesta)
             else:
                 print(f"\\n⏰ [TAREA AUTÓNOMA LOCAL COMPLETADA]: {respuesta}\\n")
+            
+            log_task_end(row_id, "success", result=respuesta[:2000] if respuesta else "", duration_ms=int((time.time()-t0)*1000))
         else:
             print("[Scheduler Error] No hay instancia global del agente; no se puede procesar la tarea autónoma.")
+            log_task_end(row_id, "error", error="No hay instancia global del agente", duration_ms=int((time.time()-t0)*1000))
     except Exception as e:
         print(f"Error procesando la tarea autónoma '{instruccion[:20]}...': {e}")
+        log_task_end(row_id, "error", error=str(e), duration_ms=int((time.time()-t0)*1000))
         try:
              await TELEGRAM_BOT_INSTANCE.send_message(chat_id=chat_id, text=f"Falló la ejecución programada de: {instruccion[:30]}...")
         except: pass

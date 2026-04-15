@@ -108,6 +108,22 @@ export class ApiService {
     return this.http.put(`${this.baseUrl}/tasks/${taskId}`, { message_or_prompt });
   }
 
+  runTask(taskId: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/tasks/${taskId}/run`, {});
+  }
+
+  getTaskLogs(taskId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/tasks/${taskId}/logs`);
+  }
+
+  pauseTask(taskId: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/tasks/${taskId}/pause`, {});
+  }
+
+  resumeTask(taskId: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/tasks/${taskId}/resume`, {});
+  }
+
   exchangeGoogleCode(code: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/google/exchange`, { code });
   }

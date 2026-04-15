@@ -31,6 +31,7 @@
 
 .task-card {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding: 24px;
@@ -43,6 +44,11 @@
 .task-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.task-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .type-badge {
@@ -314,4 +320,245 @@
 
 .btn-secondary:hover {
   background: #f9fafb;
+}
+
+/* ── Run & Logs Buttons ──────────────────────────────── */
+.btn-run {
+  background: none;
+  border: none;
+  color: #10b981;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-run:hover {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.btn-run:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-logs {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-logs:hover {
+  background-color: #f3f4f6;
+  color: #6366f1;
+}
+
+.btn-logs.active {
+  background-color: #eef2ff;
+  color: #6366f1;
+}
+
+.btn-pause {
+  background: none;
+  border: none;
+  color: #f59e0b;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-pause:hover {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.btn-resume {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-resume:hover {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.paused-text {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.run-spinner,
+.logs-spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+/* ── Logs Panel ──────────────────────────────────────── */
+.logs-panel {
+  width: 100%;
+  margin-top: 16px;
+  border-top: 1px solid var(--border-light, #e5e7eb);
+  padding-top: 16px;
+  animation: logsSlideIn 0.2s ease;
+}
+
+@keyframes logsSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.logs-header h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.logs-header h4 i {
+  color: #6366f1;
+}
+
+.logs-loading,
+.logs-empty {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+  padding: 16px;
+}
+
+.logs-loading i {
+  margin-right: 6px;
+}
+
+.logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.log-entry {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f9fafb;
+  border: 1px solid var(--border-light, #e5e7eb);
+  font-size: 13px;
+}
+
+.log-entry.error {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.log-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.log-status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.log-status-badge.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.log-status-badge.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.log-status-badge.running {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.log-trigger {
+  font-size: 11px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.log-trigger.manual {
+  color: #6366f1;
+}
+
+.log-time {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.log-duration {
+  font-size: 10px;
+  color: #9ca3af;
+  background: #f3f4f6;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.log-result {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #374151;
+  background: white;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-light, #e5e7eb);
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.log-error {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
 }
