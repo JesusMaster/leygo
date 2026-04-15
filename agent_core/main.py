@@ -784,14 +784,30 @@ class SelfExtendingAgent:
                                         
         except Exception as e:
             error_traceback = traceback.format_exc()
-            print(f"\\n[CRITICAL FATAL] Error del Sistema. Inicializando auto-curacion...\\n{str(e)}")
+            print(f"\n[CRITICAL FATAL] Error del Sistema. Inicializando auto-curacion...\n{str(e)}")
             
             # Auto-reparación desactivada temporalmente: esperamos confirmación interactiva
             final_answer = (
                 f"⚠️ He detectado un error técnico grave (posible bucle o fallo de herramientas). "
-                f"Para que evalúe y ejecute un protocolo de auto-reparación sobre mi código, envíame textualmente el siguiente comando:\\n\\n"
-                f"`@dev repara este error:`\\n```\\n{str(e)}\\n```\\n\\n*(Error más detallado se guardó en la consola del servidor)*"
+                f"Para que evalúe y ejecute un protocolo de auto-reparación sobre mi código, envíame textualmente el siguiente comando:\n\n"
+                f"`@dev repara este error:`\n```\n{str(e)}\n```\n\n*(Error más detallado se guardó en la consola del servidor)*"
             )
+
+        if getattr(self, "graph", None) and not final_answer.strip():
+            # ÚLTIMO RECURSO: recuperar el último mensaje AI con contenido del estado global
+            try:
+                state = self.graph.get_state(config)
+                for msg in reversed(state.values.get("messages", [])):
+                    if msg.type == "ai" and getattr(msg, "content", ""):
+                        if not (hasattr(msg, "tool_calls") and msg.tool_calls):
+                            raw = msg.content
+                            if isinstance(raw, list):
+                                raw = "".join(p.get("text", "") for p in raw if isinstance(p, dict) and p.get("type", "") == "text")
+                            if raw and str(raw).strip():
+                                final_answer = str(raw).strip()
+                                break
+            except Exception as ex:
+                print(f"[process_message] Error recuperando fallback de estado: {ex}")
 
         if return_usage:
             return final_answer, usage_record
@@ -956,6 +972,22 @@ class SelfExtendingAgent:
         final_text = full_response.strip()
         if not final_text and supervisor_fallback:
             final_text = supervisor_fallback
+            
+        if self.graph and not final_text.strip():
+            # ÚLTIMO RECURSO: recuperar el último mensaje AI válido del estado
+            try:
+                state = self.graph.get_state(config)
+                for msg in reversed(state.values.get("messages", [])):
+                    if msg.type == "ai" and getattr(msg, "content", ""):
+                        if not (hasattr(msg, "tool_calls") and msg.tool_calls):
+                            raw = msg.content
+                            if isinstance(raw, list):
+                                raw = "".join(p.get("text", "") for p in raw if isinstance(p, dict) and p.get("type", "") == "text")
+                            if raw and str(raw).strip():
+                                final_text = str(raw).strip()
+                                break
+            except Exception as ex:
+                print(f"[stream_message] Error recuperando fallback de estado: {ex}")
             
         yield {"type": "done", "content": final_text, "usage": total_usage}
 
