@@ -15,6 +15,46 @@
   gap: 24px;
 }
 
+/* ── Provider Cards Row ───────────────────────────────── */
+.providers-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.provider-card {
+  flex: 1;
+  min-width: 0;
+  background-color: white;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.provider-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.provider-title {
+  font-size: 1.05rem;
+  margin: 0;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.provider-status {
+  margin-bottom: 4px;
+}
+
+.provider-input {
+  margin-top: auto;
+}
+
 .config-card {
   background-color: white;
   padding: 24px;

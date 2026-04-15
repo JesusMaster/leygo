@@ -4,10 +4,114 @@
     <p>Ajusta las variables de entorno y gestiona tu identidad.</p>
   </div>
 
+  <!-- Provider Cards Row -->
+  <div class="providers-row">
+    <!-- Gemini -->
+    <div class="provider-card glass" style="border-top: 4px solid #4285f4;">
+      <div class="card-icon" style="color: #4285f4; margin-bottom: 0px;"><i class="ph-fill ph-google-logo"></i></div>
+      <h3 class="provider-title">Google (Gemini)</h3>
+      <div class="provider-status">
+         @if (geminiModels().length > 0) {
+           <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
+             {{ geminiModels().length }} modelos
+           </span>
+         } @else {
+           <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
+             Sin configurar
+           </span>
+         }
+      </div>
+      <div class="provider-input">
+         <div style="display: flex; gap: 6px;">
+             <input type="password" [(ngModel)]="geminiKeyInput" placeholder="AIzaSy..." style="flex: 1; padding: 8px 10px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 0.85rem;">
+             <button class="save-btn" style="border: 1px solid var(--border-light); height: 36px; width: 36px; font-size: 15px;" (click)="saveGeminiKey()"><i class="ph ph-floppy-disk"></i></button>
+         </div>
+      </div>
+    </div>
+
+    <!-- Ollama -->
+    <div class="provider-card glass" style="border-top: 4px solid #f97316;">
+      <div class="card-icon" style="color: #f97316; margin-bottom: 0px;"><i class="ph-fill ph-cpu"></i></div>
+      <h3 class="provider-title">IA Local (Ollama)</h3>
+      <div class="provider-status">
+         @if (ollamaModels().length > 0) {
+           <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
+             {{ ollamaModels().length }} modelos
+           </span>
+         } @else {
+           <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
+             Desconectado
+           </span>
+         }
+      </div>
+      <div class="provider-input">
+         <div style="display: flex; gap: 6px;">
+             <input type="text" [(ngModel)]="ollamaUrlInput" placeholder="http://host.docker..." style="flex: 1; padding: 8px 10px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 0.85rem;">
+             <button class="save-btn" style="border: 1px solid var(--border-light); height: 36px; width: 36px; font-size: 15px;" (click)="saveOllamaUrl()"><i class="ph ph-floppy-disk"></i></button>
+         </div>
+      </div>
+    </div>
+
+    <!-- Anthropic -->
+    <div class="provider-card glass" style="border-top: 4px solid #d97706;">
+      <div class="card-icon" style="color: #d97706; margin-bottom: 0px;"><i class="ph-fill ph-brain"></i></div>
+      <h3 class="provider-title">Anthropic (Claude)</h3>
+      <div class="provider-status">
+         @if (anthropicModels().length > 0) {
+           <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
+             {{ anthropicModels().length }} modelos
+           </span>
+         } @else {
+           <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
+             Sin configurar
+           </span>
+         }
+      </div>
+      <div class="provider-input">
+         <div style="display: flex; gap: 6px;">
+             <input type="password" [(ngModel)]="anthropicKeyInput" placeholder="sk-ant-api03-..." style="flex: 1; padding: 8px 10px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 0.85rem;">
+             <button class="save-btn" style="border: 1px solid var(--border-light); height: 36px; width: 36px; font-size: 15px;" (click)="saveAnthropicKey()"><i class="ph ph-floppy-disk"></i></button>
+         </div>
+      </div>
+    </div>
+
+    <!-- OpenAI -->
+    <div class="provider-card glass" style="border-top: 4px solid #10a37f;">
+      <div class="card-icon" style="color: #10a37f; margin-bottom: 0px;"><i class="ph-fill ph-openai-logo"></i></div>
+      <h3 class="provider-title">OpenAI (GPT)</h3>
+      <div class="provider-status">
+         @if (openaiModels().length > 0) {
+           <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
+             {{ openaiModels().length }} modelos
+           </span>
+         } @else {
+           <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+             <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
+             Sin configurar
+           </span>
+         }
+      </div>
+      <div class="provider-input">
+         <div style="display: flex; gap: 6px;">
+             <input type="password" [(ngModel)]="openaiKeyInput" placeholder="sk-proj-..." style="flex: 1; padding: 8px 10px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 0.85rem;">
+             <button class="save-btn" style="border: 1px solid var(--border-light); height: 36px; width: 36px; font-size: 15px;" (click)="saveOpenaiKey()"><i class="ph ph-floppy-disk"></i></button>
+         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid: Auth + Telegram | Env Vars -->
   <div class="config-grid">
-    <!-- Left Column: Plugins & Auth -->
+    <!-- Left Column -->
     <div style="display: flex; flex-direction: column; gap: 24px;">
-      
+
       <!-- Google Auth Card -->
       <div class="config-card glass highlight">
         <div class="card-icon" style="color: #4285f4; margin-bottom: 0px;"><i class="ph-fill ph-google-logo"></i></div>
@@ -16,7 +120,6 @@
         
         <div class="auth-status">
           @if (authStatus().authenticated) {
-            
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
               <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
                 <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
@@ -50,22 +153,25 @@
                   Conectar Workspace
                 </button>
               }
-              
-              <button class="btn-secondary auth-btn danger-btn" (click)="logoutGoogle()">
-                <i class="ph ph-sign-out"></i> Desconectar Sesión
+              <button class="auth-btn danger-btn" (click)="logout()">
+                <i class="ph ph-sign-out"></i> Cerrar Sesión
               </button>
             </div>
-
           } @else {
-            <span class="status-badge warning" style="margin-bottom: 20px; display: inline-flex; align-items: center; gap: 6px;">
+            <span class="status-badge warning" style="display: inline-flex; align-items: center; gap: 4px;">
               <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
               No autenticado
             </span>
-            @if (authStatus().clientId) {
-              <div id="google-buttonDiv" style="margin-top: 5px;"></div>
-            } @else {
-              <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">Configura el Client ID en las variables de entorno para usar SSO.</p>
-            }
+            <button class="google-style-btn" (click)="loginWithGoogle()" style="margin-top: 20px;">
+              <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                <path fill="none" d="M0 0h48v48H0z"></path>
+              </svg>
+              Iniciar Sesión con Google
+            </button>
           }
         </div>
       </div>
@@ -94,122 +200,6 @@
         <p *ngIf="telegramMsg" style="margin-top: 10px; font-size: 0.85rem;" [ngStyle]="{'color': telegramMsgError ? '#ef4444' : '#10b981'}">
           {{ telegramMsg }}
         </p>
-      </div>
-
-      <!-- Gemini Configuration Card -->
-      <div class="config-card glass highlight" style="border-top: 4px solid #4285f4;">
-        <div class="card-icon" style="color: #4285f4; margin-bottom: 0px;"><i class="ph-fill ph-google-logo"></i></div>
-        <h3 style="font-size: 1.35rem; margin-top: -8px; margin-bottom: 4px;">Google (Gemini)</h3>
-        <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Motor principal de IA. Conecta modelos Gemini Flash, Pro y más.</p>
-        
-        <div style="margin-bottom: 15px;">
-           @if (geminiModels().length > 0) {
-             <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-               <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
-               Conectado ({{ geminiModels().length }} modelos disponibles)
-             </span>
-           } @else {
-             <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-               <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
-               Sin API Key configurada
-             </span>
-           }
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-           <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">API Key</label>
-           <div style="display: flex; gap: 8px;">
-               <input type="password" [(ngModel)]="geminiKeyInput" placeholder="AIzaSy..." style="flex: 1; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px;">
-               <button class="save-btn" style="border: 1px solid var(--border-light)" (click)="saveGeminiKey()"><i class="ph ph-floppy-disk"></i></button>
-           </div>
-        </div>
-      </div>
-
-      <!-- Ollama Configuration Card -->
-      <div class="config-card glass highlight" style="border-top: 4px solid #f97316;">
-        <div class="card-icon" style="color: #f97316; margin-bottom: 0px;"><i class="ph-fill ph-cpu"></i></div>
-        <h3 style="font-size: 1.35rem; margin-top: -8px; margin-bottom: 4px;">IA Local (Ollama)</h3>
-        <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Conecta tus motores locales para procesamiento gratuito y privado de IA.</p>
-        
-        <div style="margin-bottom: 15px;">
-           @if (ollamaModels().length > 0) {
-             <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-               <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
-               Conectado ({{ ollamaModels().length }} modelos listos)
-             </span>
-           } @else {
-             <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-               <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
-               Desconectado / Carga en proceso
-             </span>
-           }
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-           <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">URL Base Servidor Local</label>
-           <div style="display: flex; gap: 8px;">
-               <input type="text" [(ngModel)]="ollamaUrlInput" placeholder="http://host.docker.internal:11434" style="flex: 1; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px;">
-               <button class="save-btn" style="border: 1px solid var(--border-light)" (click)="saveOllamaUrl()"><i class="ph ph-floppy-disk"></i></button>
-           </div>
-        </div>
-      </div>
-
-      <!-- Anthropic Configuration Card -->
-      <div class="config-card glass highlight" style="border-top: 4px solid #d97706;">
-        <div class="card-icon" style="color: #d97706; margin-bottom: 0px;"><i class="ph-fill ph-brain"></i></div>
-        <h3 style="font-size: 1.35rem; margin-top: -8px; margin-bottom: 4px;">Anthropic (Claude)</h3>
-        <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Conecta modelos Claude para razonamiento avanzado y análisis profundo.</p>
-        
-        <div style="margin-bottom: 15px;">
-           @if (anthropicModels().length > 0) {
-             <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-               <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
-               Conectado ({{ anthropicModels().length }} modelos disponibles)
-             </span>
-           } @else {
-             <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-               <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
-               Sin API Key configurada
-             </span>
-           }
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-           <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">API Key</label>
-           <div style="display: flex; gap: 8px;">
-               <input type="password" [(ngModel)]="anthropicKeyInput" placeholder="sk-ant-api03-..." style="flex: 1; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px;">
-               <button class="save-btn" style="border: 1px solid var(--border-light)" (click)="saveAnthropicKey()"><i class="ph ph-floppy-disk"></i></button>
-           </div>
-        </div>
-      </div>
-
-      <!-- OpenAI Configuration Card -->
-      <div class="config-card glass highlight" style="border-top: 4px solid #10a37f;">
-        <div class="card-icon" style="color: #10a37f; margin-bottom: 0px;"><i class="ph-fill ph-openai-logo"></i></div>
-        <h3 style="font-size: 1.35rem; margin-top: -8px; margin-bottom: 4px;">OpenAI (GPT)</h3>
-        <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Conecta modelos GPT-4o, o3 y o4 para tareas de alta complejidad.</p>
-        
-        <div style="margin-bottom: 15px;">
-           @if (openaiModels().length > 0) {
-             <span class="status-badge success" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-               <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;"></div>
-               Conectado ({{ openaiModels().length }} modelos disponibles)
-             </span>
-           } @else {
-             <span class="status-badge warning" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
-               <div style="width: 8px; height: 8px; background-color: #f59e0b; border-radius: 50%;"></div>
-               Sin API Key configurada
-             </span>
-           }
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-           <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">API Key</label>
-           <div style="display: flex; gap: 8px;">
-               <input type="password" [(ngModel)]="openaiKeyInput" placeholder="sk-proj-..." style="flex: 1; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px;">
-               <button class="save-btn" style="border: 1px solid var(--border-light)" (click)="saveOpenaiKey()"><i class="ph ph-floppy-disk"></i></button>
-           </div>
-        </div>
       </div>
 
     </div>
