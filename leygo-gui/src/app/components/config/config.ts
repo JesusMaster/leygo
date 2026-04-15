@@ -341,7 +341,9 @@ export class ConfigComponent implements OnInit {
   getEnvGroups() {
     const config = this.config();
     const groups = [];
-    const keys = Object.keys(config);
+    // Keys already managed by provider cards — don't show in env vars
+    const managedKeys = new Set(['GOOGLE_API_KEY', 'GEMINI_API_KEY', 'OLLAMA_BASE_URL', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY']);
+    const keys = Object.keys(config).filter(k => !managedKeys.has(k));
 
     const googleKeys = keys.filter(k => k.startsWith('GOOGLE_'));
     if (googleKeys.length > 0) {
