@@ -1,0 +1,9 @@
+[
+    {
+        "webhook_id": "86391d8b-9dd4-4941-b38c-42e4951303c2",
+        "timestamp": "2026-04-16T15:57:44.489758",
+        "payload": "{\"urgencia\": \"alta\", \"workflow\": \"Sincronización de Contactos\", \"error\": \"Timeout connection to Database port 5432\", \"node_name\": \"Postgres Node\"}",
+        "response": "🚨 **ALERTA DE ERROR CRÍTICO DE N8N** 🚨\n\n**Asunto:** Problemas de n8n\n**Urgencia:** Alta\n\n**Resumen del Problema:**\nEl flujo de trabajo **\"Sincronización de Contactos\"** ha fallado debido a un **Timeout de conexión** al intentar comunicarse con la base de datos.\n\n**Detalles Técnicos:**\n*   **Nodo Fallido:** Postgres Node\n*   **Error:** Timeout connection to Database port 5432\n\n**Acción Requerida:**\nSe debe verificar inmediatamente la conectividad de la red y la disponibilidad del puerto 5432 para el servicio de base de datos.",
+        "error": null
+    }
+]

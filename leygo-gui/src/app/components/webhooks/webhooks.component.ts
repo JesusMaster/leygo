@@ -14,6 +14,14 @@ interface Webhook {
   fecha_creacion: string;
 }
 
+export interface WebhookLog {
+  webhook_id: string;
+  timestamp: string;
+  payload: string;
+  response: string;
+  error?: string;
+}
+
 interface ModelOption {
   value: string;
   label: string;
@@ -44,6 +52,13 @@ export class WebhooksComponent implements OnInit {
   webhooks = signal<Webhook[]>([]);
   loading = signal<boolean>(true);
 
+  // Logs state
+  logs = signal<WebhookLog[]>([]);
+  logsLoading = signal<boolean>(false);
+  logsInterval: any;
+  logsPanelOpen = signal<boolean>(false);
+  selectedWebhookId = signal<string | null>(null);
+
   // Modal form state
   showModal = signal<boolean>(false);
   editMode = signal<boolean>(false);
@@ -63,6 +78,55 @@ export class WebhooksComponent implements OnInit {
   ngOnInit() {
     this.loadWebhooks();
     this.loadAllModels();
+    this.loadAllLogs();
+    
+    // Auto-refresh logs every 10 seconds
+    this.logsInterval = setInterval(() => {
+      this.loadAllLogs(true);
+    }, 10000);
+  }
+
+  ngOnDestroy() {
+    if (this.logsInterval) {
+      clearInterval(this.logsInterval);
+    }
+  }
+
+  loadAllLogs(silent = false) {
+    if (!this.logsPanelOpen()) return; // Solo carga si el panel está abierto
+    
+    if (!silent) this.logsLoading.set(true);
+    
+    const ob$ = this.selectedWebhookId() 
+      ? this.api.getWebhookLogs(this.selectedWebhookId()!)
+      : this.api.getAllWebhookLogs();
+
+    ob$.subscribe({
+      next: (data) => {
+        this.logs.set(data || []);
+        this.logsLoading.set(false);
+      },
+      error: (e) => {
+        console.error('Error cargando logs:', e);
+        this.logsLoading.set(false);
+      }
+    });
+  }
+
+  openLogs(webhookId?: string) {
+    this.selectedWebhookId.set(webhookId || null);
+    this.logsPanelOpen.set(true);
+    this.loadAllLogs();
+  }
+
+  closeLogs() {
+    this.logsPanelOpen.set(false);
+    this.selectedWebhookId.set(null);
+  }
+
+  getWebhookTitle(id: string): string {
+    const wh = this.webhooks().find(w => w.id === id);
+    return wh ? wh.titulo : 'Webhook Eliminado ' + id.substring(0, 4);
   }
 
   loadWebhooks() {

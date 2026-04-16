@@ -1,78 +1,145 @@
-<div class="webhooks-page">
-  <!-- Header -->
-  <div class="header">
-    <div class="header-info">
-      <h2>Smart Webhooks</h2>
-      <p>Acopla tus sistemas externos con la Inteligencia de Leygo para procesar payloads asíncronamente.</p>
+<div class="webhooks-layout">
+  <div class="webhooks-page">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-info">
+        <h2>Smart Webhooks</h2>
+        <p>Acopla tus sistemas externos con la Inteligencia de Leygo para procesar payloads asíncronamente.</p>
+      </div>
+      
+      <div style="display: flex; gap: 12px;">
+        <button (click)="openLogs()" class="btn-secondary" style="display: flex; align-items: center; gap: 8px;">
+          <i class="ph ph-terminal"></i>
+          Ver Ejecuciones
+        </button>
+        <button (click)="openCreateModal()" class="create-btn">
+          <i class="ph ph-plus"></i>
+          Nuevo Webhook
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="loading-state">
+      <i class="ph ph-spinner-gap spinner"></i>
+      <p>Cargando webhooks...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading() && webhooks().length === 0" class="empty-state">
+      <i class="ph ph-share-network empty-icon"></i>
+      <h3>No tienes Webhooks configurados</h3>
+      <p>Crea tu primer webhook para recibir eventos de sistemas de terceros.</p>
+      <button (click)="openCreateModal()" class="create-btn" style="margin-top: 24px;">
+        Crear mi primer Webhook
+      </button>
+    </div>
+
+    <!-- Webhooks Grid -->
+    <div *ngIf="!loading() && webhooks().length > 0" class="webhooks-grid">
+      <div *ngFor="let wh of webhooks()" class="webhook-card" [class.paused]="wh.paused">
+        <div class="card-header">
+          <div class="webhook-icon" [ngClass]="{'paused-icon': wh.paused}">
+            <i class="ph ph-share-network"></i>
+          </div>
+          <div class="webhook-title">
+            <h3>{{ wh.titulo }}</h3>
+            <span class="status-badge" [ngClass]="wh.paused ? 'paused' : 'active'">
+              {{ wh.paused ? 'PAUSADO' : 'ACTIVO' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <p [title]="wh.descripcion">{{ wh.descripcion }}</p>
+        </div>
+
+        <div class="model-info">
+          <i class="ph ph-cpu"></i>
+          <span class="truncate">{{ getModelLabel(wh.modelo) }}</span>
+        </div>
+
+        <div class="card-footer">
+          <button (click)="copyToClipboard(wh.id)" class="copy-btn">
+            <i class="ph ph-copy"></i>
+            Copiar URL HTTP POST
+          </button>
+          
+          <div class="actions-row">
+            <button (click)="openLogs(wh.id)" class="action-btn logs" title="Ver logs">
+              <i class="ph ph-terminal"></i> Logs
+            </button>
+            <button (click)="openEditModal(wh)" class="action-btn edit">
+              Editar
+            </button>
+            <button (click)="togglePauseState(wh)" class="action-btn" [ngClass]="wh.paused ? 'resume' : 'pause'">
+              {{ wh.paused ? 'Reanudar' : 'Pausar' }}
+            </button>
+            <button (click)="deleteWebhook(wh)" class="action-btn delete">
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Webhooks Logs Console -->
+  <div class="console-sidebar" [class.open]="logsPanelOpen()">
+    <div class="console-header">
+      <div style="display: flex; flex-direction: column;">
+        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #111827; display: flex; align-items: center; gap: 6px;">
+          <i class="ph ph-terminal" style="color: var(--accent-primary);"></i> 
+          {{ selectedWebhookId() ? 'Logs del Webhook' : 'Consola Global' }}
+        </h3>
+        <span *ngIf="selectedWebhookId()" style="font-size: 12px; color: var(--text-dim); margin-top: 2px;">
+          {{ getWebhookTitle(selectedWebhookId()!) }}
+        </span>
+      </div>
+      
+      <div style="display: flex; gap: 8px;">
+        <button (click)="loadAllLogs()" class="icon-btn" title="Refrescar">
+          <i class="ph ph-arrows-clockwise" [class.spin]="logsLoading()"></i>
+        </button>
+        <button (click)="closeLogs()" class="icon-btn close-panel" title="Cerrar">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
     </div>
     
-    <button (click)="openCreateModal()" class="create-btn">
-      <i class="ph ph-plus"></i>
-      Nuevo Webhook
-    </button>
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="loading()" class="loading-state">
-    <i class="ph ph-spinner-gap spinner"></i>
-    <p>Cargando webhooks...</p>
-  </div>
-
-  <!-- Empty State -->
-  <div *ngIf="!loading() && webhooks().length === 0" class="empty-state">
-    <i class="ph ph-share-network empty-icon"></i>
-    <h3>No tienes Webhooks configurados</h3>
-    <p>Crea tu primer webhook para recibir eventos de sistemas de terceros.</p>
-    <button (click)="openCreateModal()" class="create-btn" style="margin-top: 24px;">
-      Crear mi primer Webhook
-    </button>
-  </div>
-
-  <!-- Webhooks Grid -->
-  <div *ngIf="!loading() && webhooks().length > 0" class="webhooks-grid">
-    <div *ngFor="let wh of webhooks()" class="webhook-card" [class.paused]="wh.paused">
-      <div class="card-header">
-        <div class="webhook-icon" [ngClass]="{'paused-icon': wh.paused}">
-          <i class="ph ph-share-network"></i>
-        </div>
-        <div class="webhook-title">
-          <h3>{{ wh.titulo }}</h3>
-          <span class="status-badge" [ngClass]="wh.paused ? 'paused' : 'active'">
-            {{ wh.paused ? 'PAUSADO' : 'ACTIVO' }}
+    <div class="console-body">
+      <div *ngIf="!logsLoading() && logs().length === 0" class="console-empty">
+        <i class="ph ph-ghost" style="font-size: 32px; color: #d1d5db; margin-bottom: 12px;"></i>
+        <p>Esperando ejecuciones...</p>
+      </div>
+      
+      <div *ngFor="let log of logs()" class="log-item" [ngClass]="{'log-error': log.error}">
+        <div class="log-header">
+          <span class="log-time"><i class="ph ph-clock"></i> {{ log.timestamp | date:'shortTime' }}</span>
+          <span class="log-webhook" *ngIf="!selectedWebhookId()" [title]="getWebhookTitle(log.webhook_id)">
+             {{ getWebhookTitle(log.webhook_id) }}
           </span>
         </div>
-      </div>
-
-      <div class="card-body">
-        <p [title]="wh.descripcion">{{ wh.descripcion }}</p>
-      </div>
-
-      <div class="model-info">
-        <i class="ph ph-cpu"></i>
-        <span class="truncate">{{ getModelLabel(wh.modelo) }}</span>
-      </div>
-
-      <div class="card-footer">
-        <button (click)="copyToClipboard(wh.id)" class="copy-btn">
-          <i class="ph ph-copy"></i>
-          Copiar URL HTTP POST
-        </button>
-        
-        <div class="actions-row">
-          <button (click)="openEditModal(wh)" class="action-btn edit">
-            Editar
-          </button>
-          <button (click)="togglePauseState(wh)" class="action-btn" [ngClass]="wh.paused ? 'resume' : 'pause'">
-            {{ wh.paused ? 'Reanudar' : 'Pausar' }}
-          </button>
-          <button (click)="deleteWebhook(wh)" class="action-btn delete">
-            Eliminar
-          </button>
+        <div class="log-content">
+          <div class="log-row">
+            <span class="log-label">Payload</span>
+            <div class="log-value payload">{{ log.payload }}</div>
+          </div>
+          <div class="log-row">
+            <span class="log-label">Respuesta</span>
+            <div class="log-value response">{{ log.response }}</div>
+          </div>
+          <div *ngIf="log.error" class="log-row error-row">
+            <span class="log-label">Error</span>
+            <div class="log-value">{{ log.error }}</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Overlay de fondo -->
+  <div class="console-overlay" *ngIf="logsPanelOpen()" (click)="closeLogs()"></div>
 </div>
 
 <!-- Webhook Create/Edit Modal -->

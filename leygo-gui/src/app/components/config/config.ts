@@ -20,6 +20,11 @@ export class ConfigComponent implements OnInit {
   authStatus = signal<any>({ authenticated: false });
   loading = signal(true);
   
+  geminiLoading = signal(false);
+  ollamaLoading = signal(false);
+  anthropicLoading = signal(false);
+  openaiLoading = signal(false);
+  
   newKey = '';
   newValue = '';
 
@@ -34,25 +39,45 @@ export class ConfigComponent implements OnInit {
 
   ngOnInit() {
     this.loadData();
-    this.api.getOllamaTags().subscribe(res => {
-      if (res.models && res.models.length > 0) {
-        this.ollamaModels.set(res.models);
-      }
+    this.ollamaLoading.set(true);
+    this.api.getOllamaTags().subscribe({
+      next: (res) => {
+        if (res.models && res.models.length > 0) {
+          this.ollamaModels.set(res.models);
+        }
+        this.ollamaLoading.set(false);
+      },
+      error: () => this.ollamaLoading.set(false)
     });
-    this.api.getGeminiModels().subscribe(res => {
-      if (res.models && res.models.length > 0) {
-        this.geminiModels.set(res.models);
-      }
+    this.geminiLoading.set(true);
+    this.api.getGeminiModels().subscribe({
+      next: (res) => {
+        if (res.models && res.models.length > 0) {
+          this.geminiModels.set(res.models);
+        }
+        this.geminiLoading.set(false);
+      },
+      error: () => this.geminiLoading.set(false)
     });
-    this.api.getAnthropicModels().subscribe(res => {
-      if (res.models && res.models.length > 0) {
-        this.anthropicModels.set(res.models);
-      }
+    this.anthropicLoading.set(true);
+    this.api.getAnthropicModels().subscribe({
+      next: (res) => {
+        if (res.models && res.models.length > 0) {
+          this.anthropicModels.set(res.models);
+        }
+        this.anthropicLoading.set(false);
+      },
+      error: () => this.anthropicLoading.set(false)
     });
-    this.api.getOpenaiModels().subscribe(res => {
-      if (res.models && res.models.length > 0) {
-        this.openaiModels.set(res.models);
-      }
+    this.openaiLoading.set(true);
+    this.api.getOpenaiModels().subscribe({
+      next: (res) => {
+        if (res.models && res.models.length > 0) {
+          this.openaiModels.set(res.models);
+        }
+        this.openaiLoading.set(false);
+      },
+      error: () => this.openaiLoading.set(false)
     });
   }
 
@@ -285,43 +310,94 @@ export class ConfigComponent implements OnInit {
 
   saveOllamaUrl() {
     if (!this.ollamaUrlInput) return;
-    this.updateVar('OLLAMA_BASE_URL', this.ollamaUrlInput);
+    this.ollamaLoading.set(true);
+    this.api.updateConfig('OLLAMA_BASE_URL', this.ollamaUrlInput).subscribe({
+      next: (res: any) => {
+        setTimeout(() => {
+          this.api.getOllamaTags().subscribe({
+            next: (modelRes) => {
+              if (modelRes.models && modelRes.models.length > 0) {
+                this.ollamaModels.set(modelRes.models);
+              }
+              this.ollamaLoading.set(false);
+              alert(`✅ URL de Ollama actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`);
+              this.loadData();
+            },
+            error: () => this.ollamaLoading.set(false)
+          });
+        }, 1500);
+      },
+      error: () => this.ollamaLoading.set(false)
+    });
   }
 
   saveGeminiKey() {
     if (!this.geminiKeyInput) return;
-    this.updateVar('GOOGLE_API_KEY', this.geminiKeyInput);
-    setTimeout(() => {
-      this.api.getGeminiModels().subscribe(res => {
-        if (res.models && res.models.length > 0) {
-          this.geminiModels.set(res.models);
-        }
-      });
-    }, 1000);
+    this.geminiLoading.set(true);
+    this.api.updateConfig('GOOGLE_API_KEY', this.geminiKeyInput).subscribe({
+      next: (res: any) => {
+        setTimeout(() => {
+          this.api.getGeminiModels().subscribe({
+            next: (modelRes) => {
+              if (modelRes.models && modelRes.models.length > 0) {
+                this.geminiModels.set(modelRes.models);
+              }
+              this.geminiLoading.set(false);
+              alert(`✅ Clave Gemini actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`);
+              this.loadData();
+            },
+            error: () => this.geminiLoading.set(false)
+          });
+        }, 1500);
+      },
+      error: () => this.geminiLoading.set(false)
+    });
   }
 
   saveAnthropicKey() {
     if (!this.anthropicKeyInput) return;
-    this.updateVar('ANTHROPIC_API_KEY', this.anthropicKeyInput);
-    setTimeout(() => {
-      this.api.getAnthropicModels().subscribe(res => {
-        if (res.models && res.models.length > 0) {
-          this.anthropicModels.set(res.models);
-        }
-      });
-    }, 1000);
+    this.anthropicLoading.set(true);
+    this.api.updateConfig('ANTHROPIC_API_KEY', this.anthropicKeyInput).subscribe({
+      next: (res: any) => {
+        setTimeout(() => {
+          this.api.getAnthropicModels().subscribe({
+            next: (modelRes) => {
+              if (modelRes.models && modelRes.models.length > 0) {
+                this.anthropicModels.set(modelRes.models);
+              }
+              this.anthropicLoading.set(false);
+              alert(`✅ Clave Anthropic actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`);
+              this.loadData();
+            },
+            error: () => this.anthropicLoading.set(false)
+          });
+        }, 1500);
+      },
+      error: () => this.anthropicLoading.set(false)
+    });
   }
 
   saveOpenaiKey() {
     if (!this.openaiKeyInput) return;
-    this.updateVar('OPENAI_API_KEY', this.openaiKeyInput);
-    setTimeout(() => {
-      this.api.getOpenaiModels().subscribe(res => {
-        if (res.models && res.models.length > 0) {
-          this.openaiModels.set(res.models);
-        }
-      });
-    }, 1000);
+    this.openaiLoading.set(true);
+    this.api.updateConfig('OPENAI_API_KEY', this.openaiKeyInput).subscribe({
+      next: (res: any) => {
+        setTimeout(() => {
+          this.api.getOpenaiModels().subscribe({
+            next: (modelRes) => {
+              if (modelRes.models && modelRes.models.length > 0) {
+                this.openaiModels.set(modelRes.models);
+              }
+              this.openaiLoading.set(false);
+              alert(`✅ Clave OpenAI actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`);
+              this.loadData();
+            },
+            error: () => this.openaiLoading.set(false)
+          });
+        }, 1500);
+      },
+      error: () => this.openaiLoading.set(false)
+    });
   }
 
   isKnownModel(value: string): boolean {

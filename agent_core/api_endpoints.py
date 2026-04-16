@@ -10,7 +10,7 @@ from dotenv import dotenv_values
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from main import discover_sub_agents
 from scheduler_manager import scheduler, MEMORIA_RECORDATORIOS_PATH, guardar_estado_jobs, send_telegram_reminder, send_dynamic_telegram_reminder, execute_agent_task
-from webhooks_manager import load_webhooks, save_webhooks, create_webhook, update_webhook, delete_webhook, get_webhook
+from webhooks_manager import load_webhooks, save_webhooks, create_webhook, update_webhook, delete_webhook, get_webhook, log_webhook_execution, get_webhook_logs
 import status_bus
 import json
 from datetime import datetime
@@ -913,6 +913,14 @@ async def api_delete_webhook(webhook_id: str):
         return {"status": "success"}
     raise HTTPException(status_code=404, detail="Webhook no encontrado")
 
+@router.get("/webhooks/{webhook_id}/logs")
+async def api_get_webhook_logs(webhook_id: str):
+    return get_webhook_logs(webhook_id)
+
+@router.get("/webhooks/logs/all")
+async def api_get_all_webhook_logs():
+    return get_webhook_logs()
+
 @router.post("/webhook/{webhook_id}")
 async def handle_dynamic_webhook(webhook_id: str, request: Request):
     """Endpoint receptor dinámico para webhooks."""
@@ -977,12 +985,15 @@ async def handle_dynamic_webhook(webhook_id: str, request: Request):
                         
                         try:
                             await bot.send_message(chat_id=chat_id, text=text, parse_mode=ParseMode.HTML)
+                            log_webhook_execution(webhook_id, payload, respuesta)
                         except Exception as e:
                             print(f"Error HTML telegram sender in webhook: {e}")
                             await bot.send_message(chat_id=chat_id, text=respuesta)
+                            log_webhook_execution(webhook_id, payload, respuesta, error=f"HTML error: {e}")
                             
                 except Exception as e:
                     print(f"Error procesando webhook background task: {e}")
+                    log_webhook_execution(webhook_id, payload, "Fallo al procesar", error=str(e))
 
             # We run it in background to immediately return 202
             asyncio.create_task(process_and_notify())
