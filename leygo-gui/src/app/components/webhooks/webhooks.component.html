@@ -1,0 +1,136 @@
+<div class="webhooks-page">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-info">
+      <h2>Smart Webhooks</h2>
+      <p>Acopla tus sistemas externos con la Inteligencia de Leygo para procesar payloads asíncronamente.</p>
+    </div>
+    
+    <button (click)="openCreateModal()" class="create-btn">
+      <i class="ph ph-plus"></i>
+      Nuevo Webhook
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-state">
+    <i class="ph ph-spinner-gap spinner"></i>
+    <p>Cargando webhooks...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading() && webhooks().length === 0" class="empty-state">
+    <i class="ph ph-share-network empty-icon"></i>
+    <h3>No tienes Webhooks configurados</h3>
+    <p>Crea tu primer webhook para recibir eventos de sistemas de terceros.</p>
+    <button (click)="openCreateModal()" class="create-btn" style="margin-top: 24px;">
+      Crear mi primer Webhook
+    </button>
+  </div>
+
+  <!-- Webhooks Grid -->
+  <div *ngIf="!loading() && webhooks().length > 0" class="webhooks-grid">
+    <div *ngFor="let wh of webhooks()" class="webhook-card" [class.paused]="wh.paused">
+      <div class="card-header">
+        <div class="webhook-icon" [ngClass]="{'paused-icon': wh.paused}">
+          <i class="ph ph-share-network"></i>
+        </div>
+        <div class="webhook-title">
+          <h3>{{ wh.titulo }}</h3>
+          <span class="status-badge" [ngClass]="wh.paused ? 'paused' : 'active'">
+            {{ wh.paused ? 'PAUSADO' : 'ACTIVO' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <p [title]="wh.descripcion">{{ wh.descripcion }}</p>
+      </div>
+
+      <div class="model-info">
+        <i class="ph ph-cpu"></i>
+        <span class="truncate">{{ getModelLabel(wh.modelo) }}</span>
+      </div>
+
+      <div class="card-footer">
+        <button (click)="copyToClipboard(wh.id)" class="copy-btn">
+          <i class="ph ph-copy"></i>
+          Copiar URL HTTP POST
+        </button>
+        
+        <div class="actions-row">
+          <button (click)="openEditModal(wh)" class="action-btn edit">
+            Editar
+          </button>
+          <button (click)="togglePauseState(wh)" class="action-btn" [ngClass]="wh.paused ? 'resume' : 'pause'">
+            {{ wh.paused ? 'Reanudar' : 'Pausar' }}
+          </button>
+          <button (click)="deleteWebhook(wh)" class="action-btn delete">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Webhook Create/Edit Modal -->
+<div *ngIf="showModal()" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>{{ editMode() ? 'Editar Webhook' : 'Nuevo Webhook' }}</h3>
+      <button (click)="closeModal()" class="close-btn">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Título / Nombre</label>
+        <input [(ngModel)]="formData().titulo" type="text" placeholder="Ej. Procesar Logs GCP" class="form-control">
+      </div>
+      
+      <div class="form-group">
+        <label>Descripción (Instrucciones para la IA)</label>
+        <textarea [(ngModel)]="formData().descripcion" rows="4" 
+                  placeholder="Instruye al agente sobre qué debe hacer con el payload JSON..." 
+                  class="form-control"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Modelo de IA a utilizar</label>
+        
+        <div *ngIf="modelsLoading()" class="form-help">
+          <i class="ph ph-spinner-gap spinner" style="font-size: 14px; margin-right: 4px;"></i> Cargando modelos...
+        </div>
+
+        <select *ngIf="!modelsLoading()" [(ngModel)]="formData().modelo" class="form-control">
+          <optgroup label="Default">
+            <option value="gemini-2.0-flash">Default System (Supervisor Fallback)</option>
+          </optgroup>
+          <optgroup label="Google">
+            <option *ngFor="let m of availableModels() | filterProvider:'google'" [value]="m.value">{{ m.label }}</option>
+          </optgroup>
+          <optgroup label="Anthropic">
+            <option *ngFor="let m of availableModels() | filterProvider:'anthropic'" [value]="m.value">{{ m.label }}</option>
+          </optgroup>
+          <optgroup label="OpenAI">
+            <option *ngFor="let m of availableModels() | filterProvider:'openai'" [value]="m.value">{{ m.label }}</option>
+          </optgroup>
+          <optgroup label="Ollama (Local)">
+            <option *ngFor="let m of availableModels() | filterProvider:'ollama'" [value]="m.value">{{ m.label }}</option>
+          </optgroup>
+        </select>
+        <p class="form-help">Este modelo procesará los payloads asíncronamente.</p>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button (click)="closeModal()" class="btn-secondary">Cancelar</button>
+      <button (click)="saveWebhook()" class="btn-primary">
+        {{ editMode() ? 'Guardar Cambios' : 'Crear Webhook' }}
+      </button>
+    </div>
+  </div>
+</div>

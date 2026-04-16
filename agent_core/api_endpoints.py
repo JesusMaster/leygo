@@ -10,6 +10,7 @@ from dotenv import dotenv_values
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from main import discover_sub_agents
 from scheduler_manager import scheduler, MEMORIA_RECORDATORIOS_PATH, guardar_estado_jobs, send_telegram_reminder, send_dynamic_telegram_reminder, execute_agent_task
+from webhooks_manager import load_webhooks, save_webhooks, create_webhook, update_webhook, delete_webhook, get_webhook
 import status_bus
 import json
 from datetime import datetime
@@ -34,6 +35,17 @@ class TaskCreateRequest(BaseModel):
 
 class TaskUpdateRequest(BaseModel):
     message_or_prompt: str
+
+class WebhookCreateRequest(BaseModel):
+    titulo: str
+    descripcion: str
+    modelo: str
+
+class WebhookUpdateRequest(BaseModel):
+    titulo: str = None
+    descripcion: str = None
+    modelo: str = None
+    paused: bool = None
 
 @router.get("/agents")
 async def get_agents():
@@ -874,6 +886,113 @@ async def get_task_execution_logs(task_id: str, limit: int = 50):
         return get_task_logs(task_id, limit=limit)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error leyendo logs: {e}")
+
+# ==========================================
+# WEBHOOKS ENDPOINTS
+# ==========================================
+
+@router.get("/webhooks")
+async def api_get_webhooks():
+    return load_webhooks()
+
+@router.post("/webhooks")
+async def api_create_webhook(req: WebhookCreateRequest):
+    wh = create_webhook(req.titulo, req.descripcion, req.modelo)
+    return {"status": "success", "webhook": wh}
+
+@router.put("/webhooks/{webhook_id}")
+async def api_update_webhook(webhook_id: str, req: WebhookUpdateRequest):
+    wh = update_webhook(webhook_id, req.titulo, req.descripcion, req.modelo, req.paused)
+    if wh:
+        return {"status": "success", "webhook": wh}
+    raise HTTPException(status_code=404, detail="Webhook no encontrado")
+
+@router.delete("/webhooks/{webhook_id}")
+async def api_delete_webhook(webhook_id: str):
+    if delete_webhook(webhook_id):
+        return {"status": "success"}
+    raise HTTPException(status_code=404, detail="Webhook no encontrado")
+
+@router.post("/webhook/{webhook_id}")
+async def handle_dynamic_webhook(webhook_id: str, request: Request):
+    """Endpoint receptor dinámico para webhooks."""
+    wh = get_webhook(webhook_id)
+    if not wh:
+        raise HTTPException(status_code=404, detail="Webhook no encontrado o inactivo")
+        
+    if wh.get("paused"):
+        return JSONResponse(status_code=422, content={"status": "paused", "message": "Este webhook está en pausa."})
+        
+    try:
+        # Intentar obtener payload JSON, si falla obtener texto crudo
+        try:
+            payload = await request.json()
+        except Exception:
+            try:
+                payload_bytes = await request.body()
+                payload = payload_bytes.decode('utf-8')
+            except Exception:
+                payload = "No_Payload"
+                
+        prompt = (
+            f"El webhook local '{wh.get('titulo')}' ha recibido un payload. "
+            f"INSTRUCCIONES DE SISTEMA: {wh.get('descripcion')}\n\n"
+            f"PAYLOAD RECIBIDO:\n```json\n{json.dumps(payload, indent=2, ensure_ascii=False) if isinstance(payload, dict) else payload}\n```\n\n"
+            f"REGLA CRUCIAL: Tu respuesta final en texto será reenviada AUTOMÁTICAMENTE por Telegram al usuario. "
+            f"Por favor, NO ASUMAS que debes usar herramientas como `crear_recordatorio` para notificarlo. Limítate a cumplir las instrucciones y entregar el texto final, sabiendo que el sistema se encargará de despacharlo de inmediato a su Telegram."
+        )
+        
+        agent = request.app.state.agent
+        if agent:
+            import asyncio
+            import os
+            
+            async def process_and_notify():
+                try:
+                    respuesta = await agent.process_message(
+                        prompt, 
+                        thread_id=f"webhook_{webhook_id}"
+                    )
+                    
+                    if not respuesta:
+                        return
+                        
+                    # Notify via Telegram
+                    from telegram import Bot
+                    from telegram.constants import ParseMode
+                    import re
+                    
+                    token = os.getenv("TELEGRAM_TOKEN")
+                    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+                    
+                    if token and chat_id:
+                        bot = Bot(token=token)
+                        
+                        # Apply naive formatting mimicking telegram_bot.py
+                        text = respuesta.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                        text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
+                        text = re.sub(r'(?<!\*)\*(?!\s)(?!\*)(.*?)(?<!\s)(?<!\*)\*(?!\*)', r'<i>\1</i>', text)
+                        text = re.sub(r'```(.*?)```', r'<pre>\1</pre>', text, flags=re.DOTALL)
+                        text = re.sub(r'`(.*?)`', r'<code>\1</code>', text)
+                        
+                        try:
+                            await bot.send_message(chat_id=chat_id, text=text, parse_mode=ParseMode.HTML)
+                        except Exception as e:
+                            print(f"Error HTML telegram sender in webhook: {e}")
+                            await bot.send_message(chat_id=chat_id, text=respuesta)
+                            
+                except Exception as e:
+                    print(f"Error procesando webhook background task: {e}")
+
+            # We run it in background to immediately return 202
+            asyncio.create_task(process_and_notify())
+            
+        return JSONResponse(status_code=202, content={"status": "accepted", "message": "Payload recibido y enviado al agente en segundo plano."})
+        
+    except Exception as e:
+        print(f"Error procesando webhook {webhook_id}: {e}")
+        raise HTTPException(status_code=500, detail="Error interno al procesar webhook")
+
 
 # --- MCP MANAGER API ---
 

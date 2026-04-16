@@ -155,4 +155,21 @@ export class ApiService {
   getOpenaiModels(): Observable<{models: {name: string, displayName: string}[], error?: string}> {
     return this.http.get<{models: {name: string, displayName: string}[], error?: string}>(`${this.baseUrl}/openai/models`);
   }
+
+  // --- Webhooks APIs ---
+  getWebhooks(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/webhooks`);
+  }
+
+  createWebhook(payload: { titulo: string, descripcion: string, modelo: string }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/webhooks`, payload);
+  }
+
+  updateWebhook(id: string, payload: { titulo?: string, descripcion?: string, modelo?: string, paused?: boolean }): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/webhooks/${id}`, payload);
+  }
+
+  deleteWebhook(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/webhooks/${id}`);
+  }
 }
