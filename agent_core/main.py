@@ -330,20 +330,25 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
         while i < len(clean_messages):
             m = clean_messages[i]
             
+            # Si es un mensaje de herramienta, incluimos un resumen para que el Supervisor sepa qué pasó
             if isinstance(m, ToolMessage):
+                content_str = str(m.content)
+                if len(content_str) > 500:
+                    content_str = content_str[:500] + "... [Resultado recortado]"
+                lightweight_messages.append(ToolMessage(content=content_str, tool_call_id=m.tool_call_id, name=m.name))
                 i += 1
                 continue
             
-            has_tool_calls = hasattr(m, 'tool_calls') and m.tool_calls
-            has_content = m.content and str(m.content).strip()
-            
-            if has_tool_calls:
-                j = i + 1
-                while j < len(clean_messages) and isinstance(clean_messages[j], ToolMessage):
-                    j += 1
-                if has_content:
-                    lightweight_messages.append(AIMessage(content=m.content))
-                i = j
+            # Si el AIMessage tiene tool_calls, debemos incluirlo (aunque no tenga content) 
+            # para que el Supervisor sepa que el agente ejecutó algo
+            if isinstance(m, AIMessage) and m.tool_calls:
+                tc_names = [tc.get('name', 'tool') for tc in m.tool_calls]
+                # Creamos una versión ligera del AIMessage para el Supervisor
+                lightweight_messages.append(AIMessage(
+                    content=f"{m.content if m.content else ''} [Ejecutando: {', '.join(tc_names)}]",
+                    tool_calls=m.tool_calls
+                ))
+                i += 1
                 continue
             
             lightweight_messages.append(m)
@@ -352,6 +357,7 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
         if len(lightweight_messages) > MAX_CONTEXT_MESSAGES:
             # Preservar siempre el primer mensaje (el prompt original del usuario) para no perder el norte de la tarea
             first_msg = lightweight_messages[0]
+            # Tomar los últimos N mensajes, pero asegurar que el primero sea siempre HumanMessage(petición original)
             lightweight_messages = [first_msg] + lightweight_messages[-(MAX_CONTEXT_MESSAGES-1):]
         
         print(f">> Supervisor evaluando (historial: {len(lightweight_messages)} msjs, filtrados de {len(clean_messages)})...")
