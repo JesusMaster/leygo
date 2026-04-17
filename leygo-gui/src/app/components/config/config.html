@@ -294,6 +294,14 @@
                       <button class="save-btn" title="Guardar cambios" (click)="updateVar(key, valInput.value)">
                         <i class="ph ph-floppy-disk"></i>
                       </button>
+                    } @else if (key === 'ENABLE_STREAMING') {
+                      <select [ngModel]="config()[key] || 'true'" #valInput class="model-select">
+                        <option value="true">Activo (Tiempo Real)</option>
+                        <option value="false">Desactivado (En bloque final)</option>
+                      </select>
+                      <button class="save-btn" title="Guardar cambios" (click)="updateVar(key, valInput.value)">
+                        <i class="ph ph-floppy-disk"></i>
+                      </button>
                     } @else {
                       <input type="text" [value]="config()[key]" #valInput>
                       <button class="save-btn" title="Guardar cambios" (click)="updateVar(key, valInput.value)">

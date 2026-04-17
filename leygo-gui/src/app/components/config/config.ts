@@ -83,6 +83,9 @@ export class ConfigComponent implements OnInit {
 
   loadData() {
     this.api.getConfig().subscribe(data => {
+      if (!data['ENABLE_STREAMING']) {
+         data['ENABLE_STREAMING'] = 'true';
+      }
       this.config.set(data);
       if (data['OLLAMA_BASE_URL']) {
         this.ollamaUrlInput = data['OLLAMA_BASE_URL'];

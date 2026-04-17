@@ -21,3 +21,5 @@ agent_core/.env
 
 # Sub-agentes personalizados (creados por el propio agente)
 agent_core/sub_agents/youtube_analyzer/
+
+agent_core/mcp_config.yaml

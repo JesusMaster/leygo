@@ -364,19 +364,32 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
         status_bus.publish_status("🧠 Supervisor analizando la solicitud...")
         response = await self.supervisor_llm.ainvoke([system_prompt] + lightweight_messages)
         
-        next_step = "FINISH"
+        next_step = "finish"
         if hasattr(response, "tool_calls") and response.tool_calls:
             tc = response.tool_calls[0]
             if "next_node" in tc["args"]:
                 next_step = tc["args"]["next_node"].lower()
                 
             resp_conv = tc["args"].get("respuesta_conversacional", "").strip()
+            
+            # Recuperar el contenido directo del LLM (fuera del tool call)
+            content_str = ""
+            if isinstance(response.content, list):
+                content_str = "".join(p.get("text", "") for p in response.content if isinstance(p, dict) and p.get("type", "") == "text")
+            elif isinstance(response.content, str):
+                content_str = response.content.strip()
                 
-            if next_step in ("finish", "end"):
+            combined_response = content_str
+            if resp_conv and resp_conv not in combined_response:
+                combined_response = (combined_response + "\n\n" + resp_conv).strip()
+            elif not combined_response:
+                combined_response = resp_conv
+                
+            if next_step in ("finish", "end", "done", "complete"):
                 print(f"[Supervisor] El flujo general está completo según el Supervisor. Terminando (END).")
                 status_bus.publish_status("✅ Tarea completada")
                 new_msg = AIMessage(
-                    content=resp_conv, 
+                    content=combined_response, 
                     usage_metadata=getattr(response, "usage_metadata", {}), 
                     response_metadata=getattr(response, "response_metadata", {})
                 )
@@ -855,6 +868,7 @@ class SelfExtendingAgent:
             "model": "varios"
         }
         last_streaming_node = None  # Nodo cuyo stream de tokens estamos emitiendo
+        has_streamed_tokens = False
 
         try:
             async for event in self.graph.astream_events(
@@ -867,9 +881,27 @@ class SelfExtendingAgent:
 
                 # ── 1. Stream de tokens del LLM ──────────────────────────────────
                 if kind == "on_chat_model_stream":
-                    # No emitimos tokens parciales en tiempo real.
-                    # La respuesta final se captura completa en on_chat_model_end.
-                    pass
+                    chunk = event.get("data", {}).get("chunk")
+                    if chunk:
+                        # Evitar stream de invocaciones a herramientas (no son texto para el usuario)
+                        if hasattr(chunk, "tool_call_chunks") and chunk.tool_call_chunks:
+                            continue
+                        if hasattr(chunk, "tool_calls") and chunk.tool_calls:
+                            continue
+                            
+                        raw_content = getattr(chunk, "content", "")
+                        text = ""
+                        if isinstance(raw_content, list):
+                            text = "".join(p.get("text", "") for p in raw_content if isinstance(p, dict) and p.get("type") == "text")
+                        elif isinstance(raw_content, str):
+                            text = raw_content
+                            
+                        if text:
+                            if node_name in worker_nodes or node_name == "supervisor":
+                                streaming_enabled = os.environ.get("ENABLE_STREAMING", "true").lower() == "true"
+                                if streaming_enabled:
+                                    has_streamed_tokens = True
+                                    yield {"type": "token", "content": text}
 
                 # ── 2. Inicio de un nodo → publicar status ───────────────────────
                 elif kind == "on_chain_start" and node_name:
@@ -1003,7 +1035,8 @@ class SelfExtendingAgent:
             except Exception as ex:
                 print(f"[stream_message] Error recuperando fallback de estado: {ex}")
             
-        yield {"type": "done", "content": final_text, "usage": total_usage}
+        content_to_send = "" if has_streamed_tokens else final_text
+        yield {"type": "done", "content": content_to_send, "usage": total_usage}
 
     async def cleanup(self):
         """Cleanup connections."""
