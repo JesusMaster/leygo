@@ -939,9 +939,22 @@ async def handle_dynamic_webhook(webhook_id: str, request: Request):
             except Exception:
                 payload = "No_Payload"
                 
+        # Extraer headers relevantes para identificar la fuente real del webhook
+        HEADERS_RELEVANTES = [
+            "x-github-event", "x-github-delivery", "x-gitlab-event",
+            "x-hook-uuid", "x-n8n-workflow", "user-agent",
+            "content-type", "x-slack-signature", "x-forwarded-for"
+        ]
+        headers_info = {
+            k: v for k, v in request.headers.items()
+            if k.lower() in HEADERS_RELEVANTES
+        }
+        headers_str = json.dumps(headers_info, indent=2, ensure_ascii=False) if headers_info else "No disponibles"
+
         prompt = (
-            f"El webhook local '{wh.get('titulo')}' ha recibido un payload. "
+            f"Has recibido un payload en el webhook configurado como '{wh.get('titulo')}'. "
             f"INSTRUCCIONES DE SISTEMA: {wh.get('descripcion')}\n\n"
+            f"HEADERS HTTP DE LA PETICIÓN (úsalos para identificar el origen real):\n```json\n{headers_str}\n```\n\n"
             f"PAYLOAD RECIBIDO:\n```json\n{json.dumps(payload, indent=2, ensure_ascii=False) if isinstance(payload, dict) else payload}\n```\n\n"
             f"REGLA CRUCIAL: Tu respuesta final en texto será reenviada AUTOMÁTICAMENTE por Telegram al usuario. "
             f"Por favor, NO ASUMAS que debes usar herramientas como `crear_recordatorio` para notificarlo. Limítate a cumplir las instrucciones y entregar el texto final, sabiendo que el sistema se encargará de despacharlo de inmediato a su Telegram."

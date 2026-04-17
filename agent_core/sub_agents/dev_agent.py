@@ -125,6 +125,19 @@ Ruta: agent_core/sub_agents/<nombre>/<nombre>_agent.py
 - OBLIGATORIO: NUNCA importes de `langchain.tools` (generará un ModuleNotFoundError). IMPORTA SIEMPRE de `langchain_core.tools` tanto para `@tool` como para `StructuredTool`.
 
 ELIMINAR SUB-AGENTES: usar eliminar_archivo_en_proyecto con ruta del directorio completo.
+
+---
+## ✅ CHECKLIST OBLIGATORIO AL FINALIZAR CREACION DE UN AGENTE
+Antes de responder "agente creado" o similar, DEBES verificar internamente que existen TODOS estos archivos.
+Si alguno falta, crealo AHORA antes de responder al usuario:
+
+1. [ ] agent_core/sub_agents/<nombre>/<nombre>_agent.py  ← EL MAS IMPORTANTE. Sin este archivo el agente NO EXISTE.
+2. [ ] agent_core/sub_agents/<nombre>/.env               ← Variables de entorno y modelo por defecto.
+3. [ ] agent_core/sub_agents/<nombre>/memoria/memoria_procedimental.md
+4. [ ] agent_core/sub_agents/<nombre>/memoria/memoria_episodica.md
+5. [ ] agent_core/sub_agents/<nombre>/memoria/usuarios_preferencias.md
+
+⛔ PROHIBIDO declarar el agente como "creado y listo" si el archivo <nombre>_agent.py no fue escrito en este turno.
 '''
 
     def get_tools(self, all_available_tools: list) -> List[Callable]:

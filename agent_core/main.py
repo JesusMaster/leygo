@@ -204,11 +204,12 @@ def get_dynamic_route_model(sub_agents: List[BaseSubAgent], all_tools: list = No
         respuesta_conversacional=(str, Field(default="", description="Si el next_node es FINISH, usa este campo para darle tu respuesta final en texto al usuario (ej. saludar, dar la hora, o confirmar)."))
     )
 
-def _sanitize_messages_for_gemini(messages):
-    """Sanitiza y RECORTA el contenido de los mensajes para evitar explosiones de tokens.
+def _sanitize_messages(messages):
+    """Sanitiza y recorta el contenido de los mensajes para todos los proveedores LLM.
+    Garantiza secuencias válidas para Gemini, Claude (Anthropic), OpenAI y Ollama.
     
-    1. Asegura secuencias válidas para Gemini (AIMessage -> ToolMessage).
-    2. Recorta mensajes individuales que excedan MAX_MESSAGE_CHARS para proteger el contexto.
+    1. Elimina tool_calls huérfanos por ID (previene error 400 en Claude y Gemini).
+    2. Recorta mensajes que excedan MAX_MESSAGE_CHARS para proteger el contexto.
     """
     if not messages:
         return messages
@@ -229,7 +230,7 @@ def _sanitize_messages_for_gemini(messages):
         
         sanitized.append(m)
     
-    # --- Lógica de Secuencia (Validación Gemini) ---
+    # --- Lógica de Secuencia (Validación Gemini + Claude) ---
     # 1. Remover ToolMessages huérfanos al inicio
     while sanitized and isinstance(sanitized[0], ToolMessage):
         sanitized.pop(0)
@@ -238,19 +239,26 @@ def _sanitize_messages_for_gemini(messages):
     if not sanitized or isinstance(sanitized[0], AIMessage):
         sanitized.insert(0, HumanMessage(content="Continúa con la tarea pendiente usando tu contexto y herramientas.", name="WorkerContext"))
     
-    # 3. Eliminar tool_calls huérfanos de AIMessages (previene error 400 de Gemini)
+    # 3. Verificar que CADA tool_call en un AIMessage tenga su ToolMessage correspondiente por ID
+    #    Esto es crítico para Claude (400) y Gemini (400): ambos exigen pairing estricto.
     cleaned_sequence = []
-    for i, m in enumerate(sanitized):
+    fulfilled_tool_ids: set = set()
+
+    # Primer paso: recolectar todos los tool_call_id que sí tienen respuesta
+    for m in sanitized:
+        if isinstance(m, ToolMessage) and m.tool_call_id:
+            fulfilled_tool_ids.add(m.tool_call_id)
+
+    # Segundo paso: limpiar AIMessages con tool_calls huérfanos (sin ToolMessage correspondiente)
+    for m in sanitized:
         if isinstance(m, AIMessage) and getattr(m, 'tool_calls', None):
-            # Check if there is at least one following ToolMessage
-            has_tool_message_next = False
-            if i + 1 < len(sanitized) and isinstance(sanitized[i+1], ToolMessage):
-                has_tool_message_next = True
-            
-            if not has_tool_message_next:
-                # Strip tool_calls to prevent Gemini API crashing due to unfulfilled function calls
+            pending_ids = {tc['id'] for tc in m.tool_calls if 'id' in tc}
+            unfulfilled = pending_ids - fulfilled_tool_ids
+            if unfulfilled:
+                print(f"  [Sanitizer] Eliminando {len(unfulfilled)} tool_call(s) huérfano(s): {unfulfilled}")
+                # Strip tool_calls para no crashear la API (Claude ni Gemini toleran huérfanos)
                 m = AIMessage(
-                    content=m.content, 
+                    content=m.content if m.content else "He intentado usar herramientas pero no obtuve respuesta.",
                     usage_metadata=getattr(m, "usage_metadata", None),
                     response_metadata=getattr(m, "response_metadata", None)
                 )
@@ -438,7 +446,7 @@ ATENCIÓN - REGLAS PARA SUB-AGENTES TRABAJADORES:
             first_msg = clean_messages[0]
             clean_messages = [first_msg] + clean_messages[-(MAX_CONTEXT_MESSAGES-1):]
         
-        clean_messages = _sanitize_messages_for_gemini(clean_messages)
+        clean_messages = _sanitize_messages(clean_messages)
         
         print(f">> LLM Razonando en contexto Worker (historial: {len(clean_messages)} msjs)...")
         if self.agent_name:
