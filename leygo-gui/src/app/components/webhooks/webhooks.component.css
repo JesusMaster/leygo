@@ -582,7 +582,8 @@
   line-height: 1.5;
 }
 
-.log-value.markdown-body {
+/* Shadow piercing required for innerHTML content */
+:host ::ng-deep .log-value.markdown-body {
   font-family: inherit;
   white-space: normal;
   color: #1f2937;
@@ -590,47 +591,47 @@
   overflow: visible;
 }
 
-.log-value.markdown-body p {
+:host ::ng-deep .log-value.markdown-body p {
   margin-bottom: 12px;
+  line-height: 1.6;
 }
 
-.log-value.markdown-body p:last-child {
+:host ::ng-deep .log-value.markdown-body p:last-child {
   margin-bottom: 0;
 }
 
-.log-value.markdown-body h1, 
-.log-value.markdown-body h2, 
-.log-value.markdown-body h3 {
+:host ::ng-deep .log-value.markdown-body h1, 
+:host ::ng-deep .log-value.markdown-body h2, 
+:host ::ng-deep .log-value.markdown-body h3 {
   margin-top: 16px;
   margin-bottom: 8px;
   font-weight: 700;
   color: #111827;
 }
 
-.log-value.markdown-body h1 { font-size: 1.4em; }
-.log-value.markdown-body h2 { font-size: 1.25em; }
-.log-value.markdown-body h3 { font-size: 1.1em; }
+:host ::ng-deep .log-value.markdown-body h1 { font-size: 1.4em; }
+:host ::ng-deep .log-value.markdown-body h2 { font-size: 1.25em; }
+:host ::ng-deep .log-value.markdown-body h3 { font-size: 1.1em; }
 
-
-.log-value.markdown-body ul, 
-.log-value.markdown-body ol {
-  padding-left: 36px;
+:host ::ng-deep .log-value.markdown-body ul, 
+:host ::ng-deep .log-value.markdown-body ol {
+  padding-left: 28px !important;
   margin-bottom: 16px;
   margin-top: 8px;
   list-style-position: outside;
 }
 
-.log-value.markdown-body li {
+:host ::ng-deep .log-value.markdown-body li {
   margin-bottom: 6px;
   line-height: 1.6;
 }
 
-.log-value.markdown-body li::marker {
+:host ::ng-deep .log-value.markdown-body li::marker {
   color: #6366f1;
   font-weight: 700;
 }
 
-.log-value.markdown-body code {
+:host ::ng-deep .log-value.markdown-body code {
   font-family: 'JetBrains Mono', monospace;
   background-color: #f1f5f9;
   padding: 2px 4px;
@@ -638,7 +639,7 @@
   font-size: 0.9em;
 }
 
-.log-value.markdown-body pre {
+:host ::ng-deep .log-value.markdown-body pre {
   background-color: #1e293b;
   color: #f8fafc;
   padding: 12px;
@@ -647,13 +648,13 @@
   margin-bottom: 12px;
 }
 
-.log-value.markdown-body pre code {
+:host ::ng-deep .log-value.markdown-body pre code {
   background-color: transparent;
   padding: 0;
   color: inherit;
 }
 
-.log-value.markdown-body blockquote {
+:host ::ng-deep .log-value.markdown-body blockquote {
   border-left: 4px solid #e5e7eb;
   padding-left: 16px;
   color: #6b7280;
@@ -661,20 +662,20 @@
   margin-bottom: 12px;
 }
 
-.log-value.markdown-body table {
+:host ::ng-deep .log-value.markdown-body table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 12px;
 }
 
-.log-value.markdown-body th, 
-.log-value.markdown-body td {
+:host ::ng-deep .log-value.markdown-body th, 
+:host ::ng-deep .log-value.markdown-body td {
   border: 1px solid #e5e7eb;
   padding: 8px 12px;
   text-align: left;
 }
 
-.log-value.markdown-body th {
+:host ::ng-deep .log-value.markdown-body th {
   background-color: #f9fafb;
 }
 
