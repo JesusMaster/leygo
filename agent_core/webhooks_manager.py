@@ -1,95 +1,79 @@
 import json
 import os
 import uuid
-from datetime import datetime
-
-WEBHOOKS_FILE = "memoria/episodica/webhooks.json"
-
-def get_webhooks_file_path() -> str:
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(base_dir, WEBHOOKS_FILE)
-
-def load_webhooks() -> list:
-    filepath = get_webhooks_file_path()
-    if os.path.exists(filepath):
-        try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"Error cargando webhooks.json: {e}")
-            return []
-    return []
-
-def save_webhooks(webhooks: list):
-    filepath = get_webhooks_file_path()
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    try:
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(webhooks, f, indent=4, ensure_ascii=False)
-    except Exception as e:
-        print(f"Error guardando webhooks.json: {e}")
-
-def create_webhook(titulo: str, descripcion: str, modelo: str) -> dict:
-    webhooks = load_webhooks()
-    new_id = str(uuid.uuid4())
-    
-    new_wh = {
-        "id": new_id,
-        "titulo": titulo,
-        "descripcion": descripcion,
-        "modelo": modelo,
-        "paused": False,
-        "fecha_creacion": datetime.now().isoformat()
-    }
-    webhooks.append(new_wh)
-    save_webhooks(webhooks)
-    return new_wh
-
-def update_webhook(webhook_id: str, titulo: str = None, descripcion: str = None, modelo: str = None, paused: bool = None) -> dict:
-    webhooks = load_webhooks()
-    updated_wh = None
-    for wh in webhooks:
-        if wh.get("id") == webhook_id:
-            if titulo is not None:
-                wh["titulo"] = titulo
-            if descripcion is not None:
-                wh["descripcion"] = descripcion
-            if modelo is not None:
-                wh["modelo"] = modelo
-            if paused is not None:
-                wh["paused"] = paused
-            updated_wh = wh
-            break
-            
-    if updated_wh:
-        save_webhooks(webhooks)
-        
-    return updated_wh
-
-def delete_webhook(webhook_id: str) -> bool:
-    webhooks = load_webhooks()
-    original_len = len(webhooks)
-    webhooks = [wh for wh in webhooks if wh.get("id") != webhook_id]
-    
-    if len(webhooks) < original_len:
-        save_webhooks(webhooks)
-        return True
-    return False
-
-def get_webhook(webhook_id: str) -> dict:
-    webhooks = load_webhooks()
-    for wh in webhooks:
-        if wh.get("id") == webhook_id:
-            return wh
-    return None
-
 import sqlite3
 import threading
+from datetime import datetime
+from typing import Optional
 
-WEBHOOKS_DB_FILE = "memoria/webhooks.db"
+WEBHOOKS_DB_FILE = "memoria/bds/webhooks.db"
+WEBHOOKS_FILE_OLD = "memoria/episodica/webhooks.json"
 WEBHOOK_LOGS_FILE_OLD = "memoria/episodica/webhook_logs.json"
 
 _local = threading.local()
+
+def _init_db_schema(conn: sqlite3.Connection):
+    # Tabla de Webhooks (Configuración)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS webhooks (
+            id TEXT PRIMARY KEY,
+            titulo TEXT NOT NULL,
+            descripcion TEXT,
+            modelo TEXT,
+            paused BOOLEAN DEFAULT 0,
+            fecha_creacion TEXT
+        )
+    """)
+    # Tabla de Logs de Ejecucción
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS webhook_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            webhook_id TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            payload TEXT,
+            response TEXT,
+            error TEXT
+        )
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_webhook_logs_timestamp ON webhook_logs(timestamp DESC)")
+    conn.commit()
+
+def _migrate_webhooks_json(conn: sqlite3.Connection, base_dir: str):
+    old_config_path = os.path.join(base_dir, WEBHOOKS_FILE_OLD)
+    if os.path.exists(old_config_path):
+        try:
+            c = conn.execute("SELECT COUNT(*) FROM webhooks")
+            if c.fetchone()[0] == 0:
+                with open(old_config_path, "r", encoding="utf-8") as f:
+                    whs = json.load(f)
+                for wh in whs:
+                    conn.execute(
+                        "INSERT INTO webhooks (id, titulo, descripcion, modelo, paused, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?)",
+                        (wh.get("id"), wh.get("titulo"), wh.get("descripcion"), wh.get("modelo"), 1 if wh.get("paused") else 0, wh.get("fecha_creacion"))
+                    )
+                conn.commit()
+            # Renombrar JSON viejo a .bak para evitar futuras migraciones
+            os.rename(old_config_path, old_config_path + ".bak")
+        except Exception as e:
+            print(f"Error migrando webhooks JSON a SQLite: {e}")
+
+def _migrate_webhook_logs_json(conn: sqlite3.Connection, base_dir: str):
+    old_logs_path = os.path.join(base_dir, WEBHOOK_LOGS_FILE_OLD)
+    if os.path.exists(old_logs_path):
+        try:
+            c = conn.execute("SELECT COUNT(*) FROM webhook_logs")
+            if c.fetchone()[0] == 0:
+                with open(old_logs_path, "r", encoding="utf-8") as f:
+                    logs = json.load(f)
+                for log in reversed(logs):
+                    conn.execute(
+                        "INSERT INTO webhook_logs (webhook_id, timestamp, payload, response, error) VALUES (?, ?, ?, ?, ?)",
+                        (log.get("webhook_id", ""), log.get("timestamp", ""), log.get("payload", ""), log.get("response", ""), log.get("error"))
+                    )
+                conn.commit()
+            os.rename(old_logs_path, old_logs_path + ".bak")
+        except Exception as e:
+            print(f"Error migrando webhooks_logs JSON a SQLite: {e}")
 
 def _get_db_conn() -> sqlite3.Connection:
     if not hasattr(_local, "conn") or _local.conn is None:
@@ -98,43 +82,92 @@ def _get_db_conn() -> sqlite3.Connection:
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         
         _local.conn = sqlite3.connect(db_path, check_same_thread=False)
+        _local.conn.row_factory = sqlite3.Row  # Permite acceso por nombre de columna
         _local.conn.execute("PRAGMA journal_mode=WAL")
-        _local.conn.execute("""
-            CREATE TABLE IF NOT EXISTS webhook_logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                webhook_id TEXT NOT NULL,
-                timestamp TEXT NOT NULL,
-                payload TEXT,
-                response TEXT,
-                error TEXT
-            )
-        """)
-        _local.conn.execute("CREATE INDEX IF NOT EXISTS idx_webhook_logs_timestamp ON webhook_logs(timestamp DESC)")
-        _local.conn.commit()
         
-        # Migración automática desde JSON viejo
-        old_json_path = os.path.join(base_dir, WEBHOOK_LOGS_FILE_OLD)
-        if os.path.exists(old_json_path):
-            try:
-                # Chequear si ya migramos (si la tabla está vacía)
-                c = _local.conn.execute("SELECT COUNT(*) FROM webhook_logs")
-                count = c.fetchone()[0]
-                if count == 0:
-                    with open(old_json_path, "r", encoding="utf-8") as f:
-                        logs = json.load(f)
-                    
-                    for log in reversed(logs):  # Insertar del más antiguo al más nuevo para mantener IDs correctos
-                        _local.conn.execute(
-                            "INSERT INTO webhook_logs (webhook_id, timestamp, payload, response, error) VALUES (?, ?, ?, ?, ?)",
-                            (log.get("webhook_id", ""), log.get("timestamp", ""), log.get("payload", ""), log.get("response", ""), log.get("error"))
-                        )
-                    _local.conn.commit()
-                # Renombrar JSON viejo a .bak para evitar futuras migraciones
-                os.rename(old_json_path, old_json_path + ".bak")
-            except Exception as e:
-                print(f"Error migrando webhooks_logs JSON a SQLite: {e}")
+        _init_db_schema(_local.conn)
+        _migrate_webhooks_json(_local.conn, base_dir)
+        _migrate_webhook_logs_json(_local.conn, base_dir)
                 
     return _local.conn
+
+def _row_to_dict(row) -> dict:
+    return {
+        "id": row["id"],
+        "titulo": row["titulo"],
+        "descripcion": row["descripcion"],
+        "modelo": row["modelo"],
+        "paused": bool(row["paused"]),
+        "fecha_creacion": row["fecha_creacion"]
+    }
+
+def load_webhooks() -> list:
+    conn = _get_db_conn()
+    cursor = conn.execute("SELECT * FROM webhooks ORDER BY fecha_creacion DESC")
+    return [_row_to_dict(row) for row in cursor.fetchall()]
+
+def create_webhook(titulo: str, descripcion: str, modelo: str) -> dict:
+    conn = _get_db_conn()
+    new_id = str(uuid.uuid4())
+    fecha_creacion = datetime.now().isoformat()
+    
+    conn.execute(
+        "INSERT INTO webhooks (id, titulo, descripcion, modelo, paused, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?)",
+        (new_id, titulo, descripcion, modelo, 0, fecha_creacion)
+    )
+    conn.commit()
+    
+    return {
+        "id": new_id,
+        "titulo": titulo,
+        "descripcion": descripcion,
+        "modelo": modelo,
+        "paused": False,
+        "fecha_creacion": fecha_creacion
+    }
+
+def update_webhook(webhook_id: str, titulo: str = None, descripcion: str = None, modelo: str = None, paused: bool = None) -> Optional[dict]:
+    conn = _get_db_conn()
+    # Update solo si hay info
+    updates = []
+    params = []
+    if titulo is not None:
+        updates.append("titulo = ?")
+        params.append(titulo)
+    if descripcion is not None:
+        updates.append("descripcion = ?")
+        params.append(descripcion)
+    if modelo is not None:
+        updates.append("modelo = ?")
+        params.append(modelo)
+    if paused is not None:
+        updates.append("paused = ?")
+        params.append(1 if paused else 0)
+        
+    if not updates:
+        return get_webhook(webhook_id)
+        
+    params.append(webhook_id)
+    query = f"UPDATE webhooks SET {', '.join(updates)} WHERE id = ?"
+    
+    conn.execute(query, tuple(params))
+    conn.commit()
+    return get_webhook(webhook_id)
+
+def delete_webhook(webhook_id: str) -> bool:
+    conn = _get_db_conn()
+    cursor = conn.execute("DELETE FROM webhooks WHERE id = ?", (webhook_id,))
+    conn.execute("DELETE FROM webhook_logs WHERE webhook_id = ?", (webhook_id,))
+    conn.commit()
+    return cursor.rowcount > 0
+
+def get_webhook(webhook_id: str) -> Optional[dict]:
+    conn = _get_db_conn()
+    cursor = conn.execute("SELECT * FROM webhooks WHERE id = ?", (webhook_id,))
+    row = cursor.fetchone()
+    if row:
+        return _row_to_dict(row)
+    return None
 
 def log_webhook_execution(webhook_id: str, payload, response: str, error: str = None):
     # Safe payload parsing

@@ -9,8 +9,8 @@ from dotenv import dotenv_values
 # Añadir el path para importar el agente
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from main import discover_sub_agents
-from scheduler_manager import scheduler, MEMORIA_RECORDATORIOS_PATH, guardar_estado_jobs, send_telegram_reminder, send_dynamic_telegram_reminder, execute_agent_task
-from webhooks_manager import load_webhooks, save_webhooks, create_webhook, update_webhook, delete_webhook, get_webhook, log_webhook_execution, get_webhook_logs
+from scheduler_manager import scheduler, guardar_estado_jobs, get_all_jobs, send_telegram_reminder, send_dynamic_telegram_reminder, execute_agent_task
+from webhooks_manager import load_webhooks, create_webhook, update_webhook, delete_webhook, get_webhook, log_webhook_execution, get_webhook_logs
 import status_bus
 import json
 from datetime import datetime
@@ -703,12 +703,9 @@ async def exchange_google_code(req: GoogleAuthCode):
 
 @router.get("/tasks")
 async def get_tasks():
-    """Obtiene la lista de tareas programadas desde el archivo JSON."""
-    if not os.path.exists(MEMORIA_RECORDATORIOS_PATH):
-        return []
+    """Obtiene la lista de tareas programadas desde SQLite."""
     try:
-        with open(MEMORIA_RECORDATORIOS_PATH, "r", encoding="utf-8") as f:
-            tasks = json.load(f)
+        tasks = get_all_jobs()
         return tasks
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error leyendo tareas: {e}")

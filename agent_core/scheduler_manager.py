@@ -19,11 +19,43 @@ TIMEZONE = ZoneInfo(TIMEZONE_STR)
 TELEGRAM_BOT_INSTANCE: Bot = None
 GLOBAL_AGENT_INSTANCE = None
 
+import sqlite3
+
 # Configuración de almacenamiento persistente
+SCHEDULER_DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "memoria", "bds", "scheduler.db")
 MEMORIA_RECORDATORIOS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "memoria", "episodica", "recordatorios.json")
 
 # Global scheduler instance — configurado con timezone de Chile
 scheduler = AsyncIOScheduler(timezone=TIMEZONE)
+
+def _get_scheduler_db_conn() -> sqlite3.Connection:
+    os.makedirs(os.path.dirname(SCHEDULER_DB_FILE), exist_ok=True)
+    conn = sqlite3.connect(SCHEDULER_DB_FILE, check_same_thread=False)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS jobs (
+            id TEXT PRIMARY KEY,
+            job_data TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    
+    # Migración automática desde JSON viejo
+    if os.path.exists(MEMORIA_RECORDATORIOS_PATH):
+        try:
+            c = conn.execute("SELECT COUNT(*) FROM jobs")
+            if c.fetchone()[0] == 0:
+                with open(MEMORIA_RECORDATORIOS_PATH, 'r', encoding='utf-8') as f:
+                    jobs_data = json.load(f)
+                for job_info in jobs_data:
+                    conn.execute("INSERT INTO jobs (id, job_data) VALUES (?, ?)", 
+                                 (job_info.get("id"), json.dumps(job_info, ensure_ascii=False)))
+                conn.commit()
+            os.rename(MEMORIA_RECORDATORIOS_PATH, MEMORIA_RECORDATORIOS_PATH + ".bak")
+        except Exception as e:
+            print(f"Error migrando recordatorios JSON a SQLite: {e}")
+            
+    return conn
 
 def __re_sync_jobs_listener(event):
     if getattr(event, 'exception', None) is None:
@@ -35,8 +67,9 @@ def __re_sync_jobs_listener(event):
 scheduler.add_listener(__re_sync_jobs_listener, EVENT_JOB_EXECUTED)
 
 def guardar_estado_jobs():
-    """Serializa las tareas actuales del scheduler a un archivo JSON."""
-    jobs_data = []
+    """Serializa las tareas actuales del scheduler a SQLite."""
+    conn = _get_scheduler_db_conn()
+    conn.execute("DELETE FROM jobs")
     
     for job in scheduler.get_jobs():
         job_info = {
@@ -72,20 +105,18 @@ def guardar_estado_jobs():
         else:
             job_info["type"] = "date"
 
-        jobs_data.append(job_info)
+        conn.execute("INSERT INTO jobs (id, job_data) VALUES (?, ?)", 
+                     (job.id, json.dumps(job_info, ensure_ascii=False)))
         
-    os.makedirs(os.path.dirname(MEMORIA_RECORDATORIOS_PATH), exist_ok=True)
-    with open(MEMORIA_RECORDATORIOS_PATH, 'w', encoding='utf-8') as f:
-        json.dump(jobs_data, f, ensure_ascii=False, indent=4)
+    conn.commit()
 
 def cargar_estado_jobs():
-    """Carga y reinyecta las tareas desde el JSON."""
-    if not os.path.exists(MEMORIA_RECORDATORIOS_PATH):
-        return
-        
+    """Carga y reinyecta las tareas desde SQLite."""
     try:
-        with open(MEMORIA_RECORDATORIOS_PATH, 'r', encoding='utf-8') as f:
-            jobs_data = json.load(f)
+        conn = _get_scheduler_db_conn()
+        cursor = conn.execute("SELECT job_data FROM jobs")
+        jobs_data = [json.loads(row[0]) for row in cursor.fetchall()]
+        
         now = datetime.now(TIMEZONE)
         for job_info in jobs_data:
             job_type = job_info.get("type")
@@ -167,9 +198,19 @@ def cargar_estado_jobs():
             if job_info.get("paused") and scheduler.get_job(job_id):
                 scheduler.pause_job(job_id)
                 
-        print(f"=> Se cargaron {len(scheduler.get_jobs())} tareas del almacenamiento episódico.")
+        print(f"=> Se cargaron {len(scheduler.get_jobs())} tareas del almacenamiento SQLite.")
     except Exception as e:
-        print(f"Error cargando recordatorios: {e}")
+        print(f"Error cargando recordatorios desde SQLite: {e}")
+
+def get_all_jobs() -> list:
+    """Retorna todos los jobs serializados desde SQLite."""
+    try:
+        conn = _get_scheduler_db_conn()
+        cursor = conn.execute("SELECT job_data FROM jobs")
+        return [json.loads(row[0]) for row in cursor.fetchall()]
+    except Exception as e:
+        print(f"Error al leer recordatorios SQLite: {e}")
+        return []
 
 def _resolve_chat_id(chat_id: str) -> str:
     """Resuelve el chat_id a un ID numérico de Telegram válido.

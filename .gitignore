@@ -7,6 +7,7 @@ __pycache__/
 agent_core/memoria/usage.db
 agent_core/memoria/usage.db-wal
 agent_core/memoria/usage.db-shm
+agent_core/memoria/bds/*.db*
 agent_core/memoria/*.bak
 agent_core/memoria/usage_history.json
 

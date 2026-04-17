@@ -7,7 +7,7 @@ import threading
 # ─── Paths ──────────────────────────────────────────────────────────────────────
 def _get_db_path():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_dir, "memoria", "usage.db")
+    return os.path.join(base_dir, "memoria", "bds", "usage.db")
 
 def _get_old_json_path():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

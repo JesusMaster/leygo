@@ -128,6 +128,11 @@ log "Restaurando datos de producción ..."
 restore_path "agent_core/config"
 restore_path "agent_core/keys"
 restore_path "agent_core/memoria"
+
+log "Protegiendo y reorganizando bases SQLite hacia memoria/bds/ ..."
+mkdir -p "$REPO_DIR/agent_core/memoria/bds"
+find "$REPO_DIR/agent_core/memoria" -maxdepth 1 -name "*.db*" -exec mv {} "$REPO_DIR/agent_core/memoria/bds/" \; 2>/dev/null || true
+
 restore_path "agent_core/.env"
 backup_path "agent_core/mcp_config.yaml"
 # Restaura automáticamente todos los sub-agentes respaldados
