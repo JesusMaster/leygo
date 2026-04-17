@@ -436,7 +436,7 @@
   top: 0;
   bottom: 0;
   right: 0;
-  width: 450px;
+  width: 60vw;
   max-width: 90vw;
   background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
@@ -580,6 +580,102 @@
   border-radius: 8px;
   border: 1px solid #f1f5f9;
   line-height: 1.5;
+}
+
+.log-value.markdown-body {
+  font-family: inherit;
+  white-space: normal;
+  color: #1f2937;
+  padding: 16px 16px;
+  overflow: visible;
+}
+
+.log-value.markdown-body p {
+  margin-bottom: 12px;
+}
+
+.log-value.markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.log-value.markdown-body h1, 
+.log-value.markdown-body h2, 
+.log-value.markdown-body h3 {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.log-value.markdown-body h1 { font-size: 1.4em; }
+.log-value.markdown-body h2 { font-size: 1.25em; }
+.log-value.markdown-body h3 { font-size: 1.1em; }
+
+
+.log-value.markdown-body ul, 
+.log-value.markdown-body ol {
+  padding-left: 36px;
+  margin-bottom: 16px;
+  margin-top: 8px;
+  list-style-position: outside;
+}
+
+.log-value.markdown-body li {
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+.log-value.markdown-body li::marker {
+  color: #6366f1;
+  font-weight: 700;
+}
+
+.log-value.markdown-body code {
+  font-family: 'JetBrains Mono', monospace;
+  background-color: #f1f5f9;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.log-value.markdown-body pre {
+  background-color: #1e293b;
+  color: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.log-value.markdown-body pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.log-value.markdown-body blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 16px;
+  color: #6b7280;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+.log-value.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.log-value.markdown-body th, 
+.log-value.markdown-body td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.log-value.markdown-body th {
+  background-color: #f9fafb;
 }
 
 .error-row .log-value {

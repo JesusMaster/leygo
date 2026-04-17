@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ApiService } from '../../api.service';
+import { MarkdownPipe } from '../../pipes/markdown.pipe';
 
 interface Webhook {
   id: string;
@@ -42,7 +43,7 @@ export class FilterProviderPipe implements PipeTransform {
 @Component({
   selector: 'app-webhooks',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilterProviderPipe],
+  imports: [CommonModule, FormsModule, FilterProviderPipe, MarkdownPipe],
   templateUrl: './webhooks.component.html',
   styleUrls: ['./webhooks.component.css']
 })

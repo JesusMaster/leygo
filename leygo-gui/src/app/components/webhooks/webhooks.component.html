@@ -127,7 +127,7 @@
           </div>
           <div class="log-row">
             <span class="log-label">Respuesta</span>
-            <div class="log-value response">{{ log.response }}</div>
+            <div class="log-value response markdown-body" [innerHTML]="log.response | markdown"></div>
           </div>
           <div *ngIf="log.error" class="log-row error-row">
             <span class="log-label">Error</span>
