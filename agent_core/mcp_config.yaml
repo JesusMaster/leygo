@@ -1,7 +1,13 @@
 mcp_servers:
   - name: "mcp-remote"
     command: "npx"
-    args: ["-y", "mcp-remote@latest", "https://yourMCPurl/sse", "--header", "Autorization:${YOUR_TOKEN}"]
-    env: 
-      YOUR_TOKEN: "yourToken"
-    
+    transport: "stdio"
+    args: [
+      "-y",
+      "mcp-remote@latest",
+      "https://mcp-github-323381129796.us-central1.run.app/sse",
+      "--header",
+      "GITHUB_TOKEN:${GITHUB_TOKEN}"
+    ]
+    env:
+      GITHUB_TOKEN: ""

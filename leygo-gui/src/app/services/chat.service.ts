@@ -14,15 +14,27 @@ export interface Message {
 })
 export class ChatService {
   private readonly STORAGE_KEY = 'leygo_chat_messages';
+  private readonly THREAD_KEY = 'leygo_chat_thread';
   
   // Estado global de los mensajes usando Signals
   messages = signal<Message[]>(this.loadMessages());
+  threadId = signal<string>(this.loadThreadId());
 
   constructor() {
     // Almacenar automáticamente en localStorage cuando cambian los mensajes
     effect(() => {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.messages()));
     });
+    // Almacenar el thread ID cuando cambie
+    effect(() => {
+      localStorage.setItem(this.THREAD_KEY, this.threadId());
+    });
+  }
+
+  // Cargar thread ID
+  private loadThreadId(): string {
+    const stored = localStorage.getItem(this.THREAD_KEY);
+    return stored ? stored : `gui_session_${Date.now()}`;
   }
 
   // Cargar mensajes desde localStorage o usar el predeterminado
@@ -53,5 +65,6 @@ export class ChatService {
     this.messages.set([
       { text: '¡Hola! Soy Leygo. ¿En qué puedo ayudarte hoy?', sender: 'bot', timestamp: new Date() }
     ]);
+    this.threadId.set(`gui_session_${Date.now()}`);
   }
 }

@@ -128,7 +128,7 @@ export class ChatComponent implements AfterViewInit, OnDestroy, OnInit {
       const response = await fetch(`${this.backendUrl}/api/chat/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: finalPrompt, thread_id: 'gui_session' }),
+        body: JSON.stringify({ message: finalPrompt, thread_id: this.chatService.threadId() }),
         signal: this.abortController.signal
       });
 

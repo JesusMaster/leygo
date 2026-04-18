@@ -79,6 +79,8 @@ export class ConfigComponent implements OnInit {
       },
       error: () => this.openaiLoading.set(false)
     });
+    
+    this.checkTelegramStatus();
   }
 
   loadData() {
