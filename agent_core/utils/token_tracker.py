@@ -41,94 +41,87 @@ def _get_conn() -> sqlite3.Connection:
         _local.conn.commit()
     return _local.conn
 
-# ─── Pricing ────────────────────────────────────────────────────────────────────
-def get_prices_from_json(model_id: str) -> tuple[float, float]:
+# ─── Pricing (Auto-Update via LiteLLM) ──────────────────────────────────────────
+LITELLM_PRICING_URL = "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json"
+
+def _ensure_litellm_pricing_json() -> dict:
     """
-    Busca el precio por cada 1M de tokens en gemini_cost.json para el modelo específico.
-    Retorna: (precio_in, precio_out)
+    Ensure the litellm pricing JSON is downloaded and at most 7 days old.
+    Returns the parsed JSON data.
     """
-    if model_id.startswith("ollama/"):
+    json_path = os.path.join(os.path.dirname(__file__), "litellm_cost.json")
+    
+    # Check if download is needed (doesn't exist or is older than 7 days)
+    needs_download = True
+    if os.path.exists(json_path):
+        file_age = datetime.datetime.now().timestamp() - os.path.getmtime(json_path)
+        if file_age < (7 * 24 * 60 * 60):  # 7 days
+            needs_download = False
+            
+    if needs_download:
+        try:
+            import urllib.request
+            print(f"[Pricing] Descargando precios actualizados desde LiteLLM...")
+            req = urllib.request.Request(LITELLM_PRICING_URL, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=10) as response:
+                data = json.loads(response.read().decode())
+                with open(json_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
+                return data
+        except Exception as e:
+            print(f"[Pricing] Error descargando litellm json ({e}). Usando caché local si existe.")
+            
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def get_prices(model_id: str) -> tuple[float, float]:
+    """
+    Busca el precio por cada 1M de tokens usando el registro comunitario de LiteLLM de forma dinámica.
+    Retorna: (precio_in_1M, precio_out_1M).
+    """
+    if model_id.startswith("ollama/") or "ollama" in model_id.lower():
         return 0.0, 0.0
 
-    precio_in = 0.50
-    precio_out = 3.00
+    # Sanitize model id to match litellm's keys
+    search_id = model_id.lower().replace("openai/", "").replace("anthropic/", "").replace("google/", "")
 
-    json_path = os.path.join(os.path.dirname(__file__), "gemini_cost.json")
-    if not os.path.exists(json_path):
-        return precio_in, precio_out
+    # 1. Intentar con tabla de LiteLLM (automática)
+    litellm_data = _ensure_litellm_pricing_json()
+    if litellm_data and search_id in litellm_data:
+        m_data = litellm_data[search_id]
+        in_cost_1k = m_data.get("input_cost_per_token", 0.0) * 1_000_000
+        out_cost_1k = m_data.get("output_cost_per_token", 0.0) * 1_000_000
+        if in_cost_1k > 0 or out_cost_1k > 0:
+            return float(in_cost_1k), float(out_cost_1k)
+            
+    # Fallback heurístico para modelos nuevos y desconocidos que no estén en JSON
+    if "claude-3-5-sonnet" in search_id or "claude-sonnet-4.6" in search_id:
+        return 3.00, 15.00
+    if "claude-3-haiku" in search_id or "claude-haiku-4.5" in search_id:
+        return 1.00, 5.00
+    if "gpt-4o-mini" in search_id or "gpt-5.4-mini" in search_id:
+        return 0.15, 0.60
+    if "gpt-4o" in search_id or "gpt-5.4" in search_id:
+        return 2.50, 10.00
+    if "gemini-2.5-flash" in search_id:
+        return 0.15, 0.60
+    if "gemini-3" in search_id:
+        return 2.50, 10.00
 
-    try:
-        with open(json_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
+    return 2.50, 10.00  # Default general
 
-        for model in data.get("models", []):
-            if model_id in model.get("model_ids", []):
-                standard = model.get("pricing", {}).get("standard", {})
-
-                in_data = standard.get("input", standard.get("input_text", standard.get("input_text_image", precio_in)))
-                if isinstance(in_data, dict):
-                    precio_in = in_data.get("<=200k_prompt_tokens",
-                                in_data.get("text_image_video",
-                                in_data.get("text_per_1M_tokens",
-                                in_data.get("text", precio_in))))
-                else:
-                    precio_in = float(in_data)
-
-                out_data = standard.get("output_including_thinking", standard.get("output_text_and_thinking", standard.get("output", precio_out)))
-                if isinstance(out_data, dict):
-                    precio_out = out_data.get("<=200k_prompt_tokens",
-                                 out_data.get("text", precio_out))
-                else:
-                    precio_out = float(out_data)
-
-                return float(precio_in), float(precio_out)
-    except Exception as e:
-        print(f"Error parseando gemini_cost.json: {e}")
-
-    return precio_in, precio_out
 
 # ─── Core: Log Usage ────────────────────────────────────────────────────────────
 def log_token_usage(user_input: str, model: str, input_tokens: int, output_tokens: int, thread_id: str = "system"):
     """
     Registra el uso de tokens y el costo en la base de datos SQLite.
     """
-    precio_in, precio_out = get_prices_from_json(model)
-
-    if (precio_in <= 0.0 or precio_out <= 0.0) and not model.startswith("ollama/"):
-        _lower = model.lower()
-        # Anthropic Claude pricing (per 1M tokens)
-        if "claude" in _lower:
-            if "opus" in _lower:
-                precio_in, precio_out = 15.00, 75.00
-            elif "sonnet" in _lower:
-                precio_in, precio_out = 3.00, 15.00
-            elif "haiku" in _lower:
-                precio_in, precio_out = 0.25, 1.25
-            else:
-                precio_in, precio_out = 3.00, 15.00
-        # OpenAI pricing (per 1M tokens)
-        elif "gpt" in _lower or _lower.startswith("o1") or _lower.startswith("o3") or _lower.startswith("o4"):
-            if "gpt-4o-mini" in _lower:
-                precio_in, precio_out = 0.15, 0.60
-            elif "gpt-4o" in _lower:
-                precio_in, precio_out = 2.50, 10.00
-            elif "gpt-4-turbo" in _lower:
-                precio_in, precio_out = 10.00, 30.00
-            elif _lower.startswith("o1"):
-                precio_in, precio_out = 15.00, 60.00
-            elif _lower.startswith("o3"):
-                precio_in, precio_out = 2.00, 8.00
-            elif _lower.startswith("o4"):
-                precio_in, precio_out = 2.00, 8.00
-            else:
-                precio_in, precio_out = 2.50, 10.00  # Default OpenAI
-        # Gemini fallback pricing
-        elif "lite" in _lower:
-            precio_in, precio_out = 0.25, 1.50
-        elif "pro" in _lower:
-            precio_in, precio_out = 2.00, 12.00
-        else:
-            precio_in, precio_out = 0.50, 3.00
+    precio_in, precio_out = get_prices(model)
 
     input_cost = (input_tokens / 1_000_000) * precio_in
     output_cost = (output_tokens / 1_000_000) * precio_out

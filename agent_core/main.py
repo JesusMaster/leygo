@@ -385,7 +385,7 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
             elif not combined_response:
                 combined_response = resp_conv
                 
-            if next_step in ("finish", "end", "done", "complete"):
+            if next_step in ("finish", "end", "done", "complete", "FINISH", "END", "DONE", "COMPLETE"):
                 print(f"[Supervisor] El flujo general está completo según el Supervisor. Terminando (END).")
                 status_bus.publish_status("✅ Tarea completada")
                 new_msg = AIMessage(
@@ -869,6 +869,15 @@ class SelfExtendingAgent:
         }
         last_streaming_node = None  # Nodo cuyo stream de tokens estamos emitiendo
         has_streamed_tokens = False
+        
+        # Capturamos la longitud inicial para no resucitar mensajes antiguos en el fallback
+        initial_msg_len = 0
+        if self.graph:
+            try:
+                initial_state = self.graph.get_state(config)
+                initial_msg_len = len(initial_state.values.get("messages", []))
+            except Exception:
+                pass
 
         try:
             async for event in self.graph.astream_events(
@@ -1020,10 +1029,14 @@ class SelfExtendingAgent:
             final_text = supervisor_fallback
             
         if self.graph and not final_text.strip():
-            # ÚLTIMO RECURSO: recuperar el último mensaje AI válido del estado
+            # ÚLTIMO RECURSO: recuperar el último mensaje AI válido GENERADO EN ESTE TURNO
             try:
                 state = self.graph.get_state(config)
-                for msg in reversed(state.values.get("messages", [])):
+                all_msgs = state.values.get("messages", [])
+                # Solo filtramos los mensajes que se agregaron en este ciclo (evita revivir historial antiguo)
+                new_msgs = all_msgs[initial_msg_len:] if len(all_msgs) > initial_msg_len else []
+                
+                for msg in reversed(new_msgs):
                     if msg.type == "ai" and getattr(msg, "content", ""):
                         if not (hasattr(msg, "tool_calls") and msg.tool_calls):
                             raw = msg.content
@@ -1034,6 +1047,9 @@ class SelfExtendingAgent:
                                 break
             except Exception as ex:
                 print(f"[stream_message] Error recuperando fallback de estado: {ex}")
+            
+        if not final_text.strip():
+            final_text = "El agente ha procesado la solicitud pero no ha devuelto un mensaje textual. Por favor provee más detalles."
             
         content_to_send = "" if has_streamed_tokens else final_text
         yield {"type": "done", "content": content_to_send, "usage": total_usage}
