@@ -9,7 +9,7 @@ class DevAgent(BaseSubAgent):
         
     @property
     def description(self) -> str:
-        return "Cuestiones de programacion, scripts locales, auto-construccion, comandos en consola, repositorios GitHub y escritura en memoria."
+        return "Cuestiones de programacion, scripts locales, auto-construccion, comandos en consola y escritura en memoria."
         
     @property
     def system_prompt(self) -> str:
