@@ -35,12 +35,13 @@
 .avatar {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: 0.5em;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 4px;
+  margin-top: -3px;
+  padding: 0.15em;
 }
 
 .icon-avatar {
