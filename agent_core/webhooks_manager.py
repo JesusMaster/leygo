@@ -176,14 +176,14 @@ def log_webhook_execution(webhook_id: str, payload, response: str, error: str = 
     else:
         payload_str = str(payload)
         
-    truncated_payload = payload_str[:150] + ("..." if len(payload_str) > 150 else "")
+    # ts = datetime.now().isoformat()
     ts = datetime.now().isoformat()
     
     conn = _get_db_conn()
     try:
         conn.execute(
             "INSERT INTO webhook_logs (webhook_id, timestamp, payload, response, error) VALUES (?, ?, ?, ?, ?)",
-            (webhook_id, ts, truncated_payload, response, error)
+            (webhook_id, ts, payload_str, response, error)
         )
         conn.commit()
         
