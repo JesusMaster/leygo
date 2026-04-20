@@ -317,11 +317,12 @@ MEMORIA EPISÓDICA RELACIONADA CON TU IDENTIDAD/PREFERENCIAS:
 
 Tu trabajo es analizar la petición del usuario, leer SIEMPRE TODO EL HISTORIAL para revisar si alguno de tus sub-agentes acaba de completar una parte del trabajo, y DELEGAR el resto usando la herramienta 'Route'.
 {agent_rules}
-REGLAS ESTRICTAS PARA EVITAR BUCLES:
-1. DELEGACIÓN INICIAL: Delega tareas al sub-agente correcto según sus herramientas (ej. 'assistant' para agendar/emails, 'mcp' para repositorios/datos, 'youtube' para videos).
-2. VERIFICA EL ÚLTIMO MENSAJE: Si el último AIMessage de un sub-agente en el historial indica que YA ATENDIÓ la solicitud del usuario (ej. dice "Ok, agendado", "Acá está el resumen", "Te lo recordaré", etc.), o SI EN EL ÚLTIMO MENSAJE EL AGENTE TE PIDE ALGO AL USUARIO (ej. "Dime la URL", "Qué video quieres?"), entonces **DEBES RESPONDERLE AL USUARIO**, es decir, `next_node`='FINISH'. NO se lo devuelvas al agente.
-3. FINISH (¡MUY IMPORTANTE!): SI LA TAREA FUE COMPLETADA por el agente previo o si el agente hizo una pregunta al usuario, DEBES usar `next_node`='FINISH' y proporcionar la respuesta completa o la pregunta al usuario en el campo `respuesta_conversacional`.
-4. NUNCA DELEGUES LA MISMA TAREA 2 VECES SEGUIDAS al mismo agente. Si el agente acaba de responder en el último mensaje, DEBES usar 'FINISH' (o llamar a otro distinto si hace falta). ¡Ruta de vuelta al usuario para evitar bucles infinitos!
+REGLAS ESTRICTAS PARA EVITAR BUCLES Y ORQUESTAR BIEN:
+1. DELEGACIÓN INICIAL: Delega tareas al sub-agente correcto según sus herramientas.
+2. ORQUESTACIÓN MULTI-AGENTE: Si el usuario solicitó MÚLTIPLES tareas (e.g., analizar código en GitHub, revisar SonarQube, enviar un mensaje de chat), NO uses 'FINISH' si un solo agente terminó o falló. Revisa si hay tareas pendientes y DELEGA a los demás agentes de forma secuencial.
+3. CONSOLIDACIÓN AL FINAL: Una vez que TODOS los agentes requeridos hayan hecho su parte, usa `next_node`='FINISH' para entregar la respuesta consolidada en `respuesta_conversacional`.
+4. MANEJO DE FALLOS PARCIALES / PREGUNTAS: Si un agente falla, falta un parámetro (ej. "no encuentro la project_key") o hace una pregunta al usuario, **NO ABRUPTES EL FLUJO**. Pasa al siguiente agente para que termine las tareas restantes. Al final, en tu 'FINISH', asegura que la `respuesta_conversacional` incluya el trabajo exitoso de los que sí pudieron junto a la nota/pregunta de los que fallaron.
+5. NUNCA DELEGUES al mismo agente dos veces seguidas si ya reportó fallo o te devolvió el control con una pregunta.
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
@@ -840,7 +841,13 @@ class SelfExtendingAgent:
                                     if content:
                                         final_answer = content
                         elif node_name == "supervisor":
-                            if not (hasattr(latest_message, "tool_calls") and latest_message.tool_calls):
+                            if hasattr(latest_message, "tool_calls") and latest_message.tool_calls:
+                                for tc in latest_message.tool_calls:
+                                    if tc.get("name") == "route" and tc.get("args", {}).get("next_node") == "FINISH":
+                                        resp = tc.get("args", {}).get("respuesta_conversacional", "")
+                                        if resp:
+                                            final_answer = resp
+                            else:
                                 content = latest_message.content
                                 if isinstance(content, list):
                                     text_parts = [c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text"]
