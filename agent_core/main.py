@@ -360,6 +360,43 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
             # Tomar los últimos N mensajes, pero asegurar que el primero sea siempre HumanMessage(petición original)
             lightweight_messages = [first_msg] + lightweight_messages[-(MAX_CONTEXT_MESSAGES-1):]
         
+        # ─── LOOP GUARD ───────────────────────────────────────────────────────────
+        # Si el mismo agente fue el último en responder Y el penúltimo mensaje del
+        # Supervisor ya lo redirigió hacia ese mismo agente, forzamos END para cortar el bucle
+        # antes de incurrir en la invocación al LLM.
+        last_ai_agents = []
+        for m in reversed(clean_messages):
+            if isinstance(m, HumanMessage) and getattr(m, "name", None) == "Supervisor":
+                # Extraer el agente mencionado
+                content_lower = m.content.lower()
+                for agent in self.sub_agents:
+                    if agent.name.lower() in content_lower:
+                        last_ai_agents.append(agent.name)
+                        break
+            if len(last_ai_agents) >= 2:
+                break
+
+        if len(last_ai_agents) >= 2 and len(set(last_ai_agents)) == 1:
+            repeated_agent = last_ai_agents[0]
+            print(f"[Supervisor LOOP GUARD] El agente '{repeated_agent}' fue delegado 2+ veces seguidas. Forzando END.")
+            status_bus.publish_status("⚠️ Bucle detectado — finalizando respuesta automáticamente")
+            # Intentar rescatar la última respuesta del agente como respuesta final
+            last_agent_response = ""
+            for m in reversed(clean_messages):
+                if isinstance(m, AIMessage) and not getattr(m, "tool_calls", None):
+                    raw = m.content
+                    if isinstance(raw, list):
+                        raw = "".join(p.get("text", "") for p in raw if isinstance(p, dict) and p.get("type") == "text")
+                    if raw and str(raw).strip():
+                        last_agent_response = str(raw).strip()
+                        break
+            fallback_msg = last_agent_response or "He completado el proceso. Por favor, revisa los resultados anteriores."
+            return {
+                "messages": [AIMessage(content=fallback_msg)],
+                "next_node": "END"
+            }
+        # ─────────────────────────────────────────────────────────────────────────
+
         print(f">> Supervisor evaluando (historial: {len(lightweight_messages)} msjs, filtrados de {len(clean_messages)})...")
         status_bus.publish_status("🧠 Supervisor analizando la solicitud...")
         response = await self.supervisor_llm.ainvoke([system_prompt] + lightweight_messages)
@@ -697,7 +734,7 @@ class SelfExtendingAgent:
         
         # Provide config for short-term memory continuity
         # recursion_limit evita bucles infinitos: máx ~6 ciclos supervisor↔worker
-        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 25}
+        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 50}
         
         # State will be appended to the thread automatically
         async for output in self.graph.astream({"messages": [HumanMessage(content=user_input)]}, config=config, stream_mode="updates"):
@@ -740,8 +777,8 @@ class SelfExtendingAgent:
         self._check_and_reload_graph()
             
         print(f"\\n[API] Recibido: {user_input}")
-        # recursion_limit evita bucles infinitos: máx ~6 ciclos supervisor↔worker
-        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 25}
+        # recursion_limit evita bucles infinitos: máx ~12 ciclos supervisor↔worker
+        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 50}
         final_answer = ""
         usage_record = {}
         try:
@@ -810,15 +847,37 @@ class SelfExtendingAgent:
                                         final_answer = final_answer if final_answer else text
                                         
         except Exception as e:
+            error_str = str(e)
             error_traceback = traceback.format_exc()
-            print(f"\n[CRITICAL FATAL] Error del Sistema. Inicializando auto-curacion...\n{str(e)}")
-            
-            # Auto-reparación desactivada temporalmente: esperamos confirmación interactiva
-            final_answer = (
-                f"⚠️ He detectado un error técnico grave (posible bucle o fallo de herramientas). "
-                f"Para que evalúe y ejecute un protocolo de auto-reparación sobre mi código, envíame textualmente el siguiente comando:\n\n"
-                f"`@dev repara este error:`\n```\n{str(e)}\n```\n\n*(Error más detallado se guardó en la consola del servidor)*"
-            )
+            # Detectar específicamente el error de recursión de LangGraph
+            if "recursion_limit" in error_str.lower() or "GRAPH_RECURSION_LIMIT" in error_str:
+                print(f"[process_message] ⚠️ Límite de recursión alcanzado — el agente entró en bucle.")
+                # Intentar recuperar la última respuesta parcial antes del error
+                try:
+                    state = self.graph.get_state(config)
+                    for msg in reversed(state.values.get("messages", [])):
+                        if msg.type == "ai" and getattr(msg, "content", ""):
+                            if not (hasattr(msg, "tool_calls") and msg.tool_calls):
+                                raw = msg.content
+                                if isinstance(raw, list):
+                                    raw = "".join(p.get("text", "") for p in raw if isinstance(p, dict) and p.get("type") == "text")
+                                if raw and str(raw).strip():
+                                    final_answer = str(raw).strip()
+                                    break
+                except Exception:
+                    pass
+                if not final_answer:
+                    final_answer = (
+                        "⚠️ El proceso tomó más pasos de los esperados y fue detenido automáticamente. "
+                        "Por favor, reformula tu solicitud de forma más específica o divídela en pasos más pequeños."
+                    )
+            else:
+                print(f"\n[CRITICAL FATAL] Error del Sistema. Inicializando auto-curacion...\n{error_str}")
+                final_answer = (
+                    f"⚠️ He detectado un error técnico grave (posible bucle o fallo de herramientas). "
+                    f"Para que evalúe y ejecute un protocolo de auto-reparación sobre mi código, envíame textualmente el siguiente comando:\n\n"
+                    f"`@dev repara este error:`\n```\n{error_str}\n```\n\n*(Error más detallado se guardó en la consola del servidor)*"
+                )
 
         if getattr(self, "graph", None) and not final_answer.strip():
             # ÚLTIMO RECURSO: recuperar el último mensaje AI con contenido del estado global
