@@ -2,6 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, ScheduledTask } from '../../api.service';
+import { ToastService } from '@services/toast.service';
+import { ConfirmService } from '@services/confirm.service';
 
 @Component({
   selector: 'app-tasks',
@@ -12,6 +14,8 @@ import { ApiService, ScheduledTask } from '../../api.service';
 })
 export class TasksComponent implements OnInit {
   private api = inject(ApiService);
+  private toast = inject(ToastService);
+  private confirmService = inject(ConfirmService);
   tasks = signal<ScheduledTask[]>([]);
   loading = signal(true);
 
@@ -47,13 +51,17 @@ export class TasksComponent implements OnInit {
     });
   }
 
-  deleteTask(id: string) {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+  async deleteTask(id: string) {
+    const isConfirmed = await this.confirmService.confirm('¿Estás seguro de que quieres eliminar esta tarea?');
+    if (isConfirmed) {
       this.api.deleteTask(id).subscribe({
-        next: () => this.loadTasks(),
+        next: () => {
+          this.toast.show('Tarea eliminada', 'success', '', 5000, 'bottom-right');
+          this.loadTasks();
+        },
         error: (err) => {
           console.error('Error deleting task:', err);
-          alert('Hubo un error al eliminar la tarea');
+          this.toast.show('Hubo un error al eliminar la tarea', 'danger', '', 5000, 'bottom-right');
         }
       });
     }
@@ -93,25 +101,33 @@ export class TasksComponent implements OnInit {
     });
   }
 
-  pauseTask(taskId: string) {
-    if (window.confirm('¿Pausar esta tarea?')) {
+  async pauseTask(taskId: string) {
+    const isConfirmed = await this.confirmService.confirm('¿Pausar esta tarea?');
+    if (isConfirmed) {
       this.api.pauseTask(taskId).subscribe({
-        next: () => this.loadTasks(),
+        next: () => {
+          this.toast.show('Tarea pausada', 'success', '', 5000, 'bottom-right');
+          this.loadTasks();
+        },
         error: (err) => {
           console.error('Error pausing task:', err);
-          alert('Error al pausar la tarea. ' + (err.error?.detail || ''));
+          this.toast.show('Error al pausar la tarea. ' + (err.error?.detail || ''), 'danger', '', 5000, 'bottom-right');
         }
       });
     }
   }
 
-  resumeTask(taskId: string) {
-    if (window.confirm('¿Reanudar esta tarea?')) {
+  async resumeTask(taskId: string) {
+    const isConfirmed = await this.confirmService.confirm('¿Reanudar esta tarea?');
+    if (isConfirmed) {
       this.api.resumeTask(taskId).subscribe({
-        next: () => this.loadTasks(),
+        next: () => {
+          this.toast.show('Tarea reanudada', 'success', '', 5000, 'bottom-right');
+          this.loadTasks();
+        },
         error: (err) => {
           console.error('Error resuming task:', err);
-          alert('Error al reanudar la tarea. ' + (err.error?.detail || ''));
+          this.toast.show('Error al reanudar la tarea. ' + (err.error?.detail || ''), 'danger', '', 5000, 'bottom-right');
         }
       });
     }

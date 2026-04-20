@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService, Agent } from '../../api.service';
+import { ToastService } from '@services/toast.service';
+import { ConfirmService } from '@services/confirm.service';
 
 @Component({
   selector: 'app-agents',
@@ -14,6 +16,8 @@ import { ApiService, Agent } from '../../api.service';
 export class AgentsComponent implements OnInit {
   private api = inject(ApiService);
   private router = inject(Router);
+  private toast = inject(ToastService);
+  private confirmService = inject(ConfirmService);
   
   systemAgents = signal<Agent[]>([]);
   customAgents = signal<Agent[]>([]);
@@ -41,14 +45,15 @@ export class AgentsComponent implements OnInit {
     this.router.navigate(['/editor', agentName]);
   }
 
-  deleteAgent(agentName: string) {
-    if (confirm(`¿Estás seguro de que deseas eliminar permanentemente el agente '${agentName}'?`)) {
+  async deleteAgent(agentName: string) {
+    const isConfirmed = await this.confirmService.confirm(`¿Estás seguro de que deseas eliminar permanentemente el agente '${agentName}'?`);
+    if (isConfirmed) {
       this.api.deleteAgent(agentName).subscribe({
         next: (res) => {
-          alert('Agente eliminado.');
+          this.toast.show('Agente eliminado.', 'success', '', 5000, 'bottom-right');
           this.loadAgents();
         },
-        error: (err) => alert('Error eliminando agente.')
+        error: (err) => this.toast.show('Error eliminando agente.', 'danger', '', 5000, 'bottom-right')
       });
     }
   }

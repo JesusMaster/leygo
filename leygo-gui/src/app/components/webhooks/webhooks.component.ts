@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ToastService } from '@services/toast.service';
+import { ConfirmService } from '@services/confirm.service';
 import { ApiService } from '../../api.service';
 import { MarkdownPipe } from '../../pipes/markdown.pipe';
 
@@ -49,6 +51,8 @@ export class FilterProviderPipe implements PipeTransform {
 })
 export class WebhooksComponent implements OnInit {
   api = inject(ApiService);
+  private toast = inject(ToastService);
+  private confirmService = inject(ConfirmService);
 
   webhooks = signal<Webhook[]>([]);
   loading = signal<boolean>(true);
@@ -215,7 +219,7 @@ export class WebhooksComponent implements OnInit {
   saveWebhook() {
     const data = this.formData();
     if (!data.titulo || !data.descripcion || !data.modelo) {
-      alert("Por favor completa todos los campos (título, descripción y modelo).");
+      this.toast.show("Por favor completa todos los campos (título, descripción y modelo).", 'warning', '', 5000, 'bottom-right');
       return;
     }
 
@@ -227,7 +231,7 @@ export class WebhooksComponent implements OnInit {
           this.closeModal();
         },
         error: (e) => {
-          alert('Error actualizando webhook');
+          this.toast.show('Error actualizando webhook', 'danger', '', 5000, 'bottom-right');
           console.error(e);
         }
       });
@@ -239,7 +243,7 @@ export class WebhooksComponent implements OnInit {
           this.closeModal();
         },
         error: (e) => {
-          alert('Error creando webhook');
+          this.toast.show('Error creando webhook', 'danger', '', 5000, 'bottom-right');
           console.error(e);
         }
       });
@@ -253,11 +257,18 @@ export class WebhooksComponent implements OnInit {
     });
   }
 
-  deleteWebhook(webhook: Webhook) {
-    if (confirm(`¿Estás seguro de eliminar el webhook '${webhook.titulo}'? Esta acción no se puede deshacer y la URL dejará de funcionar inmediatamente.`)) {
+  async deleteWebhook(webhook: Webhook) {
+    const isConfirmed = await this.confirmService.confirm(`¿Estás seguro de eliminar el webhook '${webhook.titulo}'? Esta acción no se puede deshacer y la URL dejará de funcionar inmediatamente.`);
+    if (isConfirmed) {
       this.api.deleteWebhook(webhook.id).subscribe({
-        next: () => this.loadWebhooks(),
-        error: (e) => console.error("Error eliminando webhook:", e)
+        next: () => {
+          this.toast.show('Webhook eliminado', 'success', '', 5000, 'bottom-right');
+          this.loadWebhooks();
+        },
+        error: (e) => {
+          this.toast.show('Error eliminando webhook', 'danger', '', 5000, 'bottom-right');
+          console.error("Error eliminando webhook:", e);
+        }
       });
     }
   }
@@ -279,7 +290,7 @@ export class WebhooksComponent implements OnInit {
     }
 
     navigator.clipboard.writeText(webhookUrl).then(() => {
-      alert('URL del Webhook copiada al portapapeles:\n' + webhookUrl);
+      this.toast.show('URL del Webhook copiada al portapapeles', 'success', '', 5000, 'bottom-right');
     });
   }
 

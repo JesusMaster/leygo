@@ -6,6 +6,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ToastService } from '@services/toast.service';
+import { ConfirmService } from '@services/confirm.service';
 
 export interface ModelOption {
   value: string;
@@ -39,6 +41,8 @@ export class AgentEditorComponent implements OnInit {
   private api = inject(ApiService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private toast = inject(ToastService);
+  private confirmService = inject(ConfirmService);
 
   agentName = signal<string>('');
   files = signal<AgentFileNode[]>([]);
@@ -231,7 +235,7 @@ export class AgentEditorComponent implements OnInit {
       next: () => this.savingModel.set(false),
       error: () => {
         this.savingModel.set(false);
-        alert('Error guardando el modelo en .env');
+        this.toast.show('Error guardando el modelo en .env', 'danger', '', 5000, 'bottom-right');
       }
     });
   }
@@ -264,7 +268,7 @@ export class AgentEditorComponent implements OnInit {
     if (!filename) return;
 
     if (this.files().find(f => f.path === filename)) {
-      alert('Ese archivo ya existe.');
+      this.toast.show('Ese archivo ya existe.', 'warning', '', 5000, 'bottom-right');
       return;
     }
 
@@ -273,12 +277,13 @@ export class AgentEditorComponent implements OnInit {
     this.selectFile(newFile);
   }
 
-  deleteFile(file: AgentFileNode) {
+  async deleteFile(file: AgentFileNode) {
     if (file.path.endsWith('_agent.py')) {
-      alert('No puedes eliminar el archivo controlador principal del agente.');
+      this.toast.show('No puedes eliminar el archivo controlador principal del agente.', 'warning', '', 5000, 'bottom-right');
       return;
     }
-    if (confirm(`¿Eliminar ${file.path}?`)) {
+    const isConfirmed = await this.confirmService.confirm(`¿Eliminar ${file.path}?`);
+    if (isConfirmed) {
       this.files.update(f => f.filter(x => x.path !== file.path));
       this.deletedFiles.update(d => [...d, file.path]);
       if (this.selectedFile()?.path === file.path) {
@@ -295,12 +300,12 @@ export class AgentEditorComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.saving.set(false);
-        alert('Archivos guardados con éxito.');
+        this.toast.show('Archivos guardados con éxito.', 'success', '', 5000, 'bottom-right');
         this.loadTree();
       },
       error: (e) => {
         this.saving.set(false);
-        alert('Error guardando archivos: ' + e.message);
+        this.toast.show('Error guardando archivos: ' + e.message, 'danger', '', 5000, 'bottom-right');
       }
     });
   }

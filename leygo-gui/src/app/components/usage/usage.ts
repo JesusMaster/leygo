@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
+import { ToastService } from '@services/toast.service';
 
 interface UsageRecord {
   timestamp: string;
@@ -35,6 +36,7 @@ interface OperationGroup {
 })
 export class UsageComponent implements OnInit {
   private api = inject(ApiService);
+  private toast = inject(ToastService);
 
   // Data cruda (toda la historia invertida, más reciente primero)
   allHistory = signal<UsageRecord[]>([]);
@@ -208,7 +210,7 @@ export class UsageComponent implements OnInit {
       },
       error: () => {
         this.budgetLoading.set(false);
-        alert('Error al guardar el presupuesto');
+        this.toast.show('Error al guardar el presupuesto', 'danger', '', 5000, 'bottom-right');
       }
     });
   }

@@ -1,0 +1,22 @@
+<div *ngFor="let position of objectKeys(toastGroups)" [ngClass]="'toast-container-' + position">
+  <div *ngFor="let toast of toastGroups[position]" class="toast" [ngClass]="getToastClass(toast.type)">
+  
+    <div class="toast-body flex">
+
+      <div class="toast-message mr-4">
+        <div class="toast-messsage__tittle" *ngIf="toast.title">
+          <strong class="mr-auto">{{ toast.title }}</strong>
+        </div>
+        <div class="toast-message__body">{{ toast.message }}</div>
+      </div>
+
+      <div class="toast-close flex items-center ml-auto">
+        <button type="button" class="close" (click)="removeToast(toast)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      
+    </div>
+  </div>
+</div>

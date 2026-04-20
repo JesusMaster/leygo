@@ -11,7 +11,7 @@
 
 .header h2 {
   font-size: 28px;
-  color: #111827;
+  color: var(--text-main);
 }
 
 .header p {
@@ -26,7 +26,7 @@
 .section-title {
   font-size: 20px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-main);
   margin-bottom: 24px;
 }
 
@@ -37,7 +37,7 @@
 }
 
 .agent-card {
-  background-color: white;
+  background-color: var(--bg-card);
   padding: 24px;
   border-radius: 16px;
   border: 1px solid var(--border-light);
@@ -77,27 +77,27 @@
 }
 
 .edit-btn {
-  color: #9ca3af;
+  color: var(--text-dim);
 }
 
 .edit-btn:hover {
-  background-color: #dbeafe;
+  background-color: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
 }
 
 .delete-btn {
-  color: #9ca3af;
+  color: var(--text-dim);
 }
 
 .delete-btn:hover {
-  background-color: #fee2e2;
+  background-color: rgba(239, 68, 68, 0.1);
   color: #ef4444;
 }
 
 .agent-icon {
   width: 48px;
   height: 48px;
-  background-color: #f3f4f6;
+  background-color: var(--bg-input);
   color: var(--accent-primary);
   border-radius: 12px;
   display: flex;
@@ -115,7 +115,7 @@
 .model-badge {
   font-size: 10px;
   color: var(--accent-primary);
-  background-color: #f0f2ff;
+  background-color: rgba(99, 102, 241, 0.1);
   padding: 2px 8px;
   border-radius: 4px;
   font-weight: 600;
@@ -130,7 +130,7 @@
 .tools-section h4 {
   font-size: 11px;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: var(--text-dim);
   margin-bottom: 12px;
 }
 
@@ -142,16 +142,16 @@
 
 .tool-chip {
   font-size: 11px;
-  background-color: #f9fafb;
+  background-color: var(--bg-input);
   padding: 4px 10px;
   border-radius: 6px;
   border: 1px solid var(--border-light);
-  color: #4b5563;
+  color: var(--text-dim);
 }
 
 .no-tools {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--text-dim);
   font-style: italic;
 }
 
@@ -176,7 +176,7 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-card);
   border-radius: 20px;
   border: 1px solid var(--border-light);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -193,14 +193,14 @@
 
 .modal-header h3 {
   font-size: 20px;
-  color: #111827;
+  color: var(--text-main);
 }
 
 .close-btn {
   background: none;
   border: none;
   font-size: 24px;
-  color: #9ca3af;
+  color: var(--text-dim);
   cursor: pointer;
   padding: 4px;
   line-height: 1;
@@ -209,8 +209,8 @@
 }
 
 .close-btn:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--bg-input);
+  color: var(--text-main);
 }
 
 .modal-body {
@@ -235,7 +235,7 @@
 .form-group label {
   font-weight: 600;
   font-size: 14px;
-  color: #111827;
+  color: var(--text-main);
 }
 
 .code-editor {
@@ -246,7 +246,8 @@
   font-family: monospace;
   font-size: 13px;
   line-height: 1.5;
-  background-color: #f8fafc;
+  background-color: var(--bg-input);
+  color: var(--text-main);
   resize: vertical;
   height: 150px;
   transition: border-color 0.2s ease;
@@ -255,7 +256,7 @@
 .code-editor:focus {
   outline: none;
   border-color: var(--accent-primary);
-  background-color: #fff;
+  background-color: var(--bg-card);
 }
 
 .py-editor {
@@ -278,16 +279,16 @@
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #4b5563;
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
+  color: var(--text-dim);
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-cancel:hover {
-  background: #e5e7eb;
+  background: var(--bg-input);
 }
 
 .btn-primary {
@@ -342,7 +343,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f8fafc;
+  background: var(--bg-input);
   padding: 8px;
   border-radius: 8px;
   border: 1px solid var(--border-light);
@@ -350,10 +351,12 @@
 
 .env-input {
   padding: 8px 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light);
   border-radius: 6px;
   font-size: 13px;
   font-family: monospace;
+  background: var(--bg-card);
+  color: var(--text-main);
 }
 
 .env-input:focus {
@@ -371,14 +374,14 @@
 }
 
 .env-equals {
-  color: #9ca3af;
+  color: var(--text-dim);
   font-weight: 600;
 }
 
 .btn-remove-env {
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-dim);
   cursor: pointer;
   padding: 8px;
   border-radius: 6px;
@@ -389,7 +392,7 @@
 }
 
 .btn-remove-env:hover {
-  background: #fee2e2;
+  background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
 }
 
@@ -399,10 +402,10 @@
   justify-content: center;
   gap: 8px;
   padding: 10px;
-  background: white;
-  border: 1px dashed #cbd5e1;
+  background: transparent;
+  border: 1px dashed var(--border-light);
   border-radius: 8px;
-  color: #64748b;
+  color: var(--text-dim);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -410,7 +413,7 @@
 }
 
 .btn-add-env:hover {
-  background: #f8fafc;
+  background: var(--bg-input);
   color: var(--accent-primary);
-  border-color: var(--accent-light);
+  border-color: var(--accent-primary);
 }

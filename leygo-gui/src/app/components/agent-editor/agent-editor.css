@@ -126,7 +126,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 170px;
-  color: var(--text-main, #111827);
+  color: #111827;
 }
 
 .provider-badge {

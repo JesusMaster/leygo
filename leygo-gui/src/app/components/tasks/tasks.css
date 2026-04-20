@@ -14,7 +14,7 @@
 
 .header h2 {
   font-size: 28px;
-  color: #111827;
+  color: var(--text-main);
   margin-bottom: 4px;
 }
 
@@ -35,7 +35,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 24px;
-  background: white;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: 16px;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -137,8 +137,8 @@
 
 .instruction-text {
   font-size: 12px;
-  color: #4b5563;
-  background: #f3f4f6;
+  color: var(--text-dim);
+  background: var(--bg-input);
   padding: 8px 12px;
   border-radius: 8px;
   font-style: italic;
@@ -224,7 +224,7 @@
 .modal-content {
   width: 100%;
   max-width: 500px;
-  background: white;
+  background: var(--bg-card);
   border-radius: 24px;
   border: 1px solid var(--border-light);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -263,7 +263,7 @@
 .form-group label {
   font-size: 13px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-main);
 }
 
 .checkbox-group {
@@ -276,6 +276,7 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  color: var(--text-main);
 }
 
 .checkbox-label input {
@@ -288,7 +289,9 @@
   border: 1px solid var(--border-light);
   border-radius: 12px;
   font-size: 14px;
-  background: #f9fafb;
+  background: var(--bg-input);
+  color: var(--text-main);
+  box-sizing: border-box;
 }
 
 .form-group textarea {
@@ -311,15 +314,17 @@
 
 .btn-secondary {
   padding: 10px 20px;
-  background: white;
+  background: transparent;
+  color: var(--text-main);
   border: 1px solid var(--border-light);
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
+  background: var(--bg-input);
 }
 
 /* ── Run & Logs Buttons ──────────────────────────────── */
@@ -362,13 +367,13 @@
 }
 
 .btn-logs:hover {
-  background-color: #f3f4f6;
-  color: #6366f1;
+  background-color: var(--bg-input);
+  color: var(--accent-primary, #6366f1);
 }
 
 .btn-logs.active {
-  background-color: #eef2ff;
-  color: #6366f1;
+  background-color: var(--bg-input);
+  color: var(--accent-primary, #6366f1);
 }
 
 .btn-pause {
@@ -441,7 +446,7 @@
 .logs-header h4 {
   font-size: 13px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-main);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -475,14 +480,14 @@
 .log-entry {
   padding: 10px 14px;
   border-radius: 10px;
-  background: #f9fafb;
+  background: var(--bg-input);
   border: 1px solid var(--border-light, #e5e7eb);
   font-size: 13px;
 }
 
 .log-entry.error {
-  border-color: #fecaca;
-  background: #fef2f2;
+  border-color: rgba(220, 38, 38, 0.2);
+  background: rgba(220, 38, 38, 0.05);
 }
 
 .log-main {
@@ -534,8 +539,8 @@
 
 .log-duration {
   font-size: 10px;
-  color: #9ca3af;
-  background: #f3f4f6;
+  color: var(--text-dim);
+  background: var(--bg-main);
   padding: 1px 6px;
   border-radius: 4px;
 }
@@ -543,8 +548,8 @@
 .log-result {
   margin-top: 8px;
   font-size: 12px;
-  color: #374151;
-  background: white;
+  color: var(--text-main);
+  background: var(--bg-card);
   padding: 8px 10px;
   border-radius: 6px;
   border: 1px solid var(--border-light, #e5e7eb);
@@ -556,9 +561,9 @@
 .log-error {
   margin-top: 6px;
   font-size: 12px;
-  color: #dc2626;
-  background: #fef2f2;
+  color: #ef4444;
+  background: rgba(220, 38, 38, 0.05);
   padding: 6px 10px;
   border-radius: 6px;
-  border: 1px solid #fecaca;
+  border: 1px solid rgba(220, 38, 38, 0.2);
 }

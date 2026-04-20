@@ -76,13 +76,23 @@
           Agent Online
         </div>
       </div>
-      <!-- <div class="header-actions">
-        <button class="icon-btn">share</button>
-        <button class="btn-primary">Deploy Agent</button>
-      </div> -->
+      <div class="header-actions">
+        <div class="theme-switch-wrapper">
+          <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" [checked]="isDarkMode" (change)="toggleTheme()" />
+            <div class="slider round">
+              <i class="ph ph-sun sun-icon"></i>
+              <i class="ph ph-moon moon-icon"></i>
+            </div>
+          </label>
+        </div>
+      </div>
     </header>
     <div class="view-container">
       <router-outlet></router-outlet>
     </div>
   </main>
+
+  <app-toast></app-toast>
+  <app-confirm-dialog></app-confirm-dialog>
 </div>

@@ -30,7 +30,7 @@
       <div class="provider-input">
          <div style="display: flex; gap: 6px;">
              <input type="password" [(ngModel)]="geminiKeyInput" placeholder="AIzaSy..." style="flex: 1; padding: 8px 10px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 0.85rem;">
-             <button class="save-btn" style="border: 1px solid var(--border-light); height: 36px; width: 36px; font-size: 15px;" (click)="saveGeminiKey()" [disabled]="geminiLoading()">
+             <button class="save-btn" (click)="saveGeminiKey()" [disabled]="geminiLoading()">
                @if (geminiLoading()) {
                  <i class="ph ph-circle-notch spin"></i>
                } @else {

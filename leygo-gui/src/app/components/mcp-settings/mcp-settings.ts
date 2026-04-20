@@ -2,6 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { McpService, McpServer } from '../../services/mcp.service';
+import { ToastService } from '@services/toast.service';
+import { ConfirmService } from '@services/confirm.service';
 
 @Component({
   selector: 'app-mcp-settings',
@@ -23,7 +25,12 @@ export class McpSettingsComponent implements OnInit {
 
   currentServer: any = this.getEmptyServer();
 
-  constructor(private mcpService: McpService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private mcpService: McpService, 
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService,
+    private confirmService: ConfirmService
+  ) {}
 
   ngOnInit() {
     this.loadServers();
@@ -88,17 +95,20 @@ export class McpSettingsComponent implements OnInit {
     this.showModal = false;
   }
 
-  deleteServer(name: string) {
-    if(!confirm(`¿Seguro que deseas eliminar la conexión a ${name}?`)) return;
+  async deleteServer(name: string) {
+    const isConfirmed = await this.confirmService.confirm(`¿Seguro que deseas eliminar la conexión a ${name}?`);
+    if(!isConfirmed) return;
     
     this.loading = true;
     this.mcpService.deleteServer(name).subscribe({
       next: () => {
         this.successMsg = 'Conexión eliminada con éxito.';
+        this.toast.show('Conexión eliminada.', 'success', '', 5000, 'bottom-right');
         this.loadServers();
       },
       error: (err) => {
         this.errorMsg = 'No se pudo eliminar: ' + (err.error?.detail || err.message);
+        this.toast.show(this.errorMsg, 'danger', '', 5000, 'bottom-right');
         this.loading = false;
         this.cdr.detectChanges();
       }

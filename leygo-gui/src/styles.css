@@ -12,6 +12,18 @@
   --font-title: 'Outfit', sans-serif;
 }
 
+body.dark-theme {
+  --bg-main: #0f172a;
+  --bg-sidebar: #1e293b;
+  --bg-card: #1e293b;
+  --border-light: #334155;
+  --accent-primary: #818cf8;
+  --accent-hover: #6366f1;
+  --text-main: #f8fafc;
+  --text-dim: #94a3b8;
+  --bg-input: #0f172a;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -26,12 +38,13 @@ body {
   line-height: 1.5;
   overflow: hidden;
   height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4 {
   font-family: var(--font-title);
   font-weight: 600;
-  color: #111827;
+  color: var(--text-main);
 }
 
 ::-webkit-scrollbar {

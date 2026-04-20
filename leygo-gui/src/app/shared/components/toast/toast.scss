@@ -1,0 +1,109 @@
+.toast-container-top-right {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1050;
+}
+
+.toast-container-top-left {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1050;
+}
+
+.toast-container-bottom-right {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1050;
+}
+
+.toast-container-bottom-left {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1050;
+}
+
+.toast-container-top-center {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+}
+
+.toast-container-bottom-center {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.toast {
+  min-width: 250px;
+  margin-bottom: 1rem;
+  color: white;
+  background-color: var(--color-bg-elevated, #333);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  animation: slideIn 300ms ease-out forwards;
+}
+
+.toast.bg-green-500 { background-color: #22c55e !important; color: white !important; }
+.toast.bg-blue-500 { background-color: #3b82f6 !important; color: white !important; }
+.toast.bg-yellow-500 { background-color: #eab308 !important; color: white !important; }
+.toast.bg-red-500 { background-color: #ef4444 !important; color: white !important; }
+
+.toast-header {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.toast-body {
+  padding: 0.75rem 1.25rem;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+}
+
+.toast-message {
+  flex: 1 1 auto;
+  margin-right: 1rem;
+}
+
+.toast-close {
+  flex: 0 0 auto;
+}
+
+.close {
+  color: white;
+  opacity: 0.7;
+  background-color: transparent;
+  border: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 1px 0 #fff;
+  padding: 0;
+  cursor: pointer;
+}
+
+.close:hover {
+  opacity: 1;
+}

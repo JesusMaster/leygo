@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit, ChangeDetectorRef } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
+import { ToastService } from '@services/toast.service';
 
 declare var google: any;
 
@@ -15,6 +16,7 @@ declare var google: any;
 export class ConfigComponent implements OnInit {
   private api = inject(ApiService);
   private cdr = inject(ChangeDetectorRef);
+  private toast = inject(ToastService);
   
   config = signal<any>({});
   authStatus = signal<any>({ authenticated: false });
@@ -169,7 +171,7 @@ export class ConfigComponent implements OnInit {
   authorizeWorkspace() {
     const clientId = this.authStatus().clientId;
     if (!clientId) {
-      alert("No se encontró el Client ID de Google");
+      this.toast.show("No se encontró el Client ID de Google", 'danger', '', 5000, 'bottom-right');
       return;
     }
     
@@ -187,13 +189,13 @@ export class ConfigComponent implements OnInit {
         // Send the authorization code to backend API
         this.api.exchangeGoogleCode(response.code).subscribe({
           next: (res) => {
-            alert("¡Permisos otorgados exitosamente! Workspace conectado.");
+            this.toast.show("¡Permisos otorgados exitosamente! Workspace conectado.", 'success', '', 5000, 'bottom-right');
             const currentStatus = this.authStatus();
             this.authStatus.set({ ...currentStatus, workspaceConnected: true });
           },
           error: (err) => {
             console.error(err);
-            alert("Hubo un error al conectar el Workspace en el backend.");
+            this.toast.show("Hubo un error al conectar el Workspace en el backend.", 'danger', '', 5000, 'bottom-right');
           }
         });
       },
@@ -226,10 +228,10 @@ export class ConfigComponent implements OnInit {
           user: payload
         }));
       }
-      alert(`¡Sesión iniciada con éxito! Bienvenido, ${payload.name}`);
+      this.toast.show(`¡Sesión iniciada con éxito! Bienvenido, ${payload.name}`, 'success', '', 5000, 'bottom-right');
     } catch (e) {
       console.error("Error al procesar el JWT de Google:", e);
-      alert("Hubo un error al iniciar sesión.");
+      this.toast.show("Hubo un error al iniciar sesión.", 'danger', '', 5000, 'bottom-right');
     }
   }
 
@@ -298,9 +300,9 @@ export class ConfigComponent implements OnInit {
     if (!value) return;
     this.api.updateConfig(key, value).subscribe((res: any) => {
       if (res.reinit) {
-        alert(`✅ Variable ${key} actualizada. El agente se re-inicializó automáticamente con los nuevos valores.`);
+        this.toast.show(`Variable ${key} actualizada. El agente se re-inicializó automáticamente con los nuevos valores.`, 'success', '', 5000, 'bottom-right');
       } else {
-        alert(`Variable ${key} actualizada exitosamente.`);
+        this.toast.show(`Variable ${key} actualizada exitosamente.`, 'success', '', 5000, 'bottom-right');
       }
       this.loadData();
     });
@@ -325,7 +327,7 @@ export class ConfigComponent implements OnInit {
                 this.ollamaModels.set(modelRes.models);
               }
               this.ollamaLoading.set(false);
-              alert(`✅ URL de Ollama actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`);
+              this.toast.show(`URL de Ollama actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`, 'success', '', 5000, 'bottom-right');
               this.loadData();
             },
             error: () => this.ollamaLoading.set(false)
@@ -348,7 +350,7 @@ export class ConfigComponent implements OnInit {
                 this.geminiModels.set(modelRes.models);
               }
               this.geminiLoading.set(false);
-              alert(`✅ Clave Gemini actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`);
+              this.toast.show(`Clave Gemini actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`, 'success', '', 5000, 'bottom-right');
               this.loadData();
             },
             error: () => this.geminiLoading.set(false)
@@ -371,7 +373,7 @@ export class ConfigComponent implements OnInit {
                 this.anthropicModels.set(modelRes.models);
               }
               this.anthropicLoading.set(false);
-              alert(`✅ Clave Anthropic actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`);
+              this.toast.show(`Clave Anthropic actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`, 'success', '', 5000, 'bottom-right');
               this.loadData();
             },
             error: () => this.anthropicLoading.set(false)
@@ -394,7 +396,7 @@ export class ConfigComponent implements OnInit {
                 this.openaiModels.set(modelRes.models);
               }
               this.openaiLoading.set(false);
-              alert(`✅ Clave OpenAI actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`);
+              this.toast.show(`Clave OpenAI actualizada. ${res.reinit ? 'El agente se re-inicializó.' : ''}`, 'success', '', 5000, 'bottom-right');
               this.loadData();
             },
             error: () => this.openaiLoading.set(false)

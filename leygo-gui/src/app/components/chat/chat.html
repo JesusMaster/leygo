@@ -4,26 +4,36 @@
       <div class="message-group" [ngClass]="msg.sender">
         @if (msg.sender === 'bot') {
           <div class="avatar icon-avatar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
           </div>
         }
 
-        <div class="message-bubble shadow-sm">
-          <div class="message-content" [innerHTML]="msg.text | markdown"></div>
-          <div class="message-meta">
-            <span>{{ msg.timestamp | date:'HH:mm a' }}</span>
-            @if (msg.tokens && msg.cost !== undefined) {
-              <span class="usage-badge" [title]="'Model: ' + msg.model">
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 3px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                {{ msg.tokens | number:'1.0-0' }} tokens · ${{ msg.cost | number:'1.4-4' }}
-              </span>
+        <div class="message-body">
+          <!-- Header row: name + time + tools badge -->
+          <div class="message-header" [ngClass]="msg.sender">
+            @if (msg.sender === 'bot') {
+              <span class="sender-name">Leygo</span>
+              <span class="msg-time">{{ msg.timestamp | date:'HH:mm' }}</span>
+              @if (msg.tokens && msg.cost !== undefined) {
+                <span class="tools-badge" [title]="'Model: ' + msg.model">
+                  <i class="ph ph-wrench"></i>
+                  {{ msg.tokens | number:'1.0-0' }} tokens · ${{ msg.cost | number:'1.4-4' }}
+                </span>
+              }
+            } @else {
+              <span class="msg-time">{{ msg.timestamp | date:'HH:mm' }}</span>
             }
+          </div>
+
+          <!-- Bubble -->
+          <div class="message-bubble" [ngClass]="msg.sender">
+            <div class="message-content" [innerHTML]="msg.text | markdown"></div>
           </div>
         </div>
 
         @if (msg.sender === 'user') {
           <div class="avatar img-avatar">
-            <img [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=0ea5e9&color=fff&bold=true'" alt="User">
+            <img [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=6366f1&color=fff&bold=true'" alt="User">
           </div>
         }
       </div>
@@ -36,27 +46,32 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
         </div>
 
-        <div class="message-bubble typing shadow-sm">
-          <!-- Pasos de estado (supervisor routing, tools) -->
-          @if (statusHistory().length > 0) {
-            <div class="status-steps">
-              @for (step of statusHistory(); track step; let last = $last) {
-                <div class="status-step" [class.active]="last && !streamingText()" [innerHTML]="step | markdown"></div>
-              }
-            </div>
-          }
+        <div class="message-body">
+          <div class="message-header bot">
+            <span class="sender-name">Leygo</span>
+          </div>
+          <div class="message-bubble bot typing">
+            <!-- Pasos de estado (supervisor routing, tools) -->
+            @if (statusHistory().length > 0) {
+              <div class="status-steps">
+                @for (step of statusHistory(); track step; let last = $last) {
+                  <div class="status-step" [class.active]="last && !streamingText()" [innerHTML]="step | markdown"></div>
+                }
+              </div>
+            }
 
-          <!-- Texto fluyendo token a token (sin markdown durante el stream) -->
-          @if (streamingText()) {
-            <div class="streaming-text">{{ streamingText() }}</div>
-            <span class="cursor-blink">▍</span>
-          } @else if (statusHistory().length === 0) {
-            <!-- Dots iniciales antes de cualquier evento -->
-            <div class="dots"><span></span><span></span><span></span></div>
-          } @else {
-            <!-- Dots mientras espera tokens tras ver pasos -->
-            <div class="dots-mini"><span></span><span></span><span></span></div>
-          }
+            <!-- Texto fluyendo token a token (sin markdown durante el stream) -->
+            @if (streamingText()) {
+              <div class="streaming-text">{{ streamingText() }}</div>
+              <span class="cursor-blink">▍</span>
+            } @else if (statusHistory().length === 0) {
+              <!-- Dots iniciales antes de cualquier evento -->
+              <div class="dots"><span></span><span></span><span></span></div>
+            } @else {
+              <!-- Dots mientras espera tokens tras ver pasos -->
+              <div class="dots-mini"><span></span><span></span><span></span></div>
+            }
+          </div>
         </div>
       </div>
     }
