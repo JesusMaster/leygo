@@ -7,6 +7,7 @@ import { ToastService } from '@services/toast.service';
 import { ConfirmService } from '@services/confirm.service';
 import { ApiService } from '../../api.service';
 import { MarkdownPipe } from '../../pipes/markdown.pipe';
+import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 
 interface Webhook {
   id: string;
@@ -23,6 +24,8 @@ export interface WebhookLog {
   payload: string;
   response: string;
   error?: string;
+  _expandedPayload?: boolean;
+  _expandedResponse?: boolean;
 }
 
 interface ModelOption {
@@ -45,7 +48,7 @@ export class FilterProviderPipe implements PipeTransform {
 @Component({
   selector: 'app-webhooks',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilterProviderPipe, MarkdownPipe],
+  imports: [CommonModule, FormsModule, FilterProviderPipe, MarkdownPipe, FriendlyDatePipe],
   templateUrl: './webhooks.component.html',
   styleUrls: ['./webhooks.component.css']
 })

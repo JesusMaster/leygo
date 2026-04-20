@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ApiService, ScheduledTask } from '../../api.service';
 import { ToastService } from '@services/toast.service';
 import { ConfirmService } from '@services/confirm.service';
+import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 
 @Component({
   selector: 'app-tasks',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FriendlyDatePipe],
   templateUrl: './tasks.html',
   styleUrl: './tasks.css'
 })

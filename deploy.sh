@@ -108,9 +108,10 @@ mkdir -p "$BACKUP_DIR"
 log "Respaldando datos de producción en $BACKUP_DIR ..."
 backup_path "agent_core/config"
 backup_path "agent_core/keys"
-backup_path "agent_core/memoria"
-backup_path "agent_core/.env"
 backup_path "agent_core/mcp_config.yaml"
+backup_path "agent_core/.env"
+# Respalda memoria COMPLETA incluyendo bds/ (usage.db, scheduler.db, webhooks.db)
+backup_path "agent_core/memoria"
 # Auto-descubre y respalda TODOS los sub-agentes en carpeta
 backup_all_sub_agents
 
@@ -127,14 +128,16 @@ log "Pull exitoso."
 log "Restaurando datos de producción ..."
 restore_path "agent_core/config"
 restore_path "agent_core/keys"
+restore_path "agent_core/mcp_config.yaml"
+restore_path "agent_core/.env"
+
+# Restaura memoria completa (bds/ incluye usage.db, scheduler.db, webhooks.db, etc.)
+# ⚠️  NO se mueven ni reorganizan archivos aquí — eso causaba pérdida de datos.
 restore_path "agent_core/memoria"
 
-log "Protegiendo y reorganizando bases SQLite hacia memoria/bds/ ..."
+# Garantiza que el directorio bds/ exista por si es la primera vez
 mkdir -p "$REPO_DIR/agent_core/memoria/bds"
-find "$REPO_DIR/agent_core/memoria" -maxdepth 1 -name "*.db*" -exec mv {} "$REPO_DIR/agent_core/memoria/bds/" \; 2>/dev/null || true
 
-restore_path "agent_core/.env"
-backup_path "agent_core/mcp_config.yaml"
 # Restaura automáticamente todos los sub-agentes respaldados
 restore_all_sub_agents
 

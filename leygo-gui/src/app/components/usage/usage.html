@@ -146,7 +146,7 @@
                       <div class="op-chevron" [class.rotated]="group.expanded">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                       </div>
-                      {{ group.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+                      {{ group.timestamp | friendlyDate }} · {{ group.timestamp | date:'HH:mm' }}
                     </div>
                   </td>
                   <td class="prompt-text">
@@ -193,7 +193,7 @@
             } @else {
               @for (record of filteredHistory(); track $index) {
                 <tr>
-                  <td>{{ record.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                  <td>{{ record.timestamp | friendlyDate }} · {{ record.timestamp | date:'HH:mm' }}</td>
                   <td class="prompt-text">{{ record.user_input || 'N/A' }}{{ (record.user_input && record.user_input.length > 40) ? '...' : '' }}</td>
                   <td><span class="badge model-badge">{{ record.model }}</span></td>
                   <td>{{ record.input_tokens | number }}</td>

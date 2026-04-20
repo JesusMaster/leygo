@@ -597,6 +597,48 @@
   line-height: 1.5;
 }
 
+.log-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  color: var(--accent-primary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.expand-btn:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.log-value.collapsed {
+  max-height: 120px;
+  overflow: hidden !important;
+  position: relative;
+}
+
+.log-value.collapsed::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--bg-input));
+  pointer-events: none;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
 /* Shadow piercing required for innerHTML content */
 :host ::ng-deep .log-value.markdown-body {
   font-family: inherit;

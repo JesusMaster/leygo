@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
 import { ToastService } from '@services/toast.service';
+import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 
 interface UsageRecord {
   timestamp: string;
@@ -30,7 +31,7 @@ interface OperationGroup {
 @Component({
   selector: 'app-usage',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FriendlyDatePipe],
   templateUrl: './usage.html',
   styleUrl: './usage.css'
 })

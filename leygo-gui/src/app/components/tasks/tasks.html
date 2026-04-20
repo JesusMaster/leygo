@@ -135,7 +135,7 @@
                           <span class="log-trigger" [ngClass]="log.trigger_type">
                             {{ log.trigger_type === 'manual' ? '▶ Manual' : '⏰ Programado' }}
                           </span>
-                          <span class="log-time">{{ log.timestamp | date:'short' }}</span>
+                          <span class="log-time">{{ log.timestamp | friendlyDate }} · {{ log.timestamp | date:'HH:mm' }}</span>
                           @if (log.duration_ms > 0) {
                             <span class="log-duration">{{ log.duration_ms }}ms</span>
                           }
