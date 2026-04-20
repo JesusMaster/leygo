@@ -150,6 +150,10 @@
   color: #ffffff;
 }
 
+::ng-deep .message-content a {
+  color: var(--link-color);
+}
+
 ::ng-deep .message-content img {
   max-width: 100%;
   height: auto;

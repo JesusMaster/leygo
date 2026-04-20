@@ -699,6 +699,10 @@
   list-style-position: outside;
 }
 
+:host ::ng-deep .log-value.markdown-body a {
+  color: var(--link-color);
+}
+
 :host ::ng-deep .log-value.markdown-body li {
   margin-bottom: 6px;
   line-height: 1.6;

@@ -10,6 +10,7 @@
   --bg-input: #f9f9f9;
   --font-main: 'Space Grotesk', sans-serif;
   --font-title: 'Space Grotesk', sans-serif;
+  --link-color: #2249b8;
 }
 
 body.dark-theme {
@@ -22,6 +23,7 @@ body.dark-theme {
   --text-main: #f8fafc;
   --text-dim: #94a3b8;
   --bg-input: #0f172a;
+  --link-color: #8aa3ff;
 }
 
 * {
