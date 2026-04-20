@@ -611,6 +611,14 @@
   border-bottom-right-radius: 6px;
 }
 
+:host ::ng-deep .log-result.markdown-body ul, 
+:host ::ng-deep .log-result.markdown-body ol {
+  padding-left: 28px !important;
+  margin-bottom: 16px;
+  margin-top: 8px;
+  list-style-position: outside;
+}
+
 .log-error {
   margin-top: 6px;
   font-size: 12px;
