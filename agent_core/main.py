@@ -366,13 +366,19 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
         # antes de incurrir en la invocación al LLM.
         last_ai_agents = []
         for m in reversed(clean_messages):
-            if isinstance(m, HumanMessage) and getattr(m, "name", None) == "Supervisor":
-                # Extraer el agente mencionado
-                content_lower = m.content.lower()
-                for agent in self.sub_agents:
-                    if agent.name.lower() in content_lower:
-                        last_ai_agents.append(agent.name)
-                        break
+            if isinstance(m, HumanMessage):
+                name = getattr(m, "name", None)
+                if name not in ["Supervisor", "WorkerContext"]:
+                    # Llegamos al mensaje del usuario (inicio del turno actual), no mirar más atrás
+                    break
+                if name == "Supervisor":
+                    # Extraer el agente mencionado
+                    content_lower = m.content.lower()
+                    for agent in self.sub_agents:
+                        if agent.name.lower() in content_lower:
+                            last_ai_agents.append(agent.name)
+                            break
+            # Si ya recolectamos 2 redirecciones en el mismo turno, es suficiente
             if len(last_ai_agents) >= 2:
                 break
 
