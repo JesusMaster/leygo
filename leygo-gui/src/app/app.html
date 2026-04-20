@@ -3,11 +3,35 @@
   <aside class="sidebar">
     <div class="logo-section">
       <div class="logo-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+          x="0px" y="0px" viewBox="0 0 226.772 226.772" style="enable-background:new 0 0 226.772 226.772;"
+          xml:space="preserve">
+          <circle style="fill:none;stroke:var(--text-main);stroke-width:8;stroke-miterlimit:10;" cx="50.827" cy="49.444"
+            r="24.941" />
+          <circle cx="50.386" cy="175.193" r="27.5" style="fill:var(--text-main);"/>
+          <line style="fill:none;stroke:var(--text-main);stroke-width:10;stroke-miterlimit:10;" x1="77.886" y1="175.193"
+            x2="151.193" y2="175.193" />
+          <g>
+            <g>
+
+              <line style="fill:none;stroke:var(--accent-primary);stroke-width:10;stroke-miterlimit:10;" x1="170.254" y1="161.6"
+                x2="167.425" y2="158.772" />
+
+              <line style="fill:none;stroke:var(--accent-primary);stroke-width:10;stroke-miterlimit:10;stroke-dasharray:8.458,8.458;"
+                x1="161.444" y1="152.791" x2="80.705" y2="72.051" />
+              <line style="fill:none;stroke:var(--accent-primary);stroke-width:10;stroke-miterlimit:10;" x1="77.714" y1="69.061"
+                x2="74.886" y2="66.232" />
+            </g>
+          </g>
+          <circle style="fill:var(--accent-primary);" cx="178.693" cy="175.193" r="27.5" />
+          <line style="fill:none;stroke:var(--text-main);stroke-width:10;stroke-miterlimit:10;" x1="50.386" y1="147.693"
+            x2="50.386" y2="74.386" />
+        </svg>
       </div>
-      <h1>LeyGo AI</h1>
+
+      <h1 class="logo-text">leygo</h1>
     </div>
-    
+
     <nav class="nav-menu">
       <a routerLink="/chat" routerLinkActive="active" class="nav-item">
         <span class="icon"><i class="ph ph-chat-circle-dots"></i></span>
@@ -50,11 +74,12 @@
         <span class="label">Creative Writing</span>
       </div>
     </div> -->
-    
+
     <div class="sidebar-footer">
       <div class="user-profile">
         <div class="avatar-container">
-          <img [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=0ea5e9&color=fff&bold=true'" alt="User Avatar">
+          <img [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=0ea5e9&color=fff&bold=true'"
+            alt="User Avatar">
         </div>
         <div class="user-details">
           <span class="user-name">{{ userName }}</span>
