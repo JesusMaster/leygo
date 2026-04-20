@@ -141,7 +141,17 @@
                           }
                         </div>
                         @if (log.result) {
-                          <div class="log-result">{{ log.result.length > 300 ? (log.result | slice:0:300) + '...' : log.result }}</div>
+                          <div class="log-result-wrapper">
+                            <div class="log-result-header">
+                              <span class="log-result-label">Resultado</span>
+                              @if (log.result.length > 300) {
+                                <button class="log-expand-btn" (click)="toggleResult(log)">
+                                  {{ isResultExpanded(log) ? 'Ocultar' : 'Ver todo' }}
+                                </button>
+                              }
+                            </div>
+                            <div class="log-result" [class.collapsed]="log.result.length > 300 && !isResultExpanded(log)">{{ log.result }}</div>
+                          </div>
                         }
                         @if (log.error) {
                           <div class="log-error">{{ log.error }}</div>

@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, ScheduledTask } from '../../api.service';
@@ -13,12 +13,15 @@ import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
   templateUrl: './tasks.html',
   styleUrl: './tasks.css'
 })
-export class TasksComponent implements OnInit {
+export class TasksComponent implements OnInit, OnDestroy {
   private api = inject(ApiService);
   private toast = inject(ToastService);
   private confirmService = inject(ConfirmService);
   tasks = signal<ScheduledTask[]>([]);
   loading = signal(true);
+  
+  // Timer para polling
+  private logsInterval: any;
 
   // Form para nuevo recordatorio
   showAddModal = signal(false);
@@ -37,8 +40,39 @@ export class TasksComponent implements OnInit {
   taskLogs = signal<any[]>([]);
   logsLoading = signal(false);
 
+  // Estado expandido de resultados (persiste entre recargas)
+  expandedResults = new Set<string>();
+
+  getLogResultId(log: any): string {
+    return `${log.task_id ?? ''}_${log.timestamp}`;
+  }
+
+  isResultExpanded(log: any): boolean {
+    return this.expandedResults.has(this.getLogResultId(log));
+  }
+
+  toggleResult(log: any) {
+    const id = this.getLogResultId(log);
+    if (this.expandedResults.has(id)) {
+      this.expandedResults.delete(id);
+    } else {
+      this.expandedResults.add(id);
+    }
+  }
+
   ngOnInit() {
     this.loadTasks();
+  }
+
+  ngOnDestroy() {
+    this.clearLogsInterval();
+  }
+
+  private clearLogsInterval() {
+    if (this.logsInterval) {
+      clearInterval(this.logsInterval);
+      this.logsInterval = null;
+    }
   }
 
   loadTasks() {
@@ -138,19 +172,39 @@ export class TasksComponent implements OnInit {
     if (this.expandedLogTaskId() === taskId) {
       this.expandedLogTaskId.set(null);
       this.taskLogs.set([]);
+      this.clearLogsInterval();
       return;
     }
     
     this.expandedLogTaskId.set(taskId);
     this.logsLoading.set(true);
+    this.fetchLogs(taskId);
+    
+    // Configurar polling cada 5 segundos si el panel está abierto
+    this.clearLogsInterval();
+    this.logsInterval = setInterval(() => {
+      if (this.expandedLogTaskId() === taskId) {
+        this.fetchLogs(taskId, false);
+      }
+    }, 5000);
+  }
+
+  private fetchLogs(taskId: string, showLoading: boolean = true) {
+    if (showLoading) this.logsLoading.set(true);
+    
     this.api.getTaskLogs(taskId).subscribe({
       next: (logs) => {
         this.taskLogs.set(logs);
-        this.logsLoading.set(false);
+        if (showLoading) this.logsLoading.set(false);
+        
+        // Si no hay logs "running", podríamos detener el polling en el futuro,
+        // pero por ahora lo dejamos para capturar nuevas ejecuciones manuales.
       },
       error: () => {
-        this.taskLogs.set([]);
-        this.logsLoading.set(false);
+        if (showLoading) {
+          this.taskLogs.set([]);
+          this.logsLoading.set(false);
+        }
       }
     });
   }

@@ -7,9 +7,9 @@
   --accent-hover: #4f46e5;
   --text-main: #111827;
   --text-dim: #6b7280;
-  --bg-input: #ffffff;
-  --font-main: 'Inter', sans-serif;
-  --font-title: 'Outfit', sans-serif;
+  --bg-input: #f9f9f9;
+  --font-main: 'Space Grotesk', sans-serif;
+  --font-title: 'Space Grotesk', sans-serif;
 }
 
 body.dark-theme {
