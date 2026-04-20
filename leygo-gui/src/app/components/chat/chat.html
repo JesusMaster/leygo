@@ -37,7 +37,10 @@
         <div class="message-header" [ngClass]="msg.sender">
           @if (msg.sender === 'bot') {
           <span class="sender-name">Leygo</span>
-          <span class="msg-time">{{ msg.timestamp | date:'HH:mm' }}</span>
+          <span class="msg-time">
+            <span class="msg-date">{{ msg.timestamp | friendlyDate }}</span>
+            {{ msg.timestamp | date:'HH:mm' }}
+          </span>
           @if (msg.tokens && msg.cost !== undefined) {
           <span class="tools-badge" [title]="'Model: ' + msg.model">
             <i class="ph ph-wrench"></i>
@@ -45,7 +48,10 @@
           </span>
           }
           } @else {
-          <span class="msg-time">{{ msg.timestamp | date:'HH:mm' }}</span>
+          <span class="msg-time">
+            {{ msg.timestamp | date:'HH:mm' }}
+            <span class="msg-date">{{ msg.timestamp | friendlyDate }}</span>
+          </span>
           }
         </div>
 

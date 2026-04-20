@@ -91,6 +91,16 @@
   font-size: 12px;
   color: var(--text-dim);
   font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.msg-date {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 600;
+  opacity: 0.75;
 }
 
 .tools-badge {

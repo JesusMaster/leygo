@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
 import { ChatService } from '../../services/chat.service';
 import { MarkdownPipe } from '../../pipes/markdown.pipe';
+import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, MarkdownPipe],
+  imports: [CommonModule, FormsModule, MarkdownPipe, FriendlyDatePipe],
   templateUrl: './chat.html',
   styleUrl: './chat.css'
 })
