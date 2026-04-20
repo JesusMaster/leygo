@@ -150,7 +150,7 @@
                                 </button>
                               }
                             </div>
-                            <div class="log-result" [class.collapsed]="log.result.length > 300 && !isResultExpanded(log)">{{ log.result }}</div>
+                            <div class="log-result markdown-body" [class.collapsed]="log.result.length > 300 && !isResultExpanded(log)" [innerHTML]="log.result | markdown"></div>
                           </div>
                         }
                         @if (log.error) {
