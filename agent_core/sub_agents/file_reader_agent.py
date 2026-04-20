@@ -37,8 +37,8 @@ class FileReaderAgent(BaseSubAgent):
 
     @property
     def model(self) -> str:
-        # Modelo general potente y rápido para resumir data ancha como PDFs largos
-        return "gemini-3.1-pro-preview"
+        # Permite configurar el modelo desde la interfaz o usa pro-preview por defecto
+        return os.environ.get("MODEL_FILE_READER", "gemini-3.1-pro-preview")
 
     def get_tools(self, all_available_tools: list = None) -> list:
         

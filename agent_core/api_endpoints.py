@@ -48,9 +48,14 @@ class WebhookUpdateRequest(BaseModel):
     paused: bool = None
 
 @router.get("/agents")
-async def get_agents():
+async def get_agents(request: Request):
     """Devuelve la lista de agentes y sus herramientas."""
     try:
+        # Forzar hot-reload en caso de cambios recientes en disco antes de devolver
+        agent = getattr(request.app.state, "agent", None)
+        if agent and hasattr(agent, "_check_and_reload_graph"):
+            agent._check_and_reload_graph()
+            
         agents = discover_sub_agents()
         result = []
         for a in agents:

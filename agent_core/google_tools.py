@@ -139,8 +139,8 @@ def enviar_correo(destinatario: str, asunto: str, cuerpo: str, responde_a_messag
         destinatario: El correo electrónico de la persona a quien enviar el mensaje (ej: 'juan@ejemplo.com').
         asunto: El asunto del correo.
         cuerpo: El mensaje o contenido del correo.
-        responde_a_message_id: (Opcional) El encabezado 'Msg-ID' del correo original, sirve para responder sobre el mismo hilo.
-        thread_id: (Opcional) El 'Thread' ID del correo original, de la mano con responde_a_message_id.
+        responde_a_message_id: (Opcional pero OBLIGATORIO PARA RESPONDER) El encabezado 'Msg-ID' del correo original. Si estás respondiendo a un correo, DEBES incluir este valor.
+        thread_id: (Opcional pero OBLIGATORIO PARA RESPONDER) El 'Thread' ID del correo original. Si no incluyes esto al responder, Gmail creará un correo nuevo en vez de agruparlo en el mismo hilo.
     Returns:
         Mensaje de confirmación del envío.
     """

@@ -154,6 +154,11 @@
   color: var(--link-color);
 }
 
+::ng-deep .message-bubble.user > .message-content a {
+  color: var(--bg-main);
+  font-weight: 600;
+}
+
 ::ng-deep .message-content img {
   max-width: 100%;
   height: auto;

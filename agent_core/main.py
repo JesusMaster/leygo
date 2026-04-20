@@ -378,13 +378,13 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES:
                         if agent.name.lower() in content_lower:
                             last_ai_agents.append(agent.name)
                             break
-            # Si ya recolectamos 2 redirecciones en el mismo turno, es suficiente
-            if len(last_ai_agents) >= 2:
+            # Si ya recolectamos 10 redirecciones en el mismo turno, es suficiente
+            if len(last_ai_agents) >= 10:
                 break
 
-        if len(last_ai_agents) >= 2 and len(set(last_ai_agents)) == 1:
+        if len(last_ai_agents) >= 10 and len(set(last_ai_agents)) == 1:
             repeated_agent = last_ai_agents[0]
-            print(f"[Supervisor LOOP GUARD] El agente '{repeated_agent}' fue delegado 2+ veces seguidas. Forzando END.")
+            print(f"[Supervisor LOOP GUARD] El agente '{repeated_agent}' fue delegado 10+ veces seguidas. Forzando END.")
             status_bus.publish_status("⚠️ Bucle detectado — finalizando respuesta automáticamente")
             # Intentar rescatar la última respuesta del agente como respuesta final
             last_agent_response = ""
