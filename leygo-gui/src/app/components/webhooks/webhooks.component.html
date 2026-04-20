@@ -124,20 +124,20 @@
           <div class="log-row">
             <div class="log-row-header">
               <span class="log-label">Payload</span>
-              <button class="expand-btn" (click)="log._expandedPayload = !log._expandedPayload">
-                {{ log._expandedPayload ? 'Ocultar' : 'Ver todo' }}
+              <button class="expand-btn" (click)="togglePayload(log)">
+                {{ isPayloadExpanded(log) ? 'Ocultar' : 'Ver todo' }}
               </button>
             </div>
-            <div class="log-value payload" [class.collapsed]="!log._expandedPayload">{{ log.payload }}</div>
+            <div class="log-value payload" [class.collapsed]="!isPayloadExpanded(log)">{{ log.payload }}</div>
           </div>
           <div class="log-row">
             <div class="log-row-header">
               <span class="log-label">Respuesta</span>
-              <button class="expand-btn" (click)="log._expandedResponse = !log._expandedResponse">
-                {{ log._expandedResponse ? 'Ocultar' : 'Ver todo' }}
+              <button class="expand-btn" (click)="toggleResponse(log)">
+                {{ isResponseExpanded(log) ? 'Ocultar' : 'Ver todo' }}
               </button>
             </div>
-            <div class="log-value response markdown-body" [class.collapsed]="!log._expandedResponse" [innerHTML]="log.response | markdown"></div>
+            <div class="log-value response markdown-body" [class.collapsed]="!isResponseExpanded(log)" [innerHTML]="log.response | markdown"></div>
           </div>
           <div *ngIf="log.error" class="log-row error-row">
             <span class="log-label">Error</span>

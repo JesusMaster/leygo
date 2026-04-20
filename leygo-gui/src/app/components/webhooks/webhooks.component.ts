@@ -24,8 +24,6 @@ export interface WebhookLog {
   payload: string;
   response: string;
   error?: string;
-  _expandedPayload?: boolean;
-  _expandedResponse?: boolean;
 }
 
 interface ModelOption {
@@ -69,6 +67,43 @@ export class WebhooksComponent implements OnInit {
 
   // Modal form state
   showModal = signal<boolean>(false);
+  formsData = signal<any>({});
+
+  // UI state for logs that persists across polling updates
+  expandedPayloads = new Set<string>();
+  expandedResponses = new Set<string>();
+
+  getLogId(log: WebhookLog): string {
+    return `${log.webhook_id}_${log.timestamp}`;
+  }
+
+  isPayloadExpanded(log: WebhookLog): boolean {
+    return this.expandedPayloads.has(this.getLogId(log));
+  }
+
+  togglePayload(log: WebhookLog) {
+    const id = this.getLogId(log);
+    if (this.expandedPayloads.has(id)) {
+      this.expandedPayloads.delete(id);
+    } else {
+      this.expandedPayloads.add(id);
+    }
+  }
+
+  isResponseExpanded(log: WebhookLog): boolean {
+    return this.expandedResponses.has(this.getLogId(log));
+  }
+
+  toggleResponse(log: WebhookLog) {
+    const id = this.getLogId(log);
+    if (this.expandedResponses.has(id)) {
+      this.expandedResponses.delete(id);
+    } else {
+      this.expandedResponses.add(id);
+    }
+  }
+
+  // Formularios para modal
   editMode = signal<boolean>(false);
   currentId = signal<string | null>(null);
   
