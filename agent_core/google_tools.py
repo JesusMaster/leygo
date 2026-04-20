@@ -746,6 +746,10 @@ def enviar_mensaje_chat(espacio_id: str, texto: str) -> str:
         import re
         service = build('chat', 'v1', credentials=creds)
         
+        # Corrección automática de formato de espacio si el usuario omitió la 's' final
+        if espacio_id.startswith('space/'):
+            espacio_id = 'spaces/' + espacio_id[6:]
+            
         texto_formateado = texto
         
         # 1. Saltos de linea literales generados por JSON/LLM a reales
