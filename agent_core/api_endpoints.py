@@ -965,6 +965,8 @@ async def handle_dynamic_webhook(webhook_id: str, request: Request):
         prompt = (
             f"Has recibido un payload en el webhook configurado como '{wh.get('titulo')}'. "
             f"INSTRUCCIONES DE SISTEMA: {wh.get('descripcion')}\n\n"
+            f"ESTOS SON TUS SUB-AGENTES DISPONIBLES (Puedes pedirle al Supervisor que les delegue tareas nombrandolos):\n"
+            f"{request.app.state.agent._agent_names if hasattr(request.app.state.agent, '_agent_names') else 'No hay agentes'}\n\n"
             f"HEADERS HTTP DE LA PETICIÓN (úsalos para identificar el origen real):\n```json\n{headers_str}\n```\n\n"
             f"PAYLOAD RECIBIDO:\n```json\n{json.dumps(payload, indent=2, ensure_ascii=False) if isinstance(payload, dict) else payload}\n```\n\n"
             f"REGLA CRUCIAL: Tu respuesta final en texto será reenviada AUTOMÁTICAMENTE por Telegram al usuario. "
