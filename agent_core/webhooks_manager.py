@@ -203,24 +203,32 @@ def get_webhook_logs(webhook_id: str = None) -> list:
     try:
         if webhook_id:
             cursor = conn.execute(
-                "SELECT webhook_id, timestamp, payload, response, error FROM webhook_logs WHERE webhook_id = ? ORDER BY timestamp DESC",
+                "SELECT id, webhook_id, timestamp, payload, response, error FROM webhook_logs WHERE webhook_id = ? ORDER BY timestamp DESC",
                 (webhook_id,)
             )
         else:
             cursor = conn.execute(
-                "SELECT webhook_id, timestamp, payload, response, error FROM webhook_logs ORDER BY timestamp DESC"
+                "SELECT id, webhook_id, timestamp, payload, response, error FROM webhook_logs ORDER BY timestamp DESC"
             )
             
         logs = []
         for row in cursor.fetchall():
             logs.append({
-                "webhook_id": row[0],
-                "timestamp": row[1],
-                "payload": row[2],
-                "response": row[3],
-                "error": row[4]
+                "id": row[0],
+                "webhook_id": row[1],
+                "timestamp": row[2],
+                "payload": row[3],
+                "response": row[4],
+                "error": row[5]
             })
         return logs
     except Exception as e:
         print(f"Error leyendo logs SQLite de webhook: {e}")
         return []
+
+def remove_webhook_log(log_id: int) -> bool:
+    conn = _get_db_conn()
+    cursor = conn.execute("DELETE FROM webhook_logs WHERE id = ?", (log_id,))
+    conn.commit()
+    return cursor.rowcount > 0
+

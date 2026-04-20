@@ -19,6 +19,7 @@ interface Webhook {
 }
 
 export interface WebhookLog {
+  id: number;
   webhook_id: string;
   timestamp: string;
   payload: string;
@@ -335,5 +336,24 @@ export class WebhooksComponent implements OnInit {
   getModelLabel(modelId: string): string {
     const m = this.availableModels().find(x => x.value === modelId);
     return m ? `${m.label} (${m.provider})` : modelId;
+  }
+
+  async deleteLog(log: WebhookLog, event: Event) {
+    event.stopPropagation();
+    const isConfirmed = await this.confirmService.confirm(
+      `¿Estás seguro de eliminar este registro del historial? Esta acción no se puede deshacer.`
+    );
+    if (isConfirmed) {
+      this.api.deleteWebhookLog(log.id).subscribe({
+        next: () => {
+          this.toast.show('Log eliminado', 'success', '', 5000, 'bottom-right');
+          this.logs.set(this.logs().filter(l => l.id !== log.id));
+        },
+        error: (err) => {
+          console.error(err);
+          this.toast.show('Error al eliminar el log', 'danger', '', 5000, 'bottom-right');
+        }
+      });
+    }
   }
 }

@@ -180,4 +180,8 @@ export class ApiService {
   getAllWebhookLogs(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/webhooks/logs/all`);
   }
+
+  deleteWebhookLog(logId: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/webhooks/logs/${logId}`);
+  }
 }

@@ -115,10 +115,15 @@
       
       <div *ngFor="let log of logs()" class="log-item" [ngClass]="{'log-error': log.error}">
         <div class="log-header">
-          <span class="log-time"><i class="ph ph-clock"></i> {{ log.timestamp | friendlyDate }} · {{ log.timestamp | date:'HH:mm' }}</span>
-          <span class="log-webhook" *ngIf="!selectedWebhookId()" [title]="getWebhookTitle(log.webhook_id)">
-             {{ getWebhookTitle(log.webhook_id) }}
-          </span>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span class="log-time"><i class="ph ph-clock"></i> {{ log.timestamp | friendlyDate }} · {{ log.timestamp | date:'HH:mm' }}</span>
+            <span class="log-webhook" *ngIf="!selectedWebhookId()" [title]="getWebhookTitle(log.webhook_id)">
+               {{ getWebhookTitle(log.webhook_id) }}
+            </span>
+          </div>
+          <button class="delete-log-btn" (click)="deleteLog(log, $event)" title="Eliminar registro">
+            <i class="ph ph-trash"></i>
+          </button>
         </div>
         <div class="log-content">
           <div class="log-row">

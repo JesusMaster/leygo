@@ -10,7 +10,7 @@ from dotenv import dotenv_values
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from main import discover_sub_agents
 from scheduler_manager import scheduler, guardar_estado_jobs, get_all_jobs, send_telegram_reminder, send_dynamic_telegram_reminder, execute_agent_task
-from webhooks_manager import load_webhooks, create_webhook, update_webhook, delete_webhook, get_webhook, log_webhook_execution, get_webhook_logs
+from webhooks_manager import load_webhooks, create_webhook, update_webhook, delete_webhook, get_webhook, log_webhook_execution, get_webhook_logs, remove_webhook_log
 import status_bus
 import json
 from datetime import datetime
@@ -917,6 +917,12 @@ async def api_get_webhook_logs(webhook_id: str):
 @router.get("/webhooks/logs/all")
 async def api_get_all_webhook_logs():
     return get_webhook_logs()
+
+@router.delete("/webhooks/logs/{log_id}")
+async def api_delete_webhook_log(log_id: int):
+    if remove_webhook_log(log_id):
+        return {"status": "success"}
+    raise HTTPException(status_code=404, detail="Webhook log no encontrado")
 
 @router.post("/webhook/{webhook_id}")
 async def handle_dynamic_webhook(webhook_id: str, request: Request):
