@@ -7,6 +7,7 @@ export interface Message {
   tokens?: number;
   cost?: number;
   model?: string;
+  requiresApproval?: boolean;
 }
 
 @Injectable({
@@ -139,6 +140,19 @@ export class ChatService {
               text: event.content || 'Error desconocido',
               sender: 'bot',
               timestamp: new Date()
+            });
+            this.streamingText.set('');
+            this.statusHistory.set([]);
+            this.isTyping.set(false);
+
+          } else if (event.type === 'interrupt') {
+            const previousText = this.streamingText();
+            this.addMessage({
+              text: (previousText ? previousText + '\n\n' : '') + 
+                    `⚠️ **APROBACIÓN DE SEGURIDAD REQUERIDA**\nEl agente necesita tu autorización para proceder con la siguiente acción:\n\n_${event.content}_`,
+              sender: 'bot',
+              timestamp: new Date(),
+              requiresApproval: true
             });
             this.streamingText.set('');
             this.statusHistory.set([]);

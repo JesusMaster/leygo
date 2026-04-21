@@ -2,7 +2,7 @@ import { Component, inject, signal, ElementRef, ViewChild, AfterViewInit, OnDest
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../api.service';
-import { ChatService } from '../../services/chat.service';
+import { ChatService, Message } from '../../services/chat.service';
 import { MarkdownPipe } from '../../pipes/markdown.pipe';
 import { FriendlyDatePipe } from '../../pipes/friendly-date.pipe';
 
@@ -100,6 +100,15 @@ export class ChatComponent implements AfterViewInit, OnDestroy, OnInit {
 
     // El stream vive en el servicio → sobrevive la navegación
     this.chatService.sendMessage(finalPrompt, this.backendUrl);
+  }
+
+  sendAction(action: string, msg: Message) {
+    // Marcar que ya no requiere aprobación para ocultar los botones
+    msg.requiresApproval = false;
+    
+    // Set the input to the action and send it
+    this.userInput.set(action);
+    this.sendMessage();
   }
 
   // ── File handling ────────────────────────────────────────────────────

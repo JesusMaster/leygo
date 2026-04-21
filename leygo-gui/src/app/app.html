@@ -36,6 +36,9 @@
       <a routerLink="/chat" routerLinkActive="active" class="nav-item">
         <span class="icon"><i class="ph ph-chat-circle-dots"></i></span>
         <span class="label">Chat Assistant</span>
+        @if (hasPendingApproval()) {
+        <span class="dot red" style="background: #ef4444; width: 8px; height: 8px; border-radius: 50%; margin-left: auto;"></span>
+        }
       </a>
       <a routerLink="/tasks" routerLinkActive="active" class="nav-item">
         <span class="icon"><i class="ph ph-calendar-blank"></i></span>
@@ -101,6 +104,15 @@
           Agent Online
         </div>
       </div>
+      
+      @if (hasPendingApproval()) {
+      <div class="approval-alert" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3); display: flex; align-items: center; gap: 0.5rem; margin: 0 auto; font-size: 0.9rem; font-weight: 500; cursor: pointer;" routerLink="/chat">
+        <i class="ph ph-warning-circle"></i>
+        <span>Acción Crítica Pendiente de Aprobación</span>
+        <i class="ph ph-arrow-right"></i>
+      </div>
+      }
+
       <div class="header-actions">
         <div class="theme-switch-wrapper">
           <label class="theme-switch" for="checkbox">

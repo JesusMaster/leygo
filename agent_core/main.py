@@ -908,6 +908,12 @@ class SelfExtendingAgent:
                                     if text:
                                         final_answer = final_answer if final_answer else text
                                         
+            # Check for interrupts at the end
+            state = await self.graph.aget_state(config)
+            if state.tasks and any(t.interrupts for t in state.tasks):
+                interrupt_payload = next(t.interrupts[0].value for t in state.tasks if t.interrupts)
+                final_answer = f"⏸️ **PAUSA DE SEGURIDAD**: {interrupt_payload}"
+
         except Exception as e:
             error_str = str(e)
             error_traceback = traceback.format_exc()
@@ -916,7 +922,7 @@ class SelfExtendingAgent:
                 print(f"[process_message] ⚠️ Límite de recursión alcanzado — el agente entró en bucle.")
                 # Intentar recuperar la última respuesta parcial antes del error
                 try:
-                    state = self.graph.get_state(config)
+                    state = await self.graph.aget_state(config)
                     for msg in reversed(state.values.get("messages", [])):
                         if msg.type == "ai" and getattr(msg, "content", ""):
                             if not (hasattr(msg, "tool_calls") and msg.tool_calls):
@@ -944,7 +950,7 @@ class SelfExtendingAgent:
         if getattr(self, "graph", None) and not final_answer.strip():
             # ÚLTIMO RECURSO: recuperar el último mensaje AI con contenido del estado global
             try:
-                state = self.graph.get_state(config)
+                state = await self.graph.aget_state(config)
                 for msg in reversed(state.values.get("messages", [])):
                     if msg.type == "ai" and getattr(msg, "content", ""):
                         if not (hasattr(msg, "tool_calls") and msg.tool_calls):
@@ -959,6 +965,65 @@ class SelfExtendingAgent:
 
         if return_usage:
             return final_answer, usage_record
+            
+        return final_answer
+
+    async def resume_thread(self, thread_id: str, decision: str):
+        """Reanuda la ejecución de un hilo interrumpido con la decisión del humano."""
+        if not self.graph:
+            return "Error: El agente no ha sido inicializado."
+            
+        print(f"\\n[HITL] Reanudando hilo {thread_id} con decisión: {decision}")
+        config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 50}
+        from langgraph.types import Command
+        
+        final_answer = ""
+        try:
+            async for output in self.graph.astream(Command(resume=decision), config=config, stream_mode="updates"):
+                for node_name, node_state in output.items():
+                    if "messages" in node_state:
+                        msgs_to_check = node_state["messages"] if isinstance(node_state["messages"], list) else [node_state["messages"]]
+                        latest_message = msgs_to_check[-1]
+                        
+                        worker_nodes = getattr(self, "_agent_names", ["dev", "assistant", "researcher"])
+                        if node_name in worker_nodes:
+                            if hasattr(latest_message, "tool_calls") and latest_message.tool_calls:
+                                pass
+                            else:
+                                content = latest_message.content
+                                if isinstance(content, list):
+                                    text_parts = [c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text"]
+                                    text = "".join(text_parts).strip()
+                                    if text: final_answer = text
+                                else:
+                                    if content: final_answer = content
+                        elif node_name == "supervisor":
+                            if hasattr(latest_message, "tool_calls") and latest_message.tool_calls:
+                                for tc in latest_message.tool_calls:
+                                    if tc.get("name") == "route" and tc.get("args", {}).get("next_node") == "FINISH":
+                                        resp = tc.get("args", {}).get("respuesta_conversacional", "")
+                                        if resp: final_answer = resp
+                            else:
+                                content = latest_message.content
+                                if isinstance(content, list):
+                                    text_parts = [c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text"]
+                                    text = "".join(text_parts).strip()
+                                    if text: final_answer = text
+                                elif content:
+                                    final_answer = content
+                                    
+            state = await self.graph.aget_state(config)
+            if state.tasks and any(t.interrupts for t in state.tasks):
+                interrupt_payload = next(t.interrupts[0].value for t in state.tasks if t.interrupts)
+                final_answer = f"⏸️ **PAUSA DE SEGURIDAD**: {interrupt_payload}"
+
+            if not final_answer:
+                final_answer = "Completado tras reanudación."
+                
+        except Exception as e:
+            error_traceback = traceback.format_exc()
+            print(f"\\n[Resume CRITICAL] {e}\\n{error_traceback}")
+            final_answer = f"Error técnico al reanudar: {str(e)[:200]}"
             
         return final_answer
 
@@ -993,16 +1058,21 @@ class SelfExtendingAgent:
         
         # Capturamos la longitud inicial para no resucitar mensajes antiguos en el fallback
         initial_msg_len = 0
+        is_paused = False
         if self.graph:
             try:
-                initial_state = self.graph.get_state(config)
+                initial_state = await self.graph.aget_state(config)
                 initial_msg_len = len(initial_state.values.get("messages", []))
+                is_paused = initial_state.tasks and any(t.interrupts for t in initial_state.tasks)
             except Exception:
                 pass
 
         try:
+            from langgraph.types import Command
+            input_cmd = Command(resume=user_input) if is_paused else {"messages": [HumanMessage(content=user_input)]}
+            
             async for event in self.graph.astream_events(
-                {"messages": [HumanMessage(content=user_input)]},
+                input_cmd,
                 config=config,
                 version="v2"
             ):
@@ -1152,7 +1222,7 @@ class SelfExtendingAgent:
         if self.graph and not final_text.strip():
             # ÚLTIMO RECURSO: recuperar el último mensaje AI válido GENERADO EN ESTE TURNO
             try:
-                state = self.graph.get_state(config)
+                state = await self.graph.aget_state(config)
                 all_msgs = state.values.get("messages", [])
                 # Solo filtramos los mensajes que se agregaron en este ciclo (evita revivir historial antiguo)
                 new_msgs = all_msgs[initial_msg_len:] if len(all_msgs) > initial_msg_len else []
@@ -1172,6 +1242,16 @@ class SelfExtendingAgent:
         if not final_text.strip():
             final_text = "El agente ha procesado la solicitud pero no ha devuelto un mensaje textual. Por favor provee más detalles."
             
+        # Detectar si el grafo se detuvo por un Human-In-The-Loop (HITL)
+        try:
+            state = await self.graph.aget_state(config)
+            if state.tasks and any(t.interrupts for t in state.tasks):
+                interrupt_payload = next(t.interrupts[0].value for t in state.tasks if t.interrupts)
+                yield {"type": "interrupt", "content": interrupt_payload, "thread_id": thread_id}
+                return
+        except Exception as ex:
+            print(f"[stream_message] Error checkeando estado de interrupción: {ex}")
+
         content_to_send = "" if has_streamed_tokens else final_text
         yield {"type": "done", "content": content_to_send, "usage": total_usage}
 

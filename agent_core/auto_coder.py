@@ -32,14 +32,21 @@ def _extract_text_from_response(response) -> str:
 @tool
 def crear_y_ejecutar_herramienta_local(descripcion_tarea: str, argumentos_de_prueba: str = "") -> str:
     """
-    Usa esta herramienta como último recurso (fallback) cuando el usuario pida hacer algo 
-    para lo cual no tienes una herramienta MCP disponible.
-    Generará código Python para resolver la tarea, lo guardará en memoria y lo ejecutará.
+    SOLO DEBE USARSE COMO ÚLTIMO RECURSO si no existen otras herramientas.
+    Escribe dinámicamente un script en python 3.11, lo guarda y lo ejecuta en un Sandbox de E2B.
     Args:
-        descripcion_tarea: Una descripción genérica de la herramienta a crear.
-        argumentos_de_prueba: Texto con los argumentos a usar en la validación (ej. "España").
+        descripcion_tarea: Detalle completo de lo que debe hacer la herramienta (el prompt para el sub-agente).
+        argumentos_de_prueba: Argumentos requeridos en formato string. Si es más de uno usa formato JSON, ej: '{"url": "...", "limite": 5}'.
     """
-    print(f"\\n[AutoCoder] Intentando crear herramienta para: {descripcion_tarea} con test-args: '{argumentos_de_prueba}'")
+    # HITL AUTOMÁTICO - Forzar aprobación antes de ejecutar código dinámico en el sandbox
+    # Ya que podría contener payloads destructivos
+    from langgraph.types import interrupt
+    print(f"[HITL] Pausando ejecución para evaluar creación de herramienta dinámica: {descripcion_tarea}")
+    respuesta_hitl = interrupt(f"Deseo crear y ejecutar dinámicamente un código no auditado para la siguiente tarea: {descripcion_tarea}")
+    if str(respuesta_hitl).strip().lower() != "aprobado":
+        return f"❌ Ejecución de código dinámico denegada por el administrador. Motivo/Decisión: {respuesta_hitl}"
+
+    print(f"\n[AutoCoder] Intentando crear herramienta para: {descripcion_tarea} con test-args: '{argumentos_de_prueba}'")
     
     try:
         model_name = os.environ.get("MODEL_AUTOCODER", "gemini-3.1-pro-preview")
@@ -308,9 +315,41 @@ def escribir_archivo_en_proyecto(ruta_relativa: str, contenido: str) -> str:
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         full_path = os.path.join(project_root, ruta_relativa)
         
-        # Creamos los directorios intermedios si no existen
+        # SI ES UN SCRIPT PYTHON, LO PASAMOS POR LA CUARENTENA Y EL SANDBOX
+        if ruta_relativa.endswith(".py"):
+            quarantine_dir = os.path.join(project_root, "quarantine")
+            os.makedirs(quarantine_dir, exist_ok=True)
+            quarantine_path = os.path.join(quarantine_dir, os.path.basename(ruta_relativa))
+            
+            with open(quarantine_path, "w", encoding="utf-8") as f:
+                f.write(contenido)
+                
+            print(f"[AutoCoder] Archivo Python en Cuarentena: {quarantine_path}")
+            
+            # Ejecutar Sandbox Validator
+            try:
+                from agent_core.sandbox_validator import validate_code_in_sandbox
+                is_sub_agent = "sub_agents" in ruta_check
+                success, reason = validate_code_in_sandbox(quarantine_path, is_sub_agent=is_sub_agent)
+                
+                if not success:
+                    os.remove(quarantine_path)
+                    return f"❌ Sandbox Bloqueó la Operación: {reason}\\nCorrige el código y asegúrate de no usar llamadas de red o librerías del sistema no permitidas."
+                    
+            except Exception as e:
+                if os.path.exists(quarantine_path):
+                    os.remove(quarantine_path)
+                return f"❌ Error interno en el Sandbox Validator: {str(e)}"
+                
+            # Si pasó el sandbox, movemos el archivo a su destino real
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+            import shutil
+            shutil.move(quarantine_path, full_path)
+            print(f"[AutoCoder] Archivo validado y promovido exitosamente a: {full_path}")
+            return f"✅ Archivo '{ruta_relativa}' creado/actualizado correctamente (¡Aprobado por el Sandbox de Seguridad!)."
+
+        # Archivos No-Python (txt, md, json, etc) van directo
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
-        
         with open(full_path, "w", encoding="utf-8") as f:
             f.write(contenido)
         
@@ -318,6 +357,22 @@ def escribir_archivo_en_proyecto(ruta_relativa: str, contenido: str) -> str:
         return f"✅ Archivo '{ruta_relativa}' creado/actualizado correctamente en el proyecto."
     except Exception as e:
         return f"❌ Error al escribir el archivo '{ruta_relativa}': {str(e)}"
+
+@tool
+def solicitar_aprobacion_humana(descripcion_accion: str) -> str:
+    """
+    IMPORTANTE: Úsalo ANTES de ejecutar acciones peligrosas o destructivas 
+    (borrar archivos, enviar emails a terceros, hacer commits a ramas main, etc.).
+    Pausa la ejecución y solicita permiso al administrador por Telegram/UI.
+    
+    Args:
+        descripcion_accion: Qué estás a punto de hacer y por qué (ej. "Voy a borrar /tmp/file").
+    """
+    from langgraph.types import interrupt
+    print(f"[HITL] Pausando ejecución para solicitar aprobación: {descripcion_accion}")
+    respuesta = interrupt(descripcion_accion)
+    print(f"[HITL] Ejecución reanudada. Decisión: {respuesta}")
+    return f"Decisión del humano: {respuesta}"
 
 @tool
 def eliminar_archivo_en_proyecto(ruta_relativa: str) -> str:
@@ -329,16 +384,24 @@ def eliminar_archivo_en_proyecto(ruta_relativa: str) -> str:
     Args:
         ruta_relativa: Ruta relativa del archivo a eliminar.
     """
-    try:
-        import shutil
-        
-        # Validación de seguridad: no permitir eliminar subagentes base del sistema
-        agentes_protegidos = ["file_reader", "dev", "assistant", "supervisor"]
-        ruta_check = ruta_relativa.lower().replace("\\\\", "/")
-        for pa in agentes_protegidos:
-            if f"sub_agents/{pa}" in ruta_check or f"{pa}_agent.py" in ruta_check:
-                return f"❌ Permiso denegado: '{pa}' es un subagente protegido del sistema central y no tienes permiso para eliminarlo."
+    import shutil
+    import os
+    
+    # Validación de seguridad: no permitir eliminar subagentes base del sistema
+    agentes_protegidos = ["file_reader", "dev", "assistant", "supervisor"]
+    ruta_check = ruta_relativa.lower().replace("\\", "/")
+    for pa in agentes_protegidos:
+        if f"sub_agents/{pa}" in ruta_check or f"{pa}_agent.py" in ruta_check:
+            return f"❌ Permiso denegado: '{pa}' es un subagente protegido del sistema central y no tienes permiso para eliminarlo."
 
+    # HITL AUTOMÁTICO - Forzar aprobación antes de borrar (FUERA del try-except)
+    from langgraph.types import interrupt
+    print(f"[HITL] Pausando ejecución para solicitar aprobación de eliminación: {ruta_relativa}")
+    respuesta_hitl = interrupt(f"Deseo eliminar permanentemente: {ruta_relativa}")
+    if str(respuesta_hitl).strip().lower() != "aprobado":
+        return f"❌ Acción denegada por el administrador. Motivo/Decisión: {respuesta_hitl}"
+
+    try:
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         full_path = os.path.join(project_root, ruta_relativa)
         

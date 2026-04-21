@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { SetupService } from './services/setup.service';
+import { ChatService } from './services/chat.service';
 import { ToastComponent } from './shared/components/toast/toast';
 import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confirm-dialog';
 
@@ -15,6 +16,9 @@ export class App {
   userName = 'Admin';
   userInitials = 'AD';
   isDarkMode = false;
+  
+  private chatService = inject(ChatService);
+  hasPendingApproval = computed(() => this.chatService.messages().some(m => m.requiresApproval));
 
   constructor(private setupService: SetupService, private router: Router) {
     const user = localStorage.getItem('leygo_user');

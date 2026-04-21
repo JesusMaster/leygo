@@ -250,6 +250,25 @@ async def handle_message_background(chat_id: int, text: str):
             except Exception:
                 pass
         
+        # Detectar si el agente pidió aprobación humana (HITL)
+        if isinstance(respuesta, str) and respuesta.startswith("⏸️ **PAUSA DE SEGURIDAD**:"):
+            from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+            desc = respuesta.replace("⏸️ **PAUSA DE SEGURIDAD**: ", "").strip()
+            
+            keyboard = [
+                [InlineKeyboardButton("✅ Autorizar Ejecución", callback_data="apr_yes")],
+                [InlineKeyboardButton("❌ Rechazar y Cancelar", callback_data="apr_no")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await current_bot.send_message(
+                chat_id=chat_id, 
+                text=f"⚠️ **Aprobación de Seguridad Requerida**\\n\\nEl agente necesita tu autorización para proceder con la siguiente acción:\\n\\n_{desc}_",
+                reply_markup=reply_markup,
+                parse_mode="Markdown"
+            )
+            return
+
         # Parsear la respuesta final y enviar usando HTML mode
         html_response = format_telegram_html(respuesta)
         
@@ -263,6 +282,31 @@ async def handle_message_background(chat_id: int, text: str):
     except Exception as e:
         print(f"Error en el procesamiento del agente: {e}")
         await current_bot.send_message(chat_id=chat_id, text=f"Ups, ocurrió un error interno: {e}")
+
+async def resume_graph_background(chat_id: int, decision: str):
+    """Reanuda el grafo en background tras el click en Telegram."""
+    current_bot = get_bot()
+    if not current_bot: return
+    
+    try:
+        status_msg = await current_bot.send_message(chat_id=chat_id, text=f"⏳ Procesando tu decisión: {decision}...")
+        
+        # Reanudar usando el agent
+        respuesta = await agent.resume_thread(str(chat_id), decision)
+        
+        try:
+            await current_bot.delete_message(chat_id=chat_id, message_id=status_msg.message_id)
+        except: pass
+        
+        html_response = format_telegram_html(respuesta)
+        try:
+            from telegram.constants import ParseMode
+            await current_bot.send_message(chat_id=chat_id, text=html_response, parse_mode=ParseMode.HTML)
+        except Exception:
+            await current_bot.send_message(chat_id=chat_id, text=respuesta)
+    except Exception as e:
+        print(f"Error al reanudar: {e}")
+        await current_bot.send_message(chat_id=chat_id, text=f"Error interno al reanudar: {e}")
 
 @app.post("/webhook")
 async def process_update(request: Request):
@@ -326,6 +370,28 @@ async def process_update(request: Request):
             if chat_id and text_to_process:
                 # Lanzar tarea concurrente para responder antes de los 10 segundos de Timeout de Telegram
                 asyncio.create_task(handle_message_background(chat_id, text_to_process))
+                
+        elif update.callback_query:
+            chat_id = update.callback_query.message.chat_id
+            data = update.callback_query.data
+            await current_bot.answer_callback_query(update.callback_query.id)
+            
+            if data in ("apr_yes", "apr_no"):
+                decision = "Aprobado" if data == "apr_yes" else "Rechazado"
+                
+                # Edit message to remove buttons and show decision
+                original_text = update.callback_query.message.text
+                try:
+                    await current_bot.edit_message_text(
+                        chat_id=chat_id, 
+                        message_id=update.callback_query.message.message_id,
+                        text=f"{original_text}\\n\\n👉 Decisión humana: **{decision}**",
+                        parse_mode="Markdown"
+                    )
+                except Exception: pass
+                
+                # Resume graph
+                asyncio.create_task(resume_graph_background(chat_id, decision))
                 
     except Exception as e:
         print(f"Error procesando el payload del webhook: {e}")

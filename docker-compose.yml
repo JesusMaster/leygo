@@ -7,6 +7,7 @@ services:
       - agent_core/.env
     volumes:
       - ./agent_core:/app/agent_core
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8443:8000"
     command: python agent_core/telegram_bot.py
