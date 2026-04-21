@@ -940,9 +940,30 @@ async def handle_dynamic_webhook(webhook_id: str, request: Request):
         return JSONResponse(status_code=422, content={"status": "paused", "message": "Este webhook está en pausa."})
         
     try:
-        # Intentar obtener payload JSON, si falla obtener texto crudo
+        # Intentar obtener payload JSON
         try:
-            payload = await request.json()
+            content_type = request.headers.get("content-type", "").lower()
+            if "application/x-www-form-urlencoded" in content_type:
+                form_data = await request.form()
+                payload = {}
+                
+                # Decodificador Universal: Iterar sobre cada llave del formulario
+                for key, value in form_data.items():
+                    try:
+                        # Si el string está URL-encoded, request.form() ya lo decodificó.
+                        # Ahora intentamos ver si el texto decodificado es un JSON válido.
+                        payload[key] = json.loads(value)
+                    except Exception:
+                        # Si no es un JSON, lo dejamos como texto normal
+                        payload[key] = value
+                
+                # Desempaquetado inteligente: Si la plataforma mandó todo envuelto en 
+                # una única llave llamada "payload" o "data" (como hace GitHub o Slack)
+                if len(payload) == 1 and list(payload.keys())[0] in ["payload", "data"]:
+                    payload = payload[list(payload.keys())[0]]
+                    
+            else:
+                payload = await request.json()
         except Exception:
             try:
                 payload_bytes = await request.body()
