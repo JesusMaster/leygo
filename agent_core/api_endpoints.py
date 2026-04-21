@@ -962,13 +962,48 @@ async def handle_dynamic_webhook(webhook_id: str, request: Request):
         }
         headers_str = json.dumps(headers_info, indent=2, ensure_ascii=False) if headers_info else "No disponibles"
 
+        payload_str = json.dumps(payload, indent=2, ensure_ascii=False) if isinstance(payload, dict) else str(payload)
+        
+        # Filtro de Embudo Dinámico (Opción C) para ahorrar tokens masivos
+        modelo_buscado = wh.get("modelo")
+        if modelo_buscado and modelo_buscado.strip() and len(payload_str) > 2000:
+            try:
+                from agent_core.main import get_llm_instance
+                from langchain_core.messages import HumanMessage
+                clean_model = modelo_buscado.replace(" (ollama)", "").strip()
+                llm = get_llm_instance(clean_model, temperature=0.1, max_tokens=2000)
+                
+                filtro_prompt = (
+                    "Eres un analizador de pre-procesamiento rápido para webhooks de alto volumen.\n"
+                    "El payload que recibirás es excesivamente grande y tu trabajo es extraer SOLAMENTE la "
+                    "información crítica para convertirlo en un resumen denso y estructurado, reduciendo el ruido.\n\n"
+                    "REGLAS:\n"
+                    "1. Identifica el contexto/plataforma (GitHub, Jira, Stripe, Slack, CRM, etc.) por la estructura de los datos.\n"
+                    "2. Extrae la 'ACCIÓN PRINCIPAL' que gatilló el webhook (ej. pago exitoso, nuevo issue, cambios en código).\n"
+                    "3. Lista a los 'ACTORES' (usuarios, clientes, correos) y los datos vitales impactados (montos, IDs clave, lista de archivos, estados).\n"
+                    "4. ELIMINA y DESCARTA por completo basura de APIs: URLs inútiles (api.github, avatares, endpoints), firmas (signatures), timestamps redundantes.\n"
+                    "Entrega el resumen final de forma clara.\n\n"
+                    f"PAYLOAD BRUTO:\n```json\n{payload_str[:60000]}\n```"
+                )
+                print(f"[Webhook] Activando filtro embudo con modelo '{clean_model}' (Bruto: {len(payload_str)} caracteres)")
+                
+                # Ejecución directa one-shot con el modelo elegido en base de datos
+                res = llm.invoke([HumanMessage(content=filtro_prompt)])
+                filtro_content = getattr(res, "content", "")
+                
+                if filtro_content:
+                    payload_str = f"[PAYLOAD FILTRADO POR EMBUDO ({clean_model})]:\n{filtro_content}"
+                    print(f"[Webhook] Embudo completado. Nuevo tamaño: {len(payload_str)} caracteres.")
+            except Exception as e:
+                print(f"[Webhook] Error ejecutando embudo de pre-procesamiento: {e}")
+
         prompt = (
             f"Has recibido un payload en el webhook configurado como '{wh.get('titulo')}'. "
             f"INSTRUCCIONES DE SISTEMA: {wh.get('descripcion')}\n\n"
             f"ESTOS SON TUS SUB-AGENTES DISPONIBLES (Puedes delegarles tareas nombrandolos):\n"
             f"{request.app.state.agent._agent_names if hasattr(request.app.state.agent, '_agent_names') else 'No hay agentes'}\n\n"
             f"HEADERS HTTP DE LA PETICIÓN:\n```json\n{headers_str}\n```\n\n"
-            f"PAYLOAD RECIBIDO:\n```json\n{json.dumps(payload, indent=2, ensure_ascii=False) if isinstance(payload, dict) else payload}\n```\n\n"
+            f"PAYLOAD RECIBIDO:\n{payload_str}\n\n"
             f"REGLA DE ORQUESTACIÓN: Si las INSTRUCCIONES demandan hacer varias cosas (ej: analizar código Y buscar en sonarqube o utilizar un subagente), aségurate de delegar la tarea a cada agente especialista secuencialmente antes de dar la respuesta FINAL.\n"
             f"REGLA CRUCIAL: Tu respuesta final en texto será reenviada AUTOMÁTICAMENTE por Telegram al usuario. "
             f"Por favor, NO ASUMAS que debes usar herramientas como `crear_recordatorio` para notificarlo. Limítate a cumplir las instrucciones y entregar el texto final, sabiendo que el sistema se encargará de despacharlo de inmediato a su Telegram."
