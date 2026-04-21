@@ -280,9 +280,26 @@ def escribir_archivo_en_proyecto(ruta_relativa: str, contenido: str) -> str:
         contenido: Contenido completo del archivo a escribir.
     """
     try:
-        # Validación de seguridad: no permitir sobreescribir subagentes base del sistema
-        agentes_protegidos = ["file_reader", "dev", "assistant", "supervisor"]
+        # Validación de seguridad RIGUROSA: Sandbox y protección de archivos core
         ruta_check = ruta_relativa.lower().replace("\\\\", "/")
+        
+        # 1. Prevenir Directory Traversal
+        if ".." in ruta_check or ruta_check.startswith("/"):
+            return "❌ Permiso denegado: Intento de Directory Traversal detectado. Solo puedes escribir dentro del proyecto."
+            
+        # 2. Proteger archivos Core del sistema (Evita que el agente se hackee a sí mismo)
+        core_files = [
+            "agent_core/main.py", "agent_core/api_endpoints.py", 
+            "agent_core/telegram_bot.py", "agent_core/auto_coder.py", 
+            "agent_core/mcp_client.py", "agent_core/setup_manager.py",
+            "agent_core/webhooks_manager.py"
+        ]
+        for cf in core_files:
+            if ruta_check.endswith(cf):
+                return f"❌ Permiso denegado (HITL): No tienes autorización para modificar archivos del Core del sistema ({cf})."
+                
+        # 3. Proteger subagentes base
+        agentes_protegidos = ["file_reader", "dev", "assistant", "supervisor"]
         for pa in agentes_protegidos:
             if f"sub_agents/{pa}" in ruta_check or f"{pa}_agent.py" in ruta_check:
                 return f"❌ Permiso denegado: '{pa}' es un subagente protegido del sistema central y no tienes permiso para modificarlo/sobrescribirlo."

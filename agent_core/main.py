@@ -28,6 +28,14 @@ from langgraph.graph import END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import MemorySaver
+import sqlite3
+import os
+try:
+    from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+    import aiosqlite
+except ImportError:
+    AsyncSqliteSaver = None
+    aiosqlite = None
 
 # Local modules
 import status_bus
@@ -120,9 +128,12 @@ def get_fallback_local_tools() -> list:
         crear_y_ejecutar_herramienta_local, usar_herramienta_local, escribir_archivo_en_proyecto, eliminar_archivo_en_proyecto, instalar_dependencia_python, memory_utils.administrar_memoria_episodica, memory_utils.administrar_memoria_procedimental, buscar_en_internet, crear_recordatorio_solo_texto_para_usuario, agendar_accion_autonoma_agente, listar_tareas_programadas, crear_rutina_texto_periodica_para_usuario, agendar_rutina_autonoma_agente, eliminar_tarea_programada, leer_correos_recientes, modificar_etiquetas_correo, enviar_correo, leer_hilo_correo, listar_eventos_calendario, responder_evento_calendario, crear_evento_calendario, comprobar_disponibilidad_calendario, leer_hoja_calculo, escribir_hoja_calculo, listar_espacios_chat, leer_mensajes_chat, enviar_mensaje_chat, buscar_chat_directo, leer_google_doc, buscar_archivos_drive, crear_google_doc
     ]
 
+import operator
+
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
     next_node: str
+    visited_nodes: Annotated[list[str], operator.add]
 
 def discover_sub_agents() -> List[BaseSubAgent]:
     """Descubre y devuelve instancias de todos los sub-agentes en la carpeta sub_agents/.
@@ -318,11 +329,12 @@ MEMORIA EPISÓDICA RELACIONADA CON TU IDENTIDAD/PREFERENCIAS:
 Tu trabajo es analizar la petición del usuario, leer SIEMPRE TODO EL HISTORIAL para revisar si alguno de tus sub-agentes acaba de completar una parte del trabajo, y DELEGAR el resto usando la herramienta 'Route'.
 {agent_rules}
 REGLAS ESTRICTAS PARA EVITAR BUCLES Y ORQUESTAR BIEN:
-1. DELEGACIÓN INICIAL: Delega tareas al sub-agente correcto según sus herramientas. Si la consulta es un saludo o tarea simple, un solo agente es suficiente.
-2. TAREA ÚNICA O SIMPLE: Si la consulta no requiere múltiples pasos, y el agente acaba de proponer su respuesta o saludar, usa INMEDIATAMENTE `next_node`='FINISH' incorporando su texto. ¡No le devuelvas la palabra al agente!
-3. ORQUESTACIÓN MULTI-AGENTE: Solo si el usuario solicitó MÚLTIPLES pasos explícitos (ej. analizar repo Y buscar en SonarQube), debes delegar secuencialmente a cada uno.
-4. MANEJO DE FALLOS PARCIALES: Si estás en medio de un flujo multi-agente y un agente no pudo hacer su parte o precisa preguntar algo (ej. "falta project_key"), NO abortes las *otras* tareas pendientes. Continúa con los demás y, finalmente, recolecta todo en tu 'FINISH'.
-5. REGLA ANTI-BUCLES: Nunca delegues de manera consecutiva a un agente que acaba de terminar su turno o fallar, salvo que tengas nueva información técnica que proporcionarle. Si la cadena de expertos ya interactuó, finaliza con 'FINISH'.
+1. CONVERSACIÓN DIRECTA: Si el usuario envía un saludo, agradecimiento o hace una pregunta netamente conversacional sobre el historial de chat (ej: "¿De qué estábamos hablando?"), NO delegues a ningún agente. Usa INMEDIATAMENTE `next_node`='FINISH' y responde tú mismo usando `respuesta_conversacional`.
+2. DELEGACIÓN INICIAL: Si la petición requiere usar herramientas o conocimientos técnicos, delega al sub-agente correcto según su descripción.
+3. TAREA COMPLETA: Si el sub-agente ya usó sus herramientas y devolvió la información solicitada o propuso su respuesta, usa INMEDIATAMENTE `next_node`='FINISH' incorporando su texto para el usuario. ¡No le devuelvas la palabra al agente si ya terminó!
+4. ORQUESTACIÓN MULTI-AGENTE: Solo si el usuario solicitó MÚLTIPLES pasos explícitos que requieran distintos agentes, debes delegar secuencialmente a cada uno.
+5. MANEJO DE FALLOS PARCIALES: Si estás en medio de un flujo multi-agente y un agente no pudo hacer su parte, NO abortes las *otras* tareas pendientes. Continúa con los demás y, finalmente, recolecta todo en tu 'FINISH'.
+6. REGLA ANTI-BUCLES: Nunca delegues de manera consecutiva a un agente que acaba de terminar su turno o fallar, salvo que tengas nueva información técnica que proporcionarle. Si la cadena de expertos ya interactuó, finaliza con 'FINISH'.
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
@@ -383,10 +395,9 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES Y ORQUESTAR BIEN:
             if len(last_ai_agents) >= 10:
                 break
 
-        if len(last_ai_agents) >= 10 and len(set(last_ai_agents)) == 1:
-            repeated_agent = last_ai_agents[0]
-            print(f"[Supervisor LOOP GUARD] El agente '{repeated_agent}' fue delegado 10+ veces seguidas. Forzando END.")
-            status_bus.publish_status("⚠️ Bucle detectado — finalizando respuesta automáticamente")
+        if len(last_ai_agents) >= 12:
+            print(f"[Supervisor LOOP GUARD] Demasiadas redirecciones detectadas en este turno ({len(last_ai_agents)}). Previniendo bucle infinito (Ej: A->B->A->B o ciclos complejos). Forzando END.")
+            status_bus.publish_status("⚠️ Límite de rebotes detectado — forzando finalización por seguridad operativa")
             # Intentar rescatar la última respuesta del agente como respuesta final
             last_agent_response = ""
             for m in reversed(clean_messages):
@@ -397,7 +408,7 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES Y ORQUESTAR BIEN:
                     if raw and str(raw).strip():
                         last_agent_response = str(raw).strip()
                         break
-            fallback_msg = last_agent_response or "He completado el proceso. Por favor, revisa los resultados anteriores."
+            fallback_msg = last_agent_response or "He detenido la ejecución para evitar un bucle de costos. Por favor, revisa el progreso o dame una orden más específica."
             return {
                 "messages": [AIMessage(content=fallback_msg)],
                 "next_node": "END"
@@ -451,6 +462,27 @@ REGLAS ESTRICTAS PARA EVITAR BUCLES Y ORQUESTAR BIEN:
             return {"messages": [instruction_msg], "next_node": next_step}
             
         print("[Supervisor] Respondiendo directamente o asumiendo END sin herramienta.")
+        # Fallback: a veces el LLM (especialmente local o fallos en Gemini) vomita el JSON crudo en texto en vez de usar tool_calls
+        if isinstance(response.content, str):
+            content_str = response.content.strip()
+            if content_str.startswith("```json") and content_str.endswith("```"):
+                content_str = content_str[7:-3].strip()
+            if content_str.startswith("{") and content_str.endswith("}"):
+                import json
+                try:
+                    parsed = json.loads(content_str)
+                    if "next_node" in parsed:
+                        next_step = parsed["next_node"].lower()
+                        resp_conv = parsed.get("respuesta_conversacional", "").strip()
+                        if next_step in ("finish", "end", "done", "complete"):
+                            return {"messages": [AIMessage(content=resp_conv)], "next_node": "END"}
+                        else:
+                            inst = parsed.get("instruccion", "")
+                            msg = f"[Instrucción del Supervisor para {next_step}]: {inst}" if inst else f"[Instrucción del Supervisor para {next_step}]: Atiende la solicitud del usuario."
+                            return {"messages": [HumanMessage(content=msg, name="Supervisor")], "next_node": next_step}
+                except Exception:
+                    pass
+                    
         return {"messages": [response], "next_node": "END"}
 
 class WorkerNode:
@@ -561,7 +593,11 @@ class SelfExtendingAgent:
 
         # The graph and memory saver
         self.graph = None
-        self.memory_saver = MemorySaver()
+        
+        # Initializing persistent checkpointer state (real initialization in initialize())
+        os.makedirs("memoria/bds", exist_ok=True)
+        self.sqlite_conn = None
+        self.memory_saver = None
 
     async def initialize(self):
         """Asynchronously connect to MCP servers and build the graph."""
@@ -609,6 +645,19 @@ class SelfExtendingAgent:
             
         self._all_tools = tools  # Guardamos para hot-reload
         self._sub_agents_snapshot = self._get_sub_agents_snapshot()
+        
+        # Iniciar base de datos asíncrona para checkpointer
+        if AsyncSqliteSaver is not None and aiosqlite is not None:
+            if not self.sqlite_conn:
+                self.sqlite_conn = await aiosqlite.connect("memoria/bds/checkpoints.db")
+                self.memory_saver = AsyncSqliteSaver(self.sqlite_conn)
+                await self.memory_saver.setup()
+                print("=> Usando AsyncSqliteSaver persistente asíncrono para LangGraph.")
+        else:
+            if not self.memory_saver:
+                self.memory_saver = MemorySaver()
+                print("=> Warning: langgraph-checkpoint-sqlite o aiosqlite no instalado. Usando MemorySaver (No persistente).")
+                
         self.graph = self._build_graph(tools)
 
     def _get_sub_agents_snapshot(self) -> frozenset:
@@ -1129,6 +1178,11 @@ class SelfExtendingAgent:
     async def cleanup(self):
         """Cleanup connections."""
         await self.mcp_manager.close()
+        if hasattr(self, 'sqlite_conn') and self.sqlite_conn:
+            try:
+                await self.sqlite_conn.close()
+            except Exception:
+                pass
 
 async def async_main():
     print("Iniciando Self-Extending Agent (Fase 2)...")
