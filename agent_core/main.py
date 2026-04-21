@@ -318,11 +318,11 @@ MEMORIA EPISÓDICA RELACIONADA CON TU IDENTIDAD/PREFERENCIAS:
 Tu trabajo es analizar la petición del usuario, leer SIEMPRE TODO EL HISTORIAL para revisar si alguno de tus sub-agentes acaba de completar una parte del trabajo, y DELEGAR el resto usando la herramienta 'Route'.
 {agent_rules}
 REGLAS ESTRICTAS PARA EVITAR BUCLES Y ORQUESTAR BIEN:
-1. DELEGACIÓN INICIAL: Delega tareas al sub-agente correcto según sus herramientas.
-2. ORQUESTACIÓN MULTI-AGENTE: Si el usuario solicitó MÚLTIPLES tareas (e.g., analizar código en GitHub, revisar SonarQube, enviar un mensaje de chat), NO uses 'FINISH' si un solo agente terminó o falló. Revisa si hay tareas pendientes y DELEGA a los demás agentes de forma secuencial.
-3. CONSOLIDACIÓN AL FINAL: Una vez que TODOS los agentes requeridos hayan hecho su parte, usa `next_node`='FINISH' para entregar la respuesta consolidada en `respuesta_conversacional`.
-4. MANEJO DE FALLOS PARCIALES / PREGUNTAS: Si un agente falla, falta un parámetro (ej. "no encuentro la project_key") o hace una pregunta al usuario, **NO ABRUPTES EL FLUJO**. Pasa al siguiente agente para que termine las tareas restantes. Al final, en tu 'FINISH', asegura que la `respuesta_conversacional` incluya el trabajo exitoso de los que sí pudieron junto a la nota/pregunta de los que fallaron.
-5. NUNCA DELEGUES al mismo agente dos veces seguidas si ya reportó fallo o te devolvió el control con una pregunta.
+1. DELEGACIÓN INICIAL: Delega tareas al sub-agente correcto según sus herramientas. Si la consulta es un saludo o tarea simple, un solo agente es suficiente.
+2. TAREA ÚNICA O SIMPLE: Si la consulta no requiere múltiples pasos, y el agente acaba de proponer su respuesta o saludar, usa INMEDIATAMENTE `next_node`='FINISH' incorporando su texto. ¡No le devuelvas la palabra al agente!
+3. ORQUESTACIÓN MULTI-AGENTE: Solo si el usuario solicitó MÚLTIPLES pasos explícitos (ej. analizar repo Y buscar en SonarQube), debes delegar secuencialmente a cada uno.
+4. MANEJO DE FALLOS PARCIALES: Si estás en medio de un flujo multi-agente y un agente no pudo hacer su parte o precisa preguntar algo (ej. "falta project_key"), NO abortes las *otras* tareas pendientes. Continúa con los demás y, finalmente, recolecta todo en tu 'FINISH'.
+5. REGLA ANTI-BUCLES: Nunca delegues de manera consecutiva a un agente que acaba de terminar su turno o fallar, salvo que tengas nueva información técnica que proporcionarle. Si la cadena de expertos ya interactuó, finaliza con 'FINISH'.
 """)
         clean_messages = [m for m in messages if not isinstance(m, SystemMessage)]
         
