@@ -10,10 +10,25 @@ import time
 from dotenv import dotenv_values
 
 # ─── Deduplicación de Payloads (Anti Retry-Storm) ─────────────────────────────
-# Cache en memoria: {payload_hash: timestamp_de_primera_recepcion}
-# Si el mismo payload llega dentro de DEDUP_TTL_SECONDS, se descarta.
-_webhook_dedup_cache: dict[str, float] = {}
+# Usa SQLite (WAL mode) en lugar de un dict en RAM para que funcione correctamente
+# con múltiples workers de Uvicorn. El dict en RAM NO se comparte entre procesos.
+# SQLite WAL permite lecturas y escrituras concurrentes sin bloqueos.
+import sqlite3 as _sqlite3
 DEDUP_TTL_SECONDS = 300  # 5 minutos
+
+def _get_dedup_db_path() -> str:
+    base = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base, "memoria", "bds", "webhooks.db")
+
+def _ensure_dedup_table(conn: _sqlite3.Connection):
+    """Crea la tabla de deduplicación si no existe (lazy init)."""
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS webhook_dedup (
+            hash      TEXT PRIMARY KEY,
+            received_at REAL NOT NULL
+        )
+    """)
+    conn.commit()
 
 def _get_payload_hash(webhook_id: str, payload) -> str:
     """Genera un hash único para un payload específico de un webhook."""
@@ -21,22 +36,46 @@ def _get_payload_hash(webhook_id: str, payload) -> str:
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 def _is_duplicate_payload(webhook_id: str, payload) -> bool:
-    """Retorna True si este payload ya fue procesado recientemente. Limpia entradas viejas."""
+    """
+    Retorna True si este payload ya fue procesado recientemente.
+    Usa SQLite con WAL → seguro ante múltiples workers de Uvicorn.
+    INSERT OR IGNORE es atómico: solo un worker registra el hash primero.
+    """
     now = time.time()
-    # Limpiar entradas expiradas
-    expired = [k for k, ts in _webhook_dedup_cache.items() if now - ts > DEDUP_TTL_SECONDS]
-    for k in expired:
-        del _webhook_dedup_cache[k]
-    
     h = _get_payload_hash(webhook_id, payload)
-    if h in _webhook_dedup_cache:
-        age = now - _webhook_dedup_cache[h]
-        print(f"[Webhook DEDUP] Payload duplicado ignorado (hash={h}, age={age:.1f}s)")
-        return True
-    
-    _webhook_dedup_cache[h] = now
-    return False
+    cutoff = now - DEDUP_TTL_SECONDS
+
+    try:
+        conn = _sqlite3.connect(_get_dedup_db_path(), timeout=5)
+        conn.execute("PRAGMA journal_mode=WAL")
+        _ensure_dedup_table(conn)
+
+        # Limpiar entradas expiradas (mantenimiento barato)
+        conn.execute("DELETE FROM webhook_dedup WHERE received_at < ?", (cutoff,))
+
+        # INSERT OR IGNORE: si el hash ya existe → no hace nada (es duplicado)
+        # Si no existe → lo inserta (primera vez que vemos este payload)
+        conn.execute(
+            "INSERT OR IGNORE INTO webhook_dedup (hash, received_at) VALUES (?, ?)",
+            (h, now)
+        )
+        inserted = conn.total_changes > 0
+        conn.commit()
+        conn.close()
+
+        if not inserted:
+            age = now - cutoff  # al menos 0, no tenemos el ts original aquí
+            print(f"[Webhook DEDUP] Payload duplicado ignorado (hash={h}) → descartando")
+            return True
+
+        return False
+
+    except Exception as e:
+        # Si falla SQLite (raro), dejar pasar el payload — mejor duplicado que bloqueado
+        print(f"[Webhook DEDUP] Error en SQLite dedup, permitiendo payload: {e}")
+        return False
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 # Añadir el path para importar el agente
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
