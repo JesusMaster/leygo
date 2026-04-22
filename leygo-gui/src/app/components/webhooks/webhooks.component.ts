@@ -218,7 +218,9 @@ export class WebhooksComponent implements OnInit {
       for (const item of (ollama?.models ?? [])) {
         const m: any = item;
         const name = typeof m === 'string' ? m : m.name;
-        all.push({ value: name, label: name, provider: 'ollama' });
+        // Prefijo ollama/ para que coincida con el valor guardado en BD
+        const value = name.startsWith('ollama/') ? name : `ollama/${name}`;
+        all.push({ value, label: name, provider: 'ollama' });
       }
 
       this.availableModels.set([
