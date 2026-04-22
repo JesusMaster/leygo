@@ -222,7 +222,7 @@ export class WebhooksComponent implements OnInit {
       }
 
       this.availableModels.set([
-        { value: 'gemini-2.0-flash', label: 'Default System (Gemini Flash)', provider: 'default' },
+        { value: 'gemini-2.5-flash-lite', label: 'Default System (Gemini Flash Lite)', provider: 'default' },
         ...all
       ]);
       this.modelsLoading.set(false);
@@ -235,7 +235,7 @@ export class WebhooksComponent implements OnInit {
     this.formData.set({
       titulo: '',
       descripcion: '',
-      modelo: 'gemini-2.0-flash'
+      modelo: 'gemini-2.5-flash-lite'
     });
     this.showModal.set(true);
   }
@@ -246,7 +246,7 @@ export class WebhooksComponent implements OnInit {
     this.formData.set({
       titulo: webhook.titulo,
       descripcion: webhook.descripcion,
-      modelo: webhook.modelo || 'gemini-2.0-flash'
+      modelo: webhook.modelo || 'gemini-2.5-flash-lite'
     });
     this.showModal.set(true);
   }

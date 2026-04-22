@@ -4,7 +4,39 @@ from pydantic import BaseModel
 import os
 import sys
 import asyncio
+import json
+import hashlib
+import time
 from dotenv import dotenv_values
+
+# ─── Deduplicación de Payloads (Anti Retry-Storm) ─────────────────────────────
+# Cache en memoria: {payload_hash: timestamp_de_primera_recepcion}
+# Si el mismo payload llega dentro de DEDUP_TTL_SECONDS, se descarta.
+_webhook_dedup_cache: dict[str, float] = {}
+DEDUP_TTL_SECONDS = 300  # 5 minutos
+
+def _get_payload_hash(webhook_id: str, payload) -> str:
+    """Genera un hash único para un payload específico de un webhook."""
+    raw = json.dumps({"wh": webhook_id, "payload": payload}, sort_keys=True, default=str)
+    return hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+def _is_duplicate_payload(webhook_id: str, payload) -> bool:
+    """Retorna True si este payload ya fue procesado recientemente. Limpia entradas viejas."""
+    now = time.time()
+    # Limpiar entradas expiradas
+    expired = [k for k, ts in _webhook_dedup_cache.items() if now - ts > DEDUP_TTL_SECONDS]
+    for k in expired:
+        del _webhook_dedup_cache[k]
+    
+    h = _get_payload_hash(webhook_id, payload)
+    if h in _webhook_dedup_cache:
+        age = now - _webhook_dedup_cache[h]
+        print(f"[Webhook DEDUP] Payload duplicado ignorado (hash={h}, age={age:.1f}s)")
+        return True
+    
+    _webhook_dedup_cache[h] = now
+    return False
+# ──────────────────────────────────────────────────────────────────────────────
 
 # Añadir el path para importar el agente
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -985,9 +1017,21 @@ async def handle_dynamic_webhook(webhook_id: str, request: Request):
 
         payload_str = json.dumps(payload, indent=2, ensure_ascii=False) if isinstance(payload, dict) else str(payload)
         
+        # ─── Anti Retry-Storm: descartar payloads duplicados ─────────────────
+        if _is_duplicate_payload(webhook_id, payload):
+            return JSONResponse(
+                status_code=200,
+                content={"status": "skipped", "message": "Payload duplicado ignorado (ya procesado recientemente)."}
+            )
+        # ─────────────────────────────────────────────────────────────────────
+
         # Filtro de Embudo Dinámico (Opción C) para ahorrar tokens masivos
-        modelo_buscado = wh.get("modelo")
-        if modelo_buscado and modelo_buscado.strip() and len(payload_str) > 2000:
+        modelo_buscado = wh.get("modelo") or "gemini-2.5-flash-lite"
+        # Reemplazar modelo antiguo si estaba hardcodeado
+        if modelo_buscado == "gemini-2.0-flash":
+            modelo_buscado = "gemini-2.5-flash-lite"
+            
+        if len(payload_str) > 2000:
             try:
                 from agent_core.main import get_llm_instance
                 from langchain_core.messages import HumanMessage
@@ -1008,8 +1052,8 @@ async def handle_dynamic_webhook(webhook_id: str, request: Request):
                 )
                 print(f"[Webhook] Activando filtro embudo con modelo '{clean_model}' (Bruto: {len(payload_str)} caracteres)")
                 
-                # Ejecución directa one-shot con el modelo elegido en base de datos
-                res = llm.invoke([HumanMessage(content=filtro_prompt)])
+                # Ejecución asíncrona one-shot con el modelo elegido en base de datos
+                res = await llm.ainvoke([HumanMessage(content=filtro_prompt)])
                 filtro_content = getattr(res, "content", "")
                 
                 if filtro_content:
@@ -1034,45 +1078,140 @@ async def handle_dynamic_webhook(webhook_id: str, request: Request):
         if agent:
             import asyncio
             import os
+            import uuid
             
+            async def _send_telegram(respuesta: str):
+                """Envía una respuesta al usuario vía Telegram con formato HTML."""
+                from telegram import Bot
+                from telegram.constants import ParseMode
+                import re
+                token = os.getenv("TELEGRAM_TOKEN")
+                chat_id = os.getenv("TELEGRAM_CHAT_ID")
+                if not (token and chat_id):
+                    return
+                bot = Bot(token=token)
+                text = respuesta.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
+                text = re.sub(r'(?<!\*)\*(?!\s)(?!\*)(.*?)(?<!\s)(?<!\*)\*(?!\*)', r'<i>\1</i>', text)
+                text = re.sub(r'```(.*?)```', r'<pre>\1</pre>', text, flags=re.DOTALL)
+                text = re.sub(r'`(.*?)`', r'<code>\1</code>', text)
+                try:
+                    await bot.send_message(chat_id=chat_id, text=text, parse_mode=ParseMode.HTML)
+                except Exception as e:
+                    print(f"[Webhook] Error HTML Telegram, fallback a texto plano: {e}")
+                    await bot.send_message(chat_id=chat_id, text=respuesta)
+
             async def process_and_notify():
                 try:
-                    respuesta = await agent.process_message(
-                        prompt, 
-                        thread_id=f"webhook_{webhook_id}"
+                    from agent_core.main import get_llm_instance
+                    from langchain_core.messages import HumanMessage
+
+                    clean_model = modelo_buscado.replace(" (ollama)", "").strip()
+                    instrucciones = wh.get("descripcion", "")
+                    agent_names = agent._agent_names if hasattr(agent, "_agent_names") else []
+
+                    # ── FASE 1: Clasificación + Intento de Respuesta Directa ──────────────
+                    # Usamos el modelo del webhook (barato) para determinar si la tarea es
+                    # simple (responde directamente) o compleja (escalar al pipeline completo).
+                    clasificador_prompt = (
+                        "Eres un clasificador y ejecutor rápido de tareas de webhook.\n"
+                        "Recibirás instrucciones del sistema y un payload procesado.\n\n"
+                        "PASO 1 — Clasifica la tarea:\n"
+                        "  - SIMPLE: Solo requiere generar texto, resumir, formatear o notificar "
+                        "basándose en el payload. NO necesita ejecutar código, leer archivos del "
+                        "sistema, llamar APIs externas, o coordinar sub-agentes.\n"
+                        "  - COMPLEJA: Requiere usar herramientas (shell, archivos, APIs), "
+                        f"delegar a sub-agentes ({', '.join(agent_names)}), o solicitar aprobación humana.\n\n"
+                        "PASO 2 — Si es SIMPLE: entrega la respuesta final completa directamente.\n"
+                        "          Si es COMPLEJA: responde SOLO con el token exacto: [[ESCALAR]]\n\n"
+                        f"INSTRUCCIONES DEL WEBHOOK:\n{instrucciones}\n\n"
+                        f"PAYLOAD:\n{payload_str}\n\n"
+                        "IMPORTANTE: Si es SIMPLE responde con el mensaje final para el usuario. "
+                        "Si es COMPLEJA responde ÚNICAMENTE con [[ESCALAR]] sin ningún otro texto."
                     )
-                    
+
+                    try:
+                        llm_clasificador = get_llm_instance(clean_model, temperature=0.1, max_tokens=2000)
+                        res_clasificacion = await llm_clasificador.ainvoke([HumanMessage(content=clasificador_prompt)])
+                        respuesta_clasificador = getattr(res_clasificacion, "content", "").strip()
+                        
+                        if isinstance(respuesta_clasificador, list):
+                            respuesta_clasificador = "".join(
+                                p.get("text", "") for p in respuesta_clasificador
+                                if isinstance(p, dict) and p.get("type") == "text"
+                            ).strip()
+
+                        print(f"[Webhook Smart Router] Modelo '{clean_model}' clasificó: "
+                              f"{'COMPLEJA → escalando' if '[[ESCALAR]]' in respuesta_clasificador else 'SIMPLE → respuesta directa'}")
+
+                        if "[[ESCALAR]]" not in respuesta_clasificador:
+                            # ── MODO SIMPLE: respuesta directa del modelo del webhook ──────
+                            print(f"[Webhook Smart Router] Respondiendo en MODO DIRECTO con '{clean_model}'.")
+                            
+                            # Registrar tokens del modo directo (normalmente queda fuera del tracker)
+                            try:
+                                from agent_core.utils.token_tracker import log_token_usage
+                                usage_meta = getattr(res_clasificacion, "usage_metadata", {}) or {}
+                                resp_meta = getattr(res_clasificacion, "response_metadata", {}) or {}
+                                i_toks = usage_meta.get("input_tokens", 0)
+                                o_toks = usage_meta.get("output_tokens", 0)
+                                mod_name = resp_meta.get("model_name") or resp_meta.get("model") or clean_model
+                                # Si el modelo del webhook era Ollama, asegurar prefijo para que
+                                # get_prices() lo detecte como gratuito ($0.00)
+                                is_ollama = (
+                                    modelo_buscado.startswith("ollama/")
+                                    or "(ollama)" in modelo_buscado.lower()
+                                    or clean_model.startswith("ollama/")
+                                )
+                                if is_ollama and not mod_name.startswith("ollama/"):
+                                    mod_name = f"ollama/{mod_name}"
+                                if i_toks > 0 or o_toks > 0:
+                                    log_token_usage(
+                                        user_input=f"[webhook-directo] {wh.get('titulo', '')[:80]}",
+                                        model=mod_name,
+                                        input_tokens=i_toks,
+                                        output_tokens=o_toks,
+                                        thread_id=f"webhook_{webhook_id}_direct"
+                                    )
+                            except Exception as te:
+                                print(f"[Webhook Smart Router] Error registrando tokens modo directo: {te}")
+                            
+                            log_webhook_execution(webhook_id, payload, respuesta_clasificador)
+                            await _send_telegram(respuesta_clasificador)
+                            return
+
+                    except Exception as e:
+                        print(f"[Webhook Smart Router] Error en clasificador: {e}. Escalando al pipeline completo.")
+
+                    # ── FASE 2: MODO COMPLEJO — Pipeline Completo (Supervisor + Agentes) ──
+                    print(f"[Webhook Smart Router] Escalando al pipeline completo (supervisor + agentes).")
+                    unique_thread_id = f"webhook_{webhook_id}_{uuid.uuid4().hex[:8]}"
+
+                    prompt_completo = (
+                        f"Has recibido un payload en el webhook configurado como '{wh.get('titulo')}'. "
+                        f"INSTRUCCIONES DE SISTEMA: {instrucciones}\n\n"
+                        f"ESTOS SON TUS SUB-AGENTES DISPONIBLES (Puedes delegarles tareas nombrandolos):\n"
+                        f"{agent_names}\n\n"
+                        f"HEADERS HTTP DE LA PETICIÓN:\n```json\n{headers_str}\n```\n\n"
+                        f"PAYLOAD RECIBIDO:\n{payload_str}\n\n"
+                        f"REGLA DE ORQUESTACIÓN: Si las INSTRUCCIONES demandan hacer varias cosas "
+                        f"(ej: analizar código Y buscar en sonarqube o utilizar un subagente), "
+                        f"asegúrate de delegar la tarea a cada agente especialista secuencialmente antes de dar la respuesta FINAL.\n"
+                        f"REGLA CRUCIAL: Tu respuesta final en texto será reenviada AUTOMÁTICAMENTE por Telegram al usuario. "
+                        f"NO uses herramientas como `crear_recordatorio` para notificarlo. "
+                        f"Limítate a cumplir las instrucciones y entregar el texto final."
+                    )
+
+                    respuesta = await agent.process_message(prompt_completo, thread_id=unique_thread_id)
+
                     if not respuesta:
                         return
-                        
-                    # Notify via Telegram
-                    from telegram import Bot
-                    from telegram.constants import ParseMode
-                    import re
-                    
-                    token = os.getenv("TELEGRAM_TOKEN")
-                    chat_id = os.getenv("TELEGRAM_CHAT_ID")
-                    
-                    if token and chat_id:
-                        bot = Bot(token=token)
-                        
-                        # Apply naive formatting mimicking telegram_bot.py
-                        text = respuesta.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-                        text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
-                        text = re.sub(r'(?<!\*)\*(?!\s)(?!\*)(.*?)(?<!\s)(?<!\*)\*(?!\*)', r'<i>\1</i>', text)
-                        text = re.sub(r'```(.*?)```', r'<pre>\1</pre>', text, flags=re.DOTALL)
-                        text = re.sub(r'`(.*?)`', r'<code>\1</code>', text)
-                        
-                        try:
-                            await bot.send_message(chat_id=chat_id, text=text, parse_mode=ParseMode.HTML)
-                            log_webhook_execution(webhook_id, payload, respuesta)
-                        except Exception as e:
-                            print(f"Error HTML telegram sender in webhook: {e}")
-                            await bot.send_message(chat_id=chat_id, text=respuesta)
-                            log_webhook_execution(webhook_id, payload, respuesta, error=f"HTML error: {e}")
-                            
+
+                    log_webhook_execution(webhook_id, payload, respuesta)
+                    await _send_telegram(respuesta)
+
                 except Exception as e:
-                    print(f"Error procesando webhook background task: {e}")
+                    print(f"[Webhook] Error procesando webhook background task: {e}")
                     log_webhook_execution(webhook_id, payload, "Fallo al procesar", error=str(e))
 
             # We run it in background to immediately return 202
