@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 import os
 import sys
 import asyncio
@@ -68,16 +68,51 @@ class TaskCreateRequest(BaseModel):
 class TaskUpdateRequest(BaseModel):
     message_or_prompt: str
 
+_CLOUD_MODEL_PREFIXES = (
+    "gemini", "gpt", "claude", "o1-", "o3-", "o4-", "text-", "dall-e",
+    "whisper", "tts-", "embedding", "deepseek-", "mistral-large",
+    "command-", "titan-"
+)
+
+def _normalize_modelo(value: str | None) -> str | None:
+    """
+    Normaliza el nombre del modelo: si tiene formato Ollama (nombre:tag)
+    y no es un modelo cloud conocido, añade el prefijo 'ollama/'.
+    """
+    if not value:
+        return value
+    v = value.strip()
+    # Ya tiene prefijo correcto
+    if v.startswith("ollama/"):
+        return v
+    # Quitar sufijo visual si lo tiene
+    clean = v.replace(" (ollama)", "").strip()
+    is_known_cloud = any(clean.lower().startswith(p) for p in _CLOUD_MODEL_PREFIXES)
+    # Si tiene formato tag (nombre:tag) y no es cloud → es Ollama
+    if not is_known_cloud and ":" in clean:
+        return f"ollama/{clean}"
+    return v
+
 class WebhookCreateRequest(BaseModel):
     titulo: str
     descripcion: str
     modelo: str
+
+    @field_validator("modelo", mode="before")
+    @classmethod
+    def normalize_modelo(cls, v):
+        return _normalize_modelo(v)
 
 class WebhookUpdateRequest(BaseModel):
     titulo: str = None
     descripcion: str = None
     modelo: str = None
     paused: bool = None
+
+    @field_validator("modelo", mode="before")
+    @classmethod
+    def normalize_modelo(cls, v):
+        return _normalize_modelo(v)
 
 @router.get("/agents")
 async def get_agents(request: Request):

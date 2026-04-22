@@ -100,9 +100,9 @@ def get_prices(model_id: str) -> tuple[float, float]:
             return float(in_cost_1k), float(out_cost_1k)
             
     # Fallback heurístico para modelos nuevos y desconocidos que no estén en JSON
-    if "claude-3-5-sonnet" in search_id or "claude-sonnet-4.6" in search_id:
+    if "claude-3-5-sonnet" in search_id or "claude-sonnet-4.6" in search_id or "claude-sonnet" in search_id:
         return 3.00, 15.00
-    if "claude-3-haiku" in search_id or "claude-haiku-4.5" in search_id:
+    if "claude-3-haiku" in search_id or "claude-haiku-4.5" in search_id or "claude-haiku" in search_id:
         return 1.00, 5.00
     if "gpt-4o-mini" in search_id or "gpt-5.4-mini" in search_id:
         return 0.15, 0.60
@@ -110,10 +110,25 @@ def get_prices(model_id: str) -> tuple[float, float]:
         return 2.50, 10.00
     if "gemini-2.5-flash" in search_id:
         return 0.15, 0.60
-    if "gemini-3" in search_id:
+    if "gemini-2.5-pro" in search_id or "gemini-3" in search_id:
         return 2.50, 10.00
+    if "gemini" in search_id:
+        return 0.15, 0.60
 
-    return 2.50, 10.00  # Default general
+    # ── Detección de modelos Ollama por formato ──────────────────────────────
+    # Los modelos cloud siempre tienen un prefijo conocido (gemini-, gpt-, claude-).
+    # Si el modelo tiene formato "nombre:tag" (ej: gemma4:latest, llama3:8b, mistral:7b)
+    # y NO tiene ninguno de esos prefijos, es un modelo local Ollama → $0.00.
+    CLOUD_PREFIXES = ("gemini", "gpt", "claude", "o1", "o3", "o4", "text-", "dall-e",
+                      "whisper", "tts-", "embedding", "deepseek", "mistral-large",
+                      "command", "titan")
+    is_known_cloud = any(search_id.startswith(p) for p in CLOUD_PREFIXES)
+    if not is_known_cloud:
+        # Formato Ollama: tiene ":" (tag) o es nombre sin espacios sin prefijo cloud
+        if ":" in search_id or not any(c in search_id for c in ["-", "."]):
+            return 0.0, 0.0
+
+    return 2.50, 10.00  # Default general solo para modelos cloud desconocidos
 
 
 # ─── Core: Log Usage ────────────────────────────────────────────────────────────
