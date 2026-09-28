@@ -12,6 +12,7 @@
 #   --todo         los tres
 #   --ninguno      ninguno en Docker (usa los tuyos o servicios en la nube)
 #   --dominio X    dominio para Caddy (por defecto :80, http://localhost sin TLS)
+#   --puerto N     puerto de la interfaz en tu computador (por defecto 80: http://localhost:N)
 #   --version X    versión de leygo a instalar (por defecto la última; queda en .env)
 #   --sin-build    no reconstruye ni descarga las imágenes
 #
@@ -20,10 +21,13 @@
 #
 # La selección queda en .env (COMPOSE_PROFILES): `./instalar.sh` sin opciones (o `docker compose up -d`)
 # vuelve a levantar lo mismo. Para cambiarla, córrelo con otras opciones.
+#
+# Varios leygo en el mismo computador: cada uno en su carpeta y con su puerto
+# (./instalar.sh --puerto 8080). Cada carpeta es un proyecto de Docker aparte, con sus datos.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-redis=0; qdrant=0; ollama=0; dominio=""; build=1; eligio=0; version=""
+redis=0; qdrant=0; ollama=0; dominio=""; build=1; eligio=0; version=""; puerto=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --redis) redis=1; eligio=1 ;;
@@ -34,9 +38,11 @@ while [ $# -gt 0 ]; do
     --dominio) shift; dominio="${1:-}" ;;
     --dominio=*) dominio="${1#*=}" ;;
     --sin-build) build=0 ;;
+    --puerto) shift; puerto="${1:-}" ;;
+    --puerto=*) puerto="${1#*=}" ;;
     --version) shift; version="${1:-}" ;;
     --version=*) version="${1#*=}" ;;
-    -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,27p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Opción desconocida: $1 (usa --help)"; exit 1 ;;
   esac
   shift
@@ -44,6 +50,8 @@ done
 
 command -v docker >/dev/null || { echo "Falta Docker: instala Docker Desktop (https://docs.docker.com/get-docker/)"; exit 1; }
 docker compose version >/dev/null 2>&1 || { echo "Falta 'docker compose' (viene con Docker Desktop o el plugin compose)"; exit 1; }
+
+case "$puerto" in ""|*[!0-9]*) [ -z "$puerto" ] || { echo "El puerto debe ser un número (por ejemplo --puerto 8080)."; exit 1; } ;; esac
 
 [ -f .env ] || { cp .env.example .env; chmod 600 .env; echo "✓ .env creado desde .env.example"; }
 mkdir -p data config
@@ -126,7 +134,46 @@ fi
 if [ -n "$dominio" ]; then poner DOMAIN "$dominio"
 elif [ -z "$(leer DOMAIN)" ]; then poner DOMAIN ":80"
 fi
-echo "  • Dominio → $(leer DOMAIN)"
+# Dentro del contenedor Caddy siempre escucha en 80/443; el puerto elegido es el de tu computador.
+case "$(leer DOMAIN)" in :*) poner DOMAIN ":80"; local_=1 ;; *) local_=0 ;; esac
+
+# Nombre del proyecto de Docker: el de la carpeta. Si ya hay otro leygo con ese nombre en otra
+# carpeta, se le agrega un sufijo para que no compartan contenedores ni volúmenes.
+if [ -z "$(leer COMPOSE_PROJECT_NAME)" ]; then
+  base="$(basename "$PWD" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9_-')"; [ -n "$base" ] || base=leygo
+  nombre="$base"
+  if docker compose ls -a --filter "name=^${base}$" --format json 2>/dev/null | grep -q '"Name"' \
+     && ! docker compose ls -a --filter "name=^${base}$" --format json 2>/dev/null | grep -qF "$PWD/"; then
+    nombre="${base}-$(printf '%s' "$PWD" | cksum | cut -c1-4)"
+  fi
+  poner COMPOSE_PROJECT_NAME "$nombre"
+fi
+
+# Puerto de la interfaz. En una instalación local el 443 se publica en un puerto al azar para
+# que varios leygo convivan; con dominio propio se usan 80 y 443 (los necesita el certificado).
+p="${puerto:-$(leer LEYGO_PUERTO)}"; [ -n "$p" ] || p=80
+if [ $local_ = 1 ]; then
+  poner LEYGO_HTTPS 443
+  if [ "$p" = 80 ]; then url="http://localhost"; else url="http://localhost:$p"; fi
+else
+  poner LEYGO_HTTPS 443:443
+  [ "$p" = 80 ] || echo "  ! Con dominio propio conviene el puerto 80: Caddy lo usa para sacar el certificado."
+  url="https://$(leer DOMAIN)"
+fi
+
+# ¿El puerto está ocupado por otra cosa (otro leygo, otro servidor)?
+if [ -z "$(docker compose ps -q caddy 2>/dev/null)" ] && (exec 3<>"/dev/tcp/127.0.0.1/$p") 2>/dev/null; then
+  echo
+  echo "✗ El puerto $p ya está en uso en este computador (¿otro leygo u otro servidor?)."
+  echo "  Elige otro: ./instalar.sh --puerto 8080"
+  exit 1
+fi
+poner LEYGO_PUERTO "$p"
+poner LEYGO_URL_LOCAL "$url"
+
+echo "  • Dominio → $(leer DOMAIN)$([ $local_ = 1 ] && echo " (local)")"
+echo "  • Puerto  → $p"
+echo "  • Proyecto de Docker → $(leer COMPOSE_PROJECT_NAME)"
 
 if [ -n "$version" ]; then poner LEYGO_VERSION "${version#v}"; fi
 v="$(leer LEYGO_VERSION)"; echo "  • Versión → ${v:-la última}"
@@ -147,20 +194,13 @@ else
   docker compose up -d --remove-orphans
 fi
 
-d="$(leer DOMAIN)"
-case "$d" in
-  :80|"") url="http://localhost" ;;
-  :*) url="http://localhost${d}" ;;
-  *) url="https://$d" ;;
-esac
-
 aqui="$(pwd)"
 echo
 echo "Listo. Abre $url"
 
 # Instalación sin configurar: se espera a que leygo arranque y se muestra el código del asistente.
 codigo=""
-if ! grep -qsE '^(ADMIN_API_KEY|GUI_PASSWORD_HASH)=.+' .env data/env.gui; then
+if ! grep -qsE "^(ADMIN_API_KEY|GUI_PASSWORD_HASH)=['\"]?[^'\"[:space:]]" .env data/env.gui; then
   printf "Esperando que leygo arranque"
   for _ in $(seq 1 45); do
     codigo="$(docker compose logs agent 2>/dev/null | grep -o 'Código de configuración: *[A-Za-z0-9-]*' | tail -n1 | sed 's/.*: *//')"

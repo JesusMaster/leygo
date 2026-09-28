@@ -10,6 +10,8 @@ services:
       NODE_ENV: production
       PORT: "4000"
       DATA_DIR: /app/data
+      # Dirección con la que se abre esta instalación (la pone instalar.sh; solo se usa en mensajes).
+      LEYGO_URL_LOCAL: ${LEYGO_URL_LOCAL:-}
     volumes:
       - ./data:/app/data
       - ./config:/app/config
@@ -30,9 +32,12 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    # LEYGO_PUERTO: puerto de la interfaz en tu computador (./instalar.sh --puerto 8080).
+    # LEYGO_HTTPS: "443:443" con dominio propio; "443" (puerto al azar) en instalaciones locales,
+    # así varios leygo pueden convivir en el mismo computador.
     ports:
-      - "80:80"
-      - "443:443"
+      - "${LEYGO_PUERTO:-80}:80"
+      - "${LEYGO_HTTPS:-443:443}"
     environment:
       DOMAIN: ${DOMAIN:-:80}
     volumes:

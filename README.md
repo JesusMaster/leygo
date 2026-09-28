@@ -39,9 +39,20 @@ y el asistente te guía por tu cuenta, la personalidad del agente, el modelo, lo
 | `--redis` `--qdrant` `--ollama` | Levanta esos servicios dentro de Docker. Los que no elijas, leygo los busca en tu computador o en la nube. |
 | `--todo` / `--ninguno` | Los tres / ninguno. |
 | `--dominio X` | Dominio con TLS automático (sin esto: `http://localhost`). |
+| `--puerto 8080` | Puerto de la interfaz en tu computador (sin esto: 80). |
 | `--version 1.4.0` | Fija una versión. Sin esto, la última. |
 
 La selección queda en `.env`: correr `./instalar.sh` sin opciones repite lo mismo.
+
+### Varios leygo en el mismo computador
+
+Cada uno en su carpeta y con su puerto. `--carpeta` elige la carpeta (por defecto `leygo`):
+
+```bash
+curl -fsSL https://leygo.cl/instalar.sh | bash -s -- --carpeta leygo-pruebas --puerto 8080 --redis --qdrant
+```
+
+Cada carpeta es un proyecto de Docker aparte, con sus propios datos, su Redis y su Qdrant. Si el puerto está ocupado, el instalador te avisa.
 
 ## Actualizar
 
