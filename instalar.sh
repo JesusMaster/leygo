@@ -193,6 +193,9 @@ else
   fi
   docker compose up -d --remove-orphans
 fi
+# El Caddyfile va montado como archivo: "up -d" no reinicia Caddy si solo cambió él, y como git
+# lo reemplaza por un archivo nuevo, un "caddy reload" seguiría leyendo el viejo. Reiniciar lo vuelve a montar.
+docker compose restart caddy >/dev/null || true
 
 aqui="$(pwd)"
 echo
