@@ -129,14 +129,21 @@ fi
 echo "  • Dominio → $(leer DOMAIN)"
 
 if [ -n "$version" ]; then poner LEYGO_VERSION "${version#v}"; fi
-echo "  • Versión → $(leer LEYGO_VERSION | sed 's/^$/la última/')"
+v="$(leer LEYGO_VERSION)"; echo "  • Versión → ${v:-la última}"
 echo
 
 if [ $build = 0 ]; then docker compose up -d --remove-orphans
 elif [ -f Dockerfile ]; then docker compose up -d --build --remove-orphans
 else
   echo "Descargando leygo…"
-  docker compose pull --quiet
+  if ! docker compose pull --quiet; then
+    echo
+    echo "✗ No se pudieron descargar las imágenes de leygo."
+    echo "  Si el error dice \"unauthorized\" o \"denied\", la versión pedida (${v:-latest}) todavía no está"
+    echo "  publicada o no es pública en ghcr.io. Revisa https://leygo.cl o prueba más tarde."
+    echo "  Si dice \"toomanyrequests\", espera unos minutos y vuelve a correr ./instalar.sh."
+    exit 1
+  fi
   docker compose up -d --remove-orphans
 fi
 
