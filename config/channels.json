@@ -1,0 +1,43 @@
+{
+  "telegram": {
+    "tools": [
+      "knowledge_agent",
+      "account_agent",
+      "triage_agent",
+      "commitments_agent",
+      "agent_builder",
+      "schedule_reminder",
+      "schedule_task",
+      "list_scheduled_reminders",
+      "trigger_morning_digest",
+      "get_recent_webhooks",
+      "create_custom_webhook",
+      "list_custom_webhooks",
+      "toggle_custom_webhook",
+      "get_custom_webhook_logs",
+      "set_monthly_budget",
+      "refresh_pricing_catalog",
+      "buzz_send_message",
+      "buzz_status",
+      "get_token_usage",
+      "a2a_send_message",
+      "a2a_list_peers"
+    ]
+  },
+  "buzz": {
+    "tools": [
+      "triage_agent",
+      "buzz_send_message",
+      "buzz_status"
+    ]
+  },
+  "api": {
+    "tools": ["*"]
+  },
+  "a2a": {
+    "_doc": "'disponibles' es el TECHO del canal: qué herramientas se montan en el agente público y se publican como skills en la Agent Card. Cada token concede un subconjunto de eso, y el permiso se valida al invocar la herramienta. Los tokens se crean en la interfaz (Conexiones A2A).",
+    "defaultTools": [],
+    "tokens": [],
+    "disponibles": ["triage_agent"]
+  }
+}

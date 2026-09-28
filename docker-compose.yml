@@ -1,0 +1,75 @@
+# leygo en producción: backend + GUI detrás de Caddy (TLS automático).
+# Un solo dominio: la GUI en / y la API en /api, /run, /a2a, … (mismo origen → sin CORS).
+services:
+  # Imágenes compiladas de leygo (ghcr.io). LEYGO_VERSION en .env fija una versión.
+  agent:
+    image: ${LEYGO_REGISTRO:-ghcr.io/jesusmaster}/leygo-agent:${LEYGO_VERSION:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      DATA_DIR: /app/data
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    # Para usar Redis, Qdrant u Ollama que ya corren en tu computador (host.docker.internal).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  gui:
+    image: ${LEYGO_REGISTRO:-ghcr.io/jesusmaster}/leygo-gui:${LEYGO_VERSION:-latest}
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: { max-size: "5m", max-file: "2" }
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-:80}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [agent, gui]
+
+  # Servicios opcionales, cada uno con su perfil. Levanta solo los que no tengas:
+  #   ./instalar.sh --redis --qdrant          (o --todo)
+  #   docker compose --profile redis --profile qdrant up -d
+  # El perfil "local" levanta los tres. Sin perfil no se levanta ninguno (producción o instancias propias).
+  redis:
+    image: redis:7-alpine
+    profiles: [local, redis]
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    profiles: [local, qdrant]
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  # Modelos y embeddings locales. El asistente descarga el modelo de embeddings que elijas.
+  ollama:
+    image: ollama/ollama:latest
+    profiles: [local, ollama]
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  caddy_data:
+  caddy_config:
+  redis_data:
+  qdrant_data:
+  ollama_data:

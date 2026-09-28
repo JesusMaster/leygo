@@ -1,0 +1,95 @@
+LICENCIA DE USO GRATUITO DE LEYGO
+Versión 1.0 — septiembre de 2026
+
+Copyright (c) 2026 Jesús Leiva. Todos los derechos reservados.
+
+leygo (el "Software") es el agente personal distribuido en forma compilada: imágenes
+de contenedor, archivos de instalación y documentación que las acompaña. Al descargar,
+instalar o usar el Software aceptas esta licencia. Si no la aceptas, no lo uses.
+
+
+1. LO QUE PUEDES HACER
+
+Se te concede, sin costo, una licencia no exclusiva, intransferible y revocable según
+la sección 5 para:
+
+  a) Instalar y usar el Software en computadores y servidores que tú controlas.
+  b) Usarlo para fines personales o para el trabajo interno de tu empresa u
+     organización, incluido que otras personas de tu equipo lo usen.
+  c) Configurarlo: personalidad, modelos, canales, herramientas, variables y los
+     agentes personalizados que crees con él.
+  d) Hacer copias de respaldo de la instalación y de tus datos.
+
+
+2. LO QUE NO PUEDES HACER
+
+Salvo que tengas una autorización escrita del titular:
+
+  a) Redistribuir el Software, en todo o en parte, compilado o no: publicarlo,
+     compartir las imágenes o los archivos de instalación, subirlo a otro
+     repositorio o registro de contenedores, ni incluirlo en otro producto.
+  b) Venderlo, arrendarlo, sublicenciarlo u ofrecerlo como servicio a terceros
+     (por ejemplo, alojar instancias de leygo para clientes).
+  c) Descompilar, desofuscar o aplicar ingeniería inversa al Software, salvo en la
+     medida en que la ley aplicable lo permita expresamente pese a esta limitación.
+  d) Modificar el Software o crear obras derivadas de él, más allá de la
+     configuración descrita en la sección 1.c.
+  e) Quitar o alterar los avisos de copyright, de licencia o de terceros.
+
+Para descargar el Software, dirige a otras personas al sitio oficial (leygo.cl) en
+vez de compartir tu copia.
+
+
+3. TUS DATOS Y TUS CREACIONES
+
+  a) Tus datos (conversaciones, memoria, compromisos, archivos, configuración) son
+     tuyos y quedan en los equipos donde instalas el Software.
+  b) El código y las instrucciones de los agentes personalizados que crees con el
+     Software son tuyos.
+  c) Lo que el Software envía a servicios externos depende de lo que tú configures
+     (proveedores de modelos, de embeddings, de decisiones y otros). Esos servicios
+     se rigen por sus propios términos, y eres responsable de cumplirlos.
+
+
+4. COMPONENTES DE TERCEROS
+
+El Software incluye componentes de terceros que se distribuyen bajo sus propias
+licencias (Apache-2.0, MIT, BSD, ISC y otras). Esas licencias rigen para cada
+componente y se detallan en el archivo AVISOS_DE_TERCEROS.txt incluido en la imagen
+del contenedor (/app/AVISOS_DE_TERCEROS.txt) y, en la interfaz, en
+3rdpartylicenses.txt. Nada en esta licencia limita los derechos que esas licencias
+te otorgan sobre esos componentes.
+
+
+5. TÉRMINO
+
+Esta licencia termina automáticamente si incumples cualquiera de sus condiciones. Al
+terminar, debes dejar de usar el Software y borrar las copias. Las secciones 3, 6 y 7
+siguen vigentes después del término.
+
+
+6. SIN GARANTÍAS
+
+EL SOFTWARE SE ENTREGA "TAL CUAL", SIN GARANTÍAS DE NINGÚN TIPO, EXPRESAS O
+IMPLÍCITAS, INCLUIDAS LAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO Y NO
+INFRACCIÓN. Un agente de IA puede equivocarse: revisa lo que hace en tu nombre,
+especialmente lo que envía, publica o decide.
+
+
+7. LIMITACIÓN DE RESPONSABILIDAD
+
+EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, EL TITULAR NO SERÁ RESPONSABLE POR DAÑOS
+DIRECTOS, INDIRECTOS, INCIDENTALES, ESPECIALES O CONSECUENTES, PÉRDIDA DE DATOS,
+LUCRO CESANTE NI COSTOS DE SERVICIOS DE TERCEROS (COMO EL CONSUMO DE MODELOS)
+DERIVADOS DEL USO O LA IMPOSIBILIDAD DE USAR EL SOFTWARE.
+
+
+8. VARIOS
+
+  a) El titular puede publicar nuevas versiones de esta licencia. Cada versión del
+     Software se rige por la licencia que la acompaña.
+  b) Si una cláusula resulta inválida, el resto sigue vigente.
+  c) Esta licencia se rige por las leyes de la República de Chile.
+
+Para permisos distintos de los aquí descritos (redistribución, uso comercial como
+servicio, integraciones), escribe al titular a través de leygo.cl.
