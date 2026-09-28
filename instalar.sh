@@ -203,7 +203,8 @@ codigo=""
 if ! grep -qsE "^(ADMIN_API_KEY|GUI_PASSWORD_HASH)=['\"]?[^'\"[:space:]]" .env data/env.gui; then
   printf "Esperando que leygo arranque"
   for _ in $(seq 1 45); do
-    codigo="$(docker compose logs agent 2>/dev/null | grep -o 'Código de configuración: *[A-Za-z0-9-]*' | tail -n1 | sed 's/.*: *//')"
+    # "|| true": mientras el código no aparece, grep no encuentra nada y con pipefail cortaría el script.
+    codigo="$(docker compose logs agent 2>/dev/null | grep -o 'Código de configuración: *[A-Za-z0-9-]*' | tail -n1 | sed 's/.*: *//' || true)"
     [ -n "$codigo" ] && break
     printf "."; sleep 2
   done
