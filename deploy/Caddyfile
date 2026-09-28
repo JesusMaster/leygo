@@ -2,8 +2,8 @@
 {$DOMAIN} {
 	encode zstd gzip
 
-	# Backend: todo lo que no es la GUI.
-	@api path /api/* /run /run_sse /apps/* /a2a/* /.well-known/* /webhook /webhook/* /webhooks/* /graphql
+	# Backend: todo lo que no es la GUI (/empresa/* es la red de la cuenta empresa).
+	@api path /api/* /run /run_sse /apps/* /a2a/* /.well-known/* /webhook /webhook/* /webhooks/* /graphql /empresa/*
 	handle @api {
 		reverse_proxy agent:4000 {
 			# SSE (/run_sse) y generación de imágenes tardan: no cortar a los 30 s por defecto.
