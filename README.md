@@ -27,7 +27,7 @@ curl -fsSL https://leygo.cl/instalar.sh | bash -s -- --dominio agente.tudominio.
 Después abre la dirección que muestra el instalador. La primera vez te pide un código de un solo uso:
 
 ```bash
-cd leygo && docker compose logs agent | grep -A4 'configuración'
+cd leygo && docker compose logs agent | grep -A4 'configuración'   # si no lo mostró el instalador
 ```
 
 y el asistente te guía por tu cuenta, la personalidad del agente, el modelo, los embeddings, Redis y Qdrant, Google y Telegram.

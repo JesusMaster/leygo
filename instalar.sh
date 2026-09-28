@@ -154,9 +154,27 @@ case "$d" in
   *) url="https://$d" ;;
 esac
 
+aqui="$(pwd)"
 echo
 echo "Listo. Abre $url"
-echo "La primera vez te pide un código de un solo uso. Lo ves con:"
-echo "  docker compose logs agent | grep -A4 'configuración'"
+
+# Instalación sin configurar: se espera a que leygo arranque y se muestra el código del asistente.
+codigo=""
+if ! grep -qsE '^(ADMIN_API_KEY|GUI_PASSWORD_HASH)=.+' .env data/env.gui; then
+  printf "Esperando que leygo arranque"
+  for _ in $(seq 1 45); do
+    codigo="$(docker compose logs agent 2>/dev/null | grep -o 'Código de configuración: *[A-Za-z0-9-]*' | tail -n1 | sed 's/.*: *//')"
+    [ -n "$codigo" ] && break
+    printf "."; sleep 2
+  done
+  echo
+fi
+if [ -n "$codigo" ]; then
+  echo "Código de configuración: $codigo"
+else
+  echo "La primera vez te pide un código de un solo uso. Lo ves con:"
+  echo "  cd \"$aqui\" && docker compose logs agent | grep -A4 'configuración'"
+fi
 echo
-echo "Puedes cambiar Redis, Qdrant y los embeddings después en el asistente (Ajustes)."
+echo "Los comandos de docker compose se corren dentro de $aqui"
+echo "Para actualizar: cd \"$aqui\" && ./instalar.sh"
