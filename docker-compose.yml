@@ -73,6 +73,9 @@ services:
     image: redis:7-alpine
     profiles: [local, redis]
     restart: unless-stopped
+    # Si no puede guardar su copia en disco (p. ej. disco lleno), sigue funcionando en vez de bloquear
+    # todas las escrituras (error MISCONF): leygo no se detiene y la copia se reintenta sola.
+    command: ["redis-server", "--stop-writes-on-bgsave-error", "no"]
     volumes:
       - redis_data:/data
 
