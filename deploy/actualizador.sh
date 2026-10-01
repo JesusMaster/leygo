@@ -54,8 +54,25 @@ if [ "$modo" = codigo ]; then
 fi
 
 # Servidor con el código: igual que deploy.sh (git pull, build y reinicio de agent y gui).
+# Si sobre el código se corrió el instalador de leygo.cl, docker-compose.yml, instalar.sh y otros
+# quedaron con la versión descargada (sin build:) y git pull no puede avanzar: se vuelve a los del código.
+restaurar_descargados() {
+  [ -f Dockerfile ] || return 0
+  git diff --quiet -- docker-compose.yml 2>/dev/null && return 0
+  grep -qE '^[[:space:]]+build:' docker-compose.yml && return 0
+  local f l=""
+  for f in docker-compose.yml instalar.sh instalar.ps1 deploy/actualizador.sh deploy/Caddyfile .env.example README.md LICENCIA.txt; do
+    git ls-files --error-unmatch "$f" >/dev/null 2>&1 && ! git diff --quiet -- "$f" && l="$l $f"
+  done
+  [ -n "$l" ] || return 0
+  echo "Estos archivos eran los de la instalación descargada (leygo.cl/instalar.sh), no los del código:$l"
+  echo "Vuelvo a los del código (tu .env, config/ y data/ no se tocan)."
+  # shellcheck disable=SC2086
+  git checkout -- $l
+}
 actualizar_codigo() { # id version
   estado "$1" descargando "$2"
+  restaurar_descargados >> "$LOG" 2>&1
   if ! git pull --ff-only > "$LOG" 2>&1; then estado "$1" error "$2" "git pull falló: $(tail -n 3 "$LOG")"; return; fi
   git fetch --tags -q >> "$LOG" 2>&1 || true
   VERSION_APP="$(git describe --tags --always 2>/dev/null || echo dev)"; export VERSION_APP
