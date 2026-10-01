@@ -15,6 +15,7 @@
 #   --puerto N     puerto de la interfaz en tu computador (por defecto 80: http://localhost:N)
 #   --version X    versión de leygo a instalar (por defecto la última; queda en .env)
 #   --sin-build    no reconstruye ni descarga las imágenes
+#   --sin-actualizador  sin el botón "Actualizar" de la interfaz (el servicio que tiene acceso a Docker)
 #
 # Con el código fuente (hay Dockerfile) arma las imágenes; en la instalación descargada de
 # leygo.cl baja las ya compiladas (docker compose pull). Correrlo de nuevo actualiza.
@@ -27,7 +28,31 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-redis=0; qdrant=0; ollama=0; dominio=""; build=1; eligio=0; version=""; puerto=""
+# Instalación descargada (sin Dockerfile): antes de nada trae la última versión de los archivos de
+# instalación (docker-compose.yml, Caddyfile, actualizador y este mismo script). Así `./instalar.sh`
+# también recibe servicios nuevos, como el actualizador del botón "Actualizar". Tus datos, tu .env y
+# tu config/ no se tocan. LEYGO_SIN_DESCARGA=1 lo salta (lo usa el instalador de leygo.cl, que ya bajó todo).
+FUENTE="${LEYGO_FUENTE:-https://raw.githubusercontent.com/JesusMaster/leygo/main}"
+if [ ! -f Dockerfile ] && [ -z "${LEYGO_SIN_DESCARGA:-}" ] && command -v curl >/dev/null 2>&1; then
+  echo "Revisando los archivos de instalación…"
+  mkdir -p deploy
+  faltaron=""
+  for f in docker-compose.yml deploy/Caddyfile deploy/actualizador.sh .env.example LICENCIA.txt README.md; do
+    if curl -fsSL "$FUENTE/$f" -o "$f.tmp" 2>/dev/null; then mv "$f.tmp" "$f"; else rm -f "$f.tmp"; faltaron="$faltaron $f"; fi
+  done
+  chmod +x deploy/actualizador.sh 2>/dev/null || true
+  [ -z "$faltaron" ] || echo "  ! No se pudieron bajar:$faltaron (sigo con los que tienes)."
+  if curl -fsSL "$FUENTE/instalar.sh" -o instalar.sh.nuevo 2>/dev/null && [ -s instalar.sh.nuevo ]; then
+    if ! cmp -s instalar.sh.nuevo instalar.sh; then
+      mv instalar.sh.nuevo instalar.sh; chmod +x instalar.sh
+      echo "  • instalar.sh actualizado: sigo con la versión nueva."
+      LEYGO_SIN_DESCARGA=1 exec ./instalar.sh "$@"
+    fi
+  fi
+  rm -f instalar.sh.nuevo
+fi
+
+redis=0; qdrant=0; ollama=0; dominio=""; build=1; eligio=0; version=""; puerto=""; actualizador=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --redis) redis=1; eligio=1 ;;
@@ -38,6 +63,8 @@ while [ $# -gt 0 ]; do
     --dominio) shift; dominio="${1:-}" ;;
     --dominio=*) dominio="${1#*=}" ;;
     --sin-build) build=0 ;;
+    --sin-actualizador) actualizador=0 ;;
+    --con-actualizador) actualizador=1 ;;
     --puerto) shift; puerto="${1:-}" ;;
     --puerto=*) puerto="${1#*=}" ;;
     --version) shift; version="${1:-}" ;;
@@ -122,6 +149,22 @@ else
   if es_docker "$u" ollama; then u="http://host.docker.internal:11434"; poner OLLAMA_BASE_URL "$u"; fi
   if es_local "$u"; then u="$(local_a_host "$u")"; poner OLLAMA_BASE_URL "$u"; fi
   echo "  • Ollama  → el tuyo o un proveedor de pago para embeddings ($u)"
+fi
+
+# Botón "Actualizar" de la interfaz: el servicio actualizador, solo en la instalación descargada (con el
+# código fuente se actualiza con deploy.sh). La elección queda en .env (LEYGO_ACTUALIZADOR).
+[ -n "$actualizador" ] && poner LEYGO_ACTUALIZADOR "$actualizador"
+case "$(uname -s 2>/dev/null)" in MINGW*|MSYS*|CYGWIN*) windows=1 ;; *) windows=0 ;; esac
+if [ -f Dockerfile ]; then
+  :
+elif [ "$(leer LEYGO_ACTUALIZADOR)" = 0 ]; then
+  echo "  • Actualizador → apagado (actualiza con ./instalar.sh; para el botón: ./instalar.sh --con-actualizador)"
+elif [ $windows = 1 ]; then
+  echo "  • Actualizador → no disponible en Windows fuera de WSL (actualiza con ./instalar.sh)"
+elif [ -f deploy/actualizador.sh ]; then
+  agregar actualizador
+  poner LEYGO_DIR "$PWD"
+  echo "  • Actualizador → botón \"Actualizar\" en la interfaz (--sin-actualizador para no usarlo)"
 fi
 
 poner COMPOSE_PROFILES "$perfiles"

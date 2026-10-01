@@ -46,6 +46,25 @@ services:
       - caddy_config:/config
     depends_on: [agent, gui]
 
+  # Botón "Actualizar" de la interfaz (perfil "actualizador", lo activa instalar.sh en la instalación
+  # descargada). Es el ÚNICO servicio con acceso a Docker: el agente deja el pedido en
+  # data/actualizacion y este baja las imágenes nuevas de agent y gui y los reinicia (deploy/actualizador.sh).
+  # La carpeta va montada en la misma ruta que en tu computador (LEYGO_DIR) para que docker compose
+  # encuentre ./data, ./config y el .env. Sin él, se actualiza con ./instalar.sh.
+  actualizador:
+    image: docker:27-cli
+    profiles: [actualizador]
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "${LEYGO_DIR:-/leygo}/deploy/actualizador.sh"]
+    environment:
+      LEYGO_DIR: ${LEYGO_DIR:-/leygo}
+    volumes:
+      - ${LEYGO_DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
+      - ${LEYGO_DIR:-.}:${LEYGO_DIR:-/leygo}
+    logging:
+      driver: json-file
+      options: { max-size: "2m", max-file: "2" }
+
   # Servicios opcionales, cada uno con su perfil. Levanta solo los que no tengas:
   #   ./instalar.sh --redis --qdrant          (o --todo)
   #   docker compose --profile redis --profile qdrant up -d
